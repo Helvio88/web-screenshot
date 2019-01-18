@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Screenshots Pages to PNG",
   "main": "screenshot.js",
+  "bin": {
+    "web-screenshot": "screenshot.js"
+  },
+  "preferGlobal": true,
   "author": "Helvio Pedreschi",
   "license": "ISC",
   "dependencies": {
@@ -12,6 +16,5 @@
   },
   "devDependencies": {
     "pkg": "^4.3.7"
-  },
-  "bin": "screenshot.js"
+  }
 }

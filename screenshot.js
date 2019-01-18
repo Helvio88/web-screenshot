@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const Jimp = require('jimp');
 const puppeteer = require('puppeteer');
 const program = require('commander');
