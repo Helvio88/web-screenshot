@@ -4,7 +4,7 @@
   "description": "Screenshots Pages to PNG",
   "main": "screenshot.js",
   "scripts": {
-    "build": "npm install && rm -Rf ./build && mkdir build && cp -R ./node_modules/puppeteer ./build/lib && pkg package.json --out-path ./build -t latest-win-x64"
+    "build": "npm install && rm -Rf ./build && mkdir build && cp -R ./node_modules/puppeteer ./build/lib && pkg package.json --out-path ./build -t host"
   },
   "author": "Helvio Pedreschi",
   "license": "ISC",
