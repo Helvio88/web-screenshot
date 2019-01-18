@@ -1,10 +1,5 @@
-const path = require('path');
 const Jimp = require('jimp');
-if (process.pkg) {
-  var puppeteer = require(path.resolve(process.cwd(), 'lib'));
-} else {
-  var puppeteer = require('puppeteer');
-}
+const puppeteer = require('puppeteer');
 const program = require('commander');
 
 help = () => {
@@ -23,10 +18,6 @@ program
   .parse(process.argv)
 
 const wait = {waitUntil: 'networkidle0'};
-const vPort = {
-    width: 1720,
-    height: 1080
-};
 
 if(!program.url) {
   program.help();
@@ -63,7 +54,6 @@ if (screenshot.clip.width === 0 || screenshot.clip.height === 0) {
   (async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    //await page.setViewport(vPort);
     await page.goto(program.url, wait);
     await page.screenshot(screenshot);
     await browser.close();
