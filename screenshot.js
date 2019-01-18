@@ -36,14 +36,13 @@ if(!program.out) {
   program.out = `${sections[sections.length - count]}.png`;
 }
 
-const screenshot = {
-  path: program.out,
-  clip: {
-    x: Number(program.x),
-    y: Number(program.y),
-    width: Number(program.width),
-    height: Number(program.height)
-  }
+program.tmp = program.out + '.tmp';
+
+const clip = {
+  x: Number(program.x),
+  y: Number(program.y),
+  width: Number(program.width),
+  height: Number(program.height)
 }
 
 const vPort = {
@@ -52,9 +51,9 @@ const vPort = {
 }
 
 // If Width or Height are 0, capture whole page
-if (screenshot.clip.width === 0 || screenshot.clip.height === 0) {
-  delete screenshot.clip;
-  screenshot.fullPage = true;
+let fullPage = false;
+if (clip.width === 0 || clip.height === 0) {
+  fullPage = true;
 }
 
   (async () => {
@@ -62,7 +61,11 @@ if (screenshot.clip.width === 0 || screenshot.clip.height === 0) {
     const page = await browser.newPage();
     await page.setViewport(vPort);
     await page.goto(program.url, wait);
-    await page.screenshot(screenshot);
+    await page.screenshot({
+      fullPage: fullPage,
+      clip: fullPage ? {} : clip,
+      path: program.tmp
+    });
     await browser.close();
-    await Jimp.read(screenshot.path).then(img => img.autocrop().write(screenshot.path));
+    await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
   })();
