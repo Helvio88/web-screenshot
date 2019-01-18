@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const fs = require('fs');
 const Jimp = require('jimp');
 const puppeteer = require('puppeteer');
 const program = require('commander');
@@ -36,7 +37,7 @@ if(!program.out) {
   program.out = `${sections[sections.length - count]}.png`;
 }
 
-program.tmp = program.out + '.tmp';
+program.tmp = 'tmp_' + program.out;
 
 const clip = {
   x: Number(program.x),
@@ -56,16 +57,23 @@ if (clip.width === 0 || clip.height === 0) {
   fullPage = true;
 }
 
+const screenshot = {
+  fullPage: fullPage,
+  clip: clip,
+  path: program.tmp
+}
+
+if(screenshot.fullPage) {
+  delete screenshot.clip;
+}
+
   (async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setViewport(vPort);
     await page.goto(program.url, wait);
-    await page.screenshot({
-      fullPage: fullPage,
-      clip: fullPage ? {} : clip,
-      path: program.tmp
-    });
+    await page.screenshot(screenshot);
     await browser.close();
     await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
+    await fs.unlinkSync(program.tmp);
   })();
