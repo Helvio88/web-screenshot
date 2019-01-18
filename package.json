@@ -1,0 +1,20 @@
+{
+  "name": "web-screenshot",
+  "version": "1.0.0",
+  "description": "Screenshots Pages to PNG",
+  "main": "screenshot.js",
+  "scripts": {
+    "build": "npm install && rm -Rf ./build && mkdir build && cp -R ./node_modules/puppeteer ./build/lib && pkg package.json --out-path ./build -t latest-win-x64"
+  },
+  "author": "Helvio Pedreschi",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "jimp": "^0.6.0",
+    "puppeteer": "^1.11.0"
+  },
+  "devDependencies": {
+    "pkg": "^4.3.7"
+  },
+  "bin": "screenshot.js"
+}
