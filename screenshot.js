@@ -46,6 +46,11 @@ const screenshot = {
   }
 }
 
+const vPort = {
+  width: 1720,
+  height: 1080
+}
+
 // If Width or Height are 0, capture whole page
 if (screenshot.clip.width === 0 || screenshot.clip.height === 0) {
   delete screenshot.clip;
@@ -55,6 +60,7 @@ if (screenshot.clip.width === 0 || screenshot.clip.height === 0) {
   (async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
+    await page.setViewport(vPort);
     await page.goto(program.url, wait);
     await page.screenshot(screenshot);
     await browser.close();
