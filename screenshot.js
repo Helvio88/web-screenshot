@@ -3,6 +3,7 @@ const fs = require('fs');
 const Jimp = require('jimp');
 const puppeteer = require('puppeteer');
 const program = require('commander');
+const package = require('./package.json');
 
 help = () => {
   program.outputHelp();
@@ -11,6 +12,7 @@ help = () => {
 }
 
 program
+  .version(package.version)
   .option('-u, --url <url>', 'URL (website) to screenshot')
   .option('-x, --x [x]', 'Leftmost Pixel', 0)
   .option('-y, --y [y]', 'Top Pixel', 0)

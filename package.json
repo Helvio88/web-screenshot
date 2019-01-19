@@ -1,20 +1,20 @@
 {
   "name": "@helvio/web-screenshot",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Screenshots Pages to PNG",
+  "keywords": ["screenshot", "webpage", "png", "image"],
   "main": "screenshot.js",
   "bin": {
     "web-screenshot": "screenshot.js"
   },
+  "license": "ISC",
   "preferGlobal": true,
   "author": "Helvio Pedreschi",
-  "license": "ISC",
+  "bugs": "https://github.com/Helvio88/web-screenshot/issues",
+  "homepage": "https://github.com/Helvio88/web-screenshot",
   "dependencies": {
     "commander": "^2.19.0",
     "jimp": "^0.6.0",
     "puppeteer": "^1.11.0"
-  },
-  "devDependencies": {
-    "pkg": "^4.3.7"
   }
 }
