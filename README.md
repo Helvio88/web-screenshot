@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Helvio88/web-screenshot.svg?branch=master)](https://travis-ci.org/Helvio88/web-screenshot#)
+[![Build Status][1]][2]
 
 web-screenshot
 ==============
@@ -10,7 +10,7 @@ Installation
 ```node
 npm install -g @helvio/web-screenshot --unsafe-perm
 ```
---unsafe-perm is necessary to install [puppeteer][1] on your computer.
+--unsafe-perm is necessary to install [puppeteer][3] on your computer.
 
 Usage
 -----
@@ -34,7 +34,7 @@ Tips
 * The program will append `http://` to your URL and save the output file as `github.com.png`.
 * If `width` or `height` are `0`, a Full Page screenshot is taken.
 * The base viewport is `1720x1080`.
-* After the ScreenShot is taken, the borders are cropped using [Jimp][2].
+* After the ScreenShot is taken, the borders are cropped using [Jimp][4].
 * You can screenshot just a rectangle (or clip) of a webpage by providing `x`, `y`, `w` and `h`, such as
 ```bash
 web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
@@ -45,10 +45,12 @@ The command outputs the image:
 
 google_logo.png
 
-![google_logo.png][3]
+![google_logo.png][5]
 
 Happy Screenshotting!
 
-[1]: https://github.com/GoogleChrome/puppeteer
-[2]: https://github.com/oliver-moran/jimp
-[3]: https://i.imgur.com/AmoKkrg.png
+[1]: https://travis-ci.org/Helvio88/web-screenshot.svg?branch=master "Build Status"
+[2]: https://travis-ci.org/Helvio88/web-screenshot#
+[3]: https://github.com/GoogleChrome/puppeteer
+[4]: https://github.com/oliver-moran/jimp
+[5]: https://i.imgur.com/AmoKkrg.png "google_logo.png"
