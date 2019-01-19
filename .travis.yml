@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - "11.6"
+
+branches:
+  only:
+    - master
+
+before_script:
+  - npm install
+
+script:
+  - web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
+
+notifications:
+  email:
+    on_failure: change
+    on_success: change
