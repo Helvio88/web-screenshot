@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Helvio88/web-screenshot.svg?branch=master)](https://travis-ci.org/Helvio88/web-screenshot#)
 web-screenshot
 ==============
 A tool to take screenshots of websites headlessly.
