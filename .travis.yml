@@ -10,7 +10,7 @@ before_script:
   - npm install
 
 script:
-  - web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
+  - node screenshot.js -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
 
 notifications:
   email:
