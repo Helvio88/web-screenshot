@@ -19,6 +19,7 @@ program
   .option('-w, --width [width]', 'Width', 0)
   .option('-h, --height [height]', 'Height', 0)
   .option('-o, --out [out]', 'Absolute or Relative Path to save the screenshot')
+  .option('-c, --crop', 'Auto crop same-color borders')
   .parse(process.argv)
 
 const wait = {waitUntil: 'networkidle0'};
@@ -76,6 +77,11 @@ if(screenshot.fullPage) {
     await page.goto(program.url, wait);
     await page.screenshot(screenshot);
     await browser.close();
-    await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
-    await fs.unlinkSync(program.tmp);
+    if(program.crop) {
+      await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
+      await fs.unlinkSync(program.tmp);
+      console.log('cropping');
+    } else {
+      await fs.renameSync(program.tmp, program.out);
+    }
   })();
