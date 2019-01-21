@@ -1,6 +1,6 @@
 {
   "name": "@helvio/web-screenshot",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Screenshots Pages to PNG",
   "keywords": ["screenshot", "webpage", "png", "image"],
   "main": "screenshot.js",

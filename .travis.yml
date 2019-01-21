@@ -9,6 +9,11 @@ branches:
 before_script:
   - npm install
 
+deploy:
+  provider: npm
+  email: $NPM_EMAIL
+  api_key: $API_KEY
+
 script:
   - node screenshot.js -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
 
