@@ -1,6 +1,6 @@
 {
   "name": "@helvio/web-screenshot",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Screenshots Pages to PNG",
   "keywords": ["screenshot", "webpage", "png", "image"],
   "main": "screenshot.js",
@@ -12,6 +12,9 @@
   "author": "Helvio Pedreschi",
   "bugs": "https://github.com/Helvio88/web-screenshot/issues",
   "homepage": "https://github.com/Helvio88/web-screenshot",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "commander": "^2.19.0",
     "jimp": "^0.6.0",
