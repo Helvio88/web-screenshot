@@ -35,10 +35,10 @@ Tips
 * The program will append `http://` to your URL and save the output file as `github.com.png`.
 * If `width` or `height` are `0`, a Full Page screenshot is taken.
 * The base viewport is `1720x1080`.
-* After the ScreenShot is taken, the borders are cropped using [Jimp][4].
+* After the ScreenShot is taken, the borders can be cropped using `--crop`. Powered by [Jimp][4].
 * You can screenshot just a rectangle (or clip) of a webpage by providing `x`, `y`, `w` and `h`, such as
 ```bash
-web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png
+web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png --crop
 ```
 Coordinates are approximate and you can either use a tool to measure the pixels or trial and error.
 
