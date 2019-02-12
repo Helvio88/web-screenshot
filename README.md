@@ -34,7 +34,7 @@ Tips
 * You can call web-screenshot with the URL only, such as `web-screenshot -u github.com`.
 * The program will append `http://` to your URL and save the output file as `github.com.png`.
 * If `width` or `height` are `0`, a Full Page screenshot is taken.
-* The base viewport is `1720x1080`.
+* The base viewport is `1920x1080`.
 * After the ScreenShot is taken, the borders can be cropped using `--crop`. Powered by [Jimp][4].
 * You can screenshot just a rectangle (or clip) of a webpage by providing `x`, `y`, `w` and `h`, such as
 ```bash
