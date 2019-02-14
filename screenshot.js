@@ -80,7 +80,6 @@ if(screenshot.fullPage) {
     if(program.crop) {
       await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
       await fs.unlinkSync(program.tmp);
-      console.log('cropping');
     } else {
       await fs.renameSync(program.tmp, program.out);
     }
