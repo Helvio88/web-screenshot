@@ -40,7 +40,7 @@ if(!program.out) {
   program.out = `${sections[sections.length - count]}.png`;
 }
 
-program.tmp = 'tmp_' + program.out;
+program.tmp = program.out + '_tmp.png';
 
 const clip = {
   x: Number(program.x),
