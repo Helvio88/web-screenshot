@@ -22,6 +22,12 @@ program
   .option('-c, --crop', 'Auto crop same-color borders')
   .parse(process.argv)
 
+// Find Chrome from env var CHROME_PATH
+let chrome = process.env.CHROME_PATH;
+if(chrome && !fs.existsSync(chrome)) {
+  chrome = undefined;
+}
+
 const wait = {waitUntil: 'networkidle0'};
 
 if(!program.url) {
@@ -71,7 +77,7 @@ if(screenshot.fullPage) {
 }
 
   (async () => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({executablePath: chrome});
     const page = await browser.newPage();
     await page.setViewport(vPort);
     await page.goto(program.url, wait);
