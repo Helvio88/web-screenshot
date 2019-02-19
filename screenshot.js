@@ -77,16 +77,21 @@ if(screenshot.fullPage) {
 }
 
   (async () => {
-    const browser = await puppeteer.launch({executablePath: chrome});
-    const page = await browser.newPage();
-    await page.setViewport(vPort);
-    await page.goto(program.url, wait);
-    await page.screenshot(screenshot);
-    await browser.close();
-    if(program.crop) {
-      await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
-      await fs.unlinkSync(program.tmp);
-    } else {
-      await fs.renameSync(program.tmp, program.out);
+    try {
+      const browser = await puppeteer.launch({executablePath: chrome});
+      const page = await browser.newPage();
+      await page.setViewport(vPort);
+      await page.goto(program.url, wait);
+      await page.screenshot(screenshot);
+      await browser.close();
+      if(program.crop) {
+        await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
+        await fs.unlinkSync(program.tmp);
+      } else {
+        await fs.renameSync(program.tmp, program.out);
+      }
+    } catch {
+      console.log('Screenshot Failed');
+      process.exit(1);
     }
   })();
