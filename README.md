@@ -26,7 +26,9 @@ Options:
   -h, --height [height]  Height (default: 0)
   -o, --out [out]        Absolute or Relative Path to save the screenshot
   -c, --crop             Auto crop same-color borders
-  -h, --help             output usage information
+  -h, --help             Output usage information
+  -d, --debug            Set debug flag
+  -a, --auth             NTLM Credentials in username:password format
 ```
 
 Tips

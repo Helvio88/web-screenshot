@@ -20,6 +20,8 @@ program
   .option('-h, --height [height]', 'Height', 0)
   .option('-o, --out [out]', 'Absolute or Relative Path to save the screenshot')
   .option('-c, --crop', 'Auto crop same-color borders')
+  .option('-d, --debug', 'Prints debug messages')
+  .option('-a, --auth [auth]', 'NTLM Credentials in username:password format')
   .parse(process.argv)
 
 // Find Chrome from env var CHROME_PATH
@@ -44,6 +46,13 @@ if(!program.out) {
   const sections = program.url.split('/');
   const count = program.url.endsWith('/') ? 2 : 1
   program.out = `${sections[sections.length - count]}.png`;
+}
+
+if(program.auth) {
+  program.auth = {
+    username: program.auth.split(':')[0],
+    password: program.auth.split(':')[1]
+  }
 }
 
 program.tmp = program.out + '_tmp.png';
@@ -76,19 +85,44 @@ if(screenshot.fullPage) {
   delete screenshot.clip;
 }
 
+debug = (message) => {
+  if(program.debug) {
+    console.log(message);
+  }
+}
+
   (async () => {
     try {
       const browser = await puppeteer.launch({executablePath: chrome});
+      await debug('Browser Opened');
+
       const page = await browser.newPage();
+      await debug('Page Created');
+
       await page.setViewport(vPort);
+      await debug('Viewport Set');
+
+      if(program.auth) {
+        await page.authenticate(program.auth);
+        await debug('Credentials Entered');
+      }
+
       await page.goto(program.url, wait);
+      await debug('Page Loaded');
+
       await page.screenshot(screenshot);
+      await debug('Screenshot Taken');
+
       await browser.close();
+      await debug('Browser Closed');
+
       if(program.crop) {
         await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
         await fs.unlinkSync(program.tmp);
+        await debug('Image Cropped');
       } else {
         await fs.renameSync(program.tmp, program.out);
+        await debug('Image Saved');
       }
     } catch {
       console.log('Screenshot Failed');
