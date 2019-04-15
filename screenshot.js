@@ -85,6 +85,11 @@ if(screenshot.fullPage) {
   delete screenshot.clip;
 }
 
+let launch = {executablePath: chrome};
+if(program.debug) {
+  launch.headless = false;
+}
+
 debug = (message) => {
   if(program.debug) {
     console.log(message);
@@ -93,7 +98,7 @@ debug = (message) => {
 
   (async () => {
     try {
-      const browser = await puppeteer.launch({executablePath: chrome});
+      const browser = await puppeteer.launch(launch);
       await debug('Browser Opened');
 
       const page = await browser.newPage();
