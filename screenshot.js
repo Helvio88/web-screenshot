@@ -122,7 +122,7 @@ debug = (message) => {
       await debug('Browser Closed');
 
       if(program.crop) {
-        await Jimp.read(program.tmp).then(img => img.autocrop().write(program.out));
+        await Jimp.read(program.tmp).then(img => img.autocrop(false).write(program.out));
         await fs.unlinkSync(program.tmp);
         await debug('Image Cropped');
       } else {
