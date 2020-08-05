@@ -21,8 +21,8 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^2.19.0",
-    "jimp": "^0.6.0",
-    "puppeteer": "^1.12.2"
+    "commander": "^6.0.0",
+    "jimp": "^0.14.0",
+    "puppeteer": "^5.2.1"
   }
 }
