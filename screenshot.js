@@ -14,6 +14,7 @@ help = () => {
 program
   .version(package.version)
   .option('-u, --url <url>', 'URL (website) to screenshot')
+  .option('-t, --time [millis]', 'Time to wait for the website to load', 10000)
   .option('-x, --x [x]', 'Leftmost Pixel', 0)
   .option('-y, --y [y]', 'Top Pixel', 0)
   .option('-w, --width [width]', 'Width', 0)
@@ -29,8 +30,6 @@ let chrome = process.env.CHROME_PATH;
 if(chrome && !fs.existsSync(chrome)) {
   chrome = undefined;
 }
-
-const wait = {waitUntil: 'networkidle0'};
 
 if(!program.url) {
   program.help();
@@ -112,7 +111,8 @@ debug = (message) => {
         await debug('Credentials Entered');
       }
 
-      await page.goto(program.url, wait);
+      await page.goto(program.url);
+      await page.waitFor(program.time);
       await debug('Page Loaded');
 
       await page.screenshot(screenshot);
@@ -129,8 +129,9 @@ debug = (message) => {
         await fs.renameSync(program.tmp, program.out);
         await debug('Image Saved');
       }
-    } catch {
+    } catch (e) { 
       console.log('Screenshot Failed');
+      console.error(e);
       process.exit(1);
     }
   })();
