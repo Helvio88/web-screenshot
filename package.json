@@ -8,9 +8,9 @@
     "png",
     "image"
   ],
-  "main": "screenshot.js",
+  "main": "ts-node screenshot.ts",
   "bin": {
-    "web-screenshot": "screenshot.js"
+    "web-screenshot": "ts-node screenshot.ts"
   },
   "license": "ISC",
   "preferGlobal": true,
@@ -21,8 +21,24 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^6.0.0",
-    "jimp": "^0.14.0",
-    "puppeteer": "^5.2.1"
+    "commander": "^9.4.0",
+    "jimp": "^0.16.2",
+    "puppeteer": "^18.0.5"
+  },
+  "devDependencies": {
+    "@types/jsforce": "latest",
+    "@types/lodash": "^4.14.185",
+    "@types/mssql": "^8.1.1",
+    "@types/node": "^18.7.18",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.23.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "plugin-import": "^1.0.52",
+    "prettier": "^2.7.1",
+    "prettier-plugin-apex": "^1.10.0"
   }
 }
