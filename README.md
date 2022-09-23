@@ -19,16 +19,18 @@ $ web-screenshot --help
 Usage: screenshot [options]
 
 Options:
+  -V, --version          output the version number
   -u, --url <url>        URL (website) to screenshot
+  -t, --time [s]         Number of seconds to wait for page to load (default: 3)
   -x, --x [x]            Leftmost Pixel (default: 0)
   -y, --y [y]            Top Pixel (default: 0)
-  -w, --width [width]    Width (default: 0)
-  -h, --height [height]  Height (default: 0)
+  -w, --width [width]    Width (default: 1920)
+  -h, --height [height]  Height (default: 1080)
   -o, --out [out]        Absolute or Relative Path to save the screenshot
   -c, --crop             Auto crop same-color borders
-  -h, --help             Output usage information
-  -d, --debug            Set debug flag
-  -a, --auth             NTLM Credentials in username:password format
+  -d, --debug            Prints debug messages
+  -a, --auth [auth]      NTLM Credentials in username:password format
+  --help                 display help for command
 ```
 
 Tips
