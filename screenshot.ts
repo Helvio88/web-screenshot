@@ -17,6 +17,7 @@ const help = () => {
 program
   .version(pkg.version)
   .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot').makeOptionMandatory(true))
+  .addOption(new Option('-t, --time [s]', 'Number of seconds to wait for page to load').default(3))
   .addOption(new Option('-x, --x [x]', 'Leftmost Pixel').default(0))
   .addOption(new Option('-y, --y [y]', 'Top Pixel').default(0))
   .addOption(new Option('-w, --width [width]', 'Width').default(1920))
@@ -56,16 +57,18 @@ if (auth && auth.indexOf(':') !== -1) {
 
 const tmp = out + '_tmp.png'
 
+const time = Number(program.getOptionValue('time')) * 1000 || 3000
+
 const x = program.getOptionValue('x')
 const y = program.getOptionValue('y')
-const width = program.getOptionValue('width')
-const height = program.getOptionValue('height')
+const w = program.getOptionValue('width')
+const h = program.getOptionValue('height')
 
 const clip = {
   x: Number(x),
   y: Number(y),
-  width: Number(width),
-  height: Number(height)
+  width: Number(w),
+  height: Number(h)
 }
 
 const vPort: Viewport = {
@@ -108,10 +111,14 @@ const debug = (message) => {
       }
 
       await page.goto(url)
+      await sleep(time)
       debug('Page Loaded')
 
       await page.screenshot(screenshot)
       debug('Screenshot Taken')
+
+      await page.close()
+      debug('Page Closed')
 
       await browser.close()
       debug('Browser Closed')
@@ -131,3 +138,5 @@ const debug = (message) => {
       process.exit(1)
     }
   })()
+
+  const sleep = (delay) => new Promise(resolve => setTimeout(resolve, delay))
