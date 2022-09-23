@@ -1,16 +1,17 @@
 #!/usr/bin/env ts-node
+import { Command, Option } from 'commander'
 import * as fs from 'fs'
 import * as Jimp from 'jimp'
 import * as puppeteer from 'puppeteer'
-import { Command, Option } from 'commander'
 
 import pkg from './package.json'
-const program = new Command();
+
+const program = new Command()
 
 const help = () => {
-  program.outputHelp();
-  console.log('If Width or Height are not specified, a Full Page screenshot will be taken');
-  process.exit(0);
+  program.outputHelp()
+  console.log('If Width or Height are not specified, a Full Page screenshot will be taken')
+  process.exit(0)
 }
 
 program
@@ -29,38 +30,37 @@ program
 
 // Find Chrome from env var CHROME_PATH
 let chrome = process.env.CHROME_PATH
-if(chrome && !fs.existsSync(chrome)) {
-  chrome = undefined;
+if (chrome && !fs.existsSync(chrome)) {
+  chrome = undefined
 }
 
 let url = program.getOptionValue('url')
-if(!url) {
-  help();
+if (!url) {
+  help()
 } else {
-  url = url.trim().toLowerCase();
+  url = url.trim().toLowerCase()
 }
 
-if(!url.startsWith('http://') && !url.startsWith('https://')) {
-  url = `http://${url}`;
+if (!url.startsWith('http://') && !url.startsWith('https://')) {
+  url = `http://${url}`
 }
-console.log(url)
 
 let out = program.getOptionValue('auth')
-if(!out) {
-  const sections = url.split('/');
+if (!out) {
+  const sections = url.split('/')
   const count = url.endsWith('/') ? 2 : 1
-  out = `${sections[sections.length - count]}.png`;
+  out = `${sections[sections.length - count]}.png`
 }
 
 let auth = program.getOptionValue('auth')
-if(auth) {
+if (auth) {
   auth = {
     username: auth.split(':')[0],
     password: auth.split(':')[1]
   }
 }
 
-let tmp = out + '_tmp.png';
+const tmp = out + '_tmp.png'
 
 const x = program.getOptionValue('x')
 const y = program.getOptionValue('y')
@@ -80,29 +80,29 @@ const vPort = {
 }
 
 // If Width or Height are 0, capture whole page
-let fullPage = false;
+let fullPage = false
 if (clip.width === 0 || clip.height === 0) {
-  fullPage = true;
+  fullPage = true
 }
 
 const screenshot = {
-  fullPage: fullPage,
-  clip: clip,
+  fullPage,
+  clip,
   path: tmp
 }
 
-if(screenshot.fullPage) {
+if (screenshot.fullPage) {
   delete screenshot.clip
 }
 
-let launch = { executablePath: chrome, headless: true, args: ['--no-sandbox'] }
+const launch = { executablePath: chrome, headless: true, args: ['--no-sandbox'] }
 const debugFlag = program.getOptionValue('debug')
-if(debugFlag) {
+if (debugFlag) {
   launch.headless = false
 }
 
 const debug = (message) => {
-  if(debugFlag) {
+  if (debugFlag) {
     console.log(message)
   }
 }
@@ -110,40 +110,39 @@ const debug = (message) => {
   (async () => {
     try {
       const browser = await puppeteer.launch(launch)
-      await debug('Browser Opened');
+      await debug('Browser Opened')
 
-      const page = await browser.newPage();
-      await debug('Page Created');
+      const page = await browser.newPage()
+      await debug('Page Created')
 
-      await page.setViewport(vPort);
-      await debug('Viewport Set');
+      await page.setViewport(vPort)
+      await debug('Viewport Set')
 
-      if(auth) {
-        await page.authenticate(auth);
-        await debug('Credentials Entered');
+      if (auth) {
+        await page.authenticate(auth)
+        await debug('Credentials Entered')
       }
 
-      await page.goto(url);
-      //await page.waitFor(program.getOptionValue('debug'));
-      await debug('Page Loaded');
+      await page.goto(url)
+      await debug('Page Loaded')
 
-      await page.screenshot(screenshot);
-      await debug('Screenshot Taken');
+      await page.screenshot(screenshot)
+      await debug('Screenshot Taken')
 
-      await browser.close();
-      await debug('Browser Closed');
+      await browser.close()
+      await debug('Browser Closed')
 
-      if(program.getOptionValue('crop')) {
-        await Jimp.read(tmp).then(img => img.autocrop(false).write(out));
-        await fs.unlinkSync(tmp);
-        await debug('Image Cropped');
+      if (program.getOptionValue('crop')) {
+        await Jimp.read(tmp).then(img => img.autocrop(false).write(out))
+        await fs.unlinkSync(tmp)
+        await debug('Image Cropped')
       } else {
-        await fs.renameSync(tmp, out);
-        await debug('Image Saved');
+        await fs.renameSync(tmp, out)
+        await debug('Image Saved')
       }
-    } catch (e) { 
-      console.log('Screenshot Failed');
-      console.error(e);
-      process.exit(1);
+    } catch (e) {
+      console.log('Screenshot Failed')
+      console.error(e)
+      process.exit(1)
     }
-  })();
+  })()
