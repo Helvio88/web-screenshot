@@ -1,4 +1,3 @@
-#!/usr/bin/env ts-node
 import { Command, Option } from 'commander'
 import fs from 'fs'
 import Jimp from 'jimp'
@@ -131,7 +130,6 @@ const debug = (message) => {
         await fs.renameSync(tmp, out)
         debug('Image Saved')
       }
-      process.exit(0)
     } catch (e) {
       console.log('Screenshot Failed')
       console.error(e)
