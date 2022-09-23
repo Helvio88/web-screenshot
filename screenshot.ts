@@ -16,7 +16,7 @@ const help = () => {
 
 program
   .version(pkg.version)
-  .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot'))
+  .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot').makeOptionMandatory(true))
   .addOption(new Option('-x, --x [x]', 'Leftmost Pixel').default(0))
   .addOption(new Option('-y, --y [y]', 'Top Pixel').default(0))
   .addOption(new Option('-w, --width [width]', 'Width').default(1920))
@@ -110,7 +110,6 @@ const debug = (message) => {
       await page.goto(url)
       debug('Page Loaded')
 
-      console.log(screenshot)
       await page.screenshot(screenshot)
       debug('Screenshot Taken')
 
