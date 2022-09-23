@@ -40,7 +40,7 @@ Tips
 * After the ScreenShot is taken, the borders can be cropped using `--crop`. Powered by [Jimp][4].
 * You can screenshot just a rectangle (or clip) of a webpage by providing `x`, `y`, `w` and `h`, such as
 ```bash
-web-screenshot -u https://google.com -x 700 -y 190 -w 300 -h 115 -o google_logo.png --crop
+web-screenshot -u https://google.com -x 700 -y 190 -w 700 -h 180 -o google_logo.png --crop
 ```
 Coordinates are approximate and you can either use a tool to measure the pixels or trial and error.
 
