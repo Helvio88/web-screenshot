@@ -124,6 +124,7 @@ const debug = (message) => {
         await fs.renameSync(tmp, out)
         debug('Image Saved')
       }
+      process.exit(0)
     } catch (e) {
       console.log('Screenshot Failed')
       console.error(e)
