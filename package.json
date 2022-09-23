@@ -1,6 +1,6 @@
 {
   "name": "@helvio/web-screenshot",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Screenshots Pages to PNG",
   "keywords": [
     "screenshot",
@@ -37,6 +37,7 @@
     "prettier": "^2.7.1",
     "prettier-plugin-apex": "^1.10.0",
     "tslib": "^2.4.0",
-    "tsc": "^2.0.4"
+    "tsc": "^2.0.4",
+    "typescript": "^4.8.3"
   }
 }
