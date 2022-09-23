@@ -2,7 +2,7 @@
 import { Command, Option } from 'commander'
 import fs from 'fs'
 import Jimp from 'jimp'
-import puppeteer from 'puppeteer'
+import puppeteer, { Credentials, PuppeteerLaunchOptions, ScreenshotOptions, Viewport } from 'puppeteer'
 
 import pkg from './package.json'
 
@@ -19,19 +19,13 @@ program
   .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot'))
   .addOption(new Option('-x, --x [x]', 'Leftmost Pixel').default(0))
   .addOption(new Option('-y, --y [y]', 'Top Pixel').default(0))
-  .addOption(new Option('-w, --width [width]', 'Width').default(0))
-  .addOption(new Option('-h, --height [height]', 'Height').default(0))
+  .addOption(new Option('-w, --width [width]', 'Width').default(1920))
+  .addOption(new Option('-h, --height [height]', 'Height').default(1080))
   .addOption(new Option('-o, --out [out]', 'Absolute or Relative Path to save the screenshot'))
   .addOption(new Option('-c, --crop', 'Auto crop same-color borders'))
   .addOption(new Option('-d, --debug', 'Prints debug messages'))
   .addOption(new Option('-a, --auth [auth]', 'NTLM Credentials in username:password format'))
   .parse(process.argv)
-
-// Find Chrome from env var CHROME_PATH
-let chrome = process.env.CHROME_PATH
-if (chrome && !fs.existsSync(chrome)) {
-  chrome = undefined
-}
 
 let url = program.getOptionValue('url')
 if (!url) {
@@ -51,9 +45,10 @@ if (!out) {
   out = `${sections[sections.length - count]}.png`
 }
 
-let auth = program.getOptionValue('auth')
-if (auth) {
-  auth = {
+let credentials: Credentials
+const auth: string = program.getOptionValue('auth')
+if (auth && auth.indexOf(':') !== -1) {
+  credentials = {
     username: auth.split(':')[0],
     password: auth.split(':')[1]
   }
@@ -73,28 +68,18 @@ const clip = {
   height: Number(height)
 }
 
-const vPort = {
+const vPort: Viewport = {
   width: 1920,
-  height: 1080
+  height: 1080,
+  isLandscape: true
 }
 
-// If Width or Height are 0, capture whole page
-let fullPage = false
-if (clip.width === 0 || clip.height === 0) {
-  fullPage = true
-}
-
-const screenshot = {
-  fullPage,
+const screenshot: ScreenshotOptions = {
   clip,
   path: tmp
 }
 
-if (screenshot.fullPage) {
-  delete screenshot.clip
-}
-
-const launch = { executablePath: chrome, headless: true, args: ['--no-sandbox'] }
+const launch: PuppeteerLaunchOptions = { headless: true, args: ['--no-sandbox'] }
 const debugFlag = program.getOptionValue('debug')
 if (debugFlag) {
   launch.headless = false
@@ -102,42 +87,43 @@ if (debugFlag) {
 
 const debug = (message) => {
   if (debugFlag) {
-    console.log(message)
+    console.debug(message)
   }
 }
 
   (async () => {
     try {
       const browser = await puppeteer.launch(launch)
-      await debug('Browser Opened')
+      debug('Browser Opened')
 
       const page = await browser.newPage()
-      await debug('Page Created')
+      debug('Page Created')
 
       await page.setViewport(vPort)
-      await debug('Viewport Set')
+      debug('Viewport Set')
 
-      if (auth) {
-        await page.authenticate(auth)
-        await debug('Credentials Entered')
+      if (credentials) {
+        await page.authenticate(credentials)
+        debug('Credentials Entered')
       }
 
       await page.goto(url)
-      await debug('Page Loaded')
+      debug('Page Loaded')
 
+      console.log(screenshot)
       await page.screenshot(screenshot)
-      await debug('Screenshot Taken')
+      debug('Screenshot Taken')
 
       await browser.close()
-      await debug('Browser Closed')
+      debug('Browser Closed')
 
       if (program.getOptionValue('crop')) {
         await Jimp.read(tmp).then(img => img.autocrop(false).write(out))
         await fs.unlinkSync(tmp)
-        await debug('Image Cropped')
+        debug('Image Cropped')
       } else {
         await fs.renameSync(tmp, out)
-        await debug('Image Saved')
+        debug('Image Saved')
       }
     } catch (e) {
       console.log('Screenshot Failed')
