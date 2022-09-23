@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
 import { Command, Option } from 'commander'
-import * as fs from 'fs'
-import * as Jimp from 'jimp'
-import * as puppeteer from 'puppeteer'
+import fs from 'fs'
+import Jimp from 'jimp'
+import puppeteer from 'puppeteer'
 
 import pkg from './package.json'
 

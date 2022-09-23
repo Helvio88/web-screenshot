@@ -8,9 +8,9 @@
     "png",
     "image"
   ],
-  "main": "ts-node screenshot.ts",
+  "main": "screenshot.js",
   "bin": {
-    "web-screenshot": "ts-node screenshot.ts"
+    "web-screenshot": "screenshot.js"
   },
   "license": "ISC",
   "preferGlobal": true,
@@ -39,6 +39,7 @@
     "eslint-plugin-simple-import-sort": "^8.0.0",
     "plugin-import": "^1.0.52",
     "prettier": "^2.7.1",
-    "prettier-plugin-apex": "^1.10.0"
+    "prettier-plugin-apex": "^1.10.0",
+    "tslib": "^2.4.0"
   }
 }
