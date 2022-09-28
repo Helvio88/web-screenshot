@@ -39,7 +39,7 @@ if (!url.startsWith('http://') && !url.startsWith('https://')) {
   url = `http://${url}`
 }
 
-let out = program.getOptionValue('auth')
+let out = program.getOptionValue('out')
 if (!out) {
   const sections = url.split('/')
   const count = url.endsWith('/') ? 2 : 1
