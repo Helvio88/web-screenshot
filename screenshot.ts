@@ -28,7 +28,7 @@ program
   .addOption(new Option('-a, --auth [auth]', 'NTLM Credentials in username:password format'))
   .parse(process.argv)
 
-let url = program.getOptionValue('url')
+let url: string = program.getOptionValue('url')
 if (!url) {
   help()
 } else {
@@ -39,7 +39,7 @@ if (!url.startsWith('http://') && !url.startsWith('https://')) {
   url = `http://${url}`
 }
 
-let out = program.getOptionValue('out')
+let out: string = program.getOptionValue('out')
 if (!out) {
   const sections = url.split('/')
   const count = url.endsWith('/') ? 2 : 1
