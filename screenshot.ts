@@ -121,7 +121,8 @@ const debug = (message) => {
       debug('Browser Closed')
 
       if (options.crop) {
-        await Jimp.read(tmp).then(img => img.autocrop(false).write(out))
+        const jimp = await Jimp.read(tmp)
+        await jimp.autocrop(false).write(out)
         await fs.unlinkSync(tmp)
         debug('Image Cropped')
       } else {
