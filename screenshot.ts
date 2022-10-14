@@ -28,7 +28,9 @@ program
   .addOption(new Option('-a, --auth [auth]', 'NTLM Credentials in username:password format'))
   .parse(process.argv)
 
-let url: string = program.getOptionValue('url')
+const options = program.opts()
+
+let url: string = options.url
 if (!url) {
   help()
 } else {
@@ -39,7 +41,7 @@ if (!url.startsWith('http://') && !url.startsWith('https://')) {
   url = `http://${url}`
 }
 
-let out: string = program.getOptionValue('out')
+let out: string = options.out
 if (!out) {
   const sections = url.split('/')
   const count = url.endsWith('/') ? 2 : 1
@@ -47,7 +49,7 @@ if (!out) {
 }
 
 let credentials: Credentials
-const auth: string = program.getOptionValue('auth')
+const auth: string = options.auth
 if (auth && auth.indexOf(':') !== -1) {
   credentials = {
     username: auth.split(':')[0],
@@ -57,18 +59,13 @@ if (auth && auth.indexOf(':') !== -1) {
 
 const tmp = out + '_tmp.png'
 
-const time = Number(program.getOptionValue('time')) * 1000 || 3000
-
-const x = program.getOptionValue('x')
-const y = program.getOptionValue('y')
-const w = program.getOptionValue('width')
-const h = program.getOptionValue('height')
+const time = Number(options.time) * 1000 || 3000
 
 const clip = {
-  x: Number(x),
-  y: Number(y),
-  width: Number(w),
-  height: Number(h)
+  x: Number(options.x),
+  y: Number(options.y),
+  width: Number(options.width),
+  height: Number(options.height)
 }
 
 const vPort: Viewport = {
@@ -83,7 +80,7 @@ const screenshot: ScreenshotOptions = {
 }
 
 const launch: PuppeteerLaunchOptions = { headless: true, args: ['--no-sandbox'] }
-const debugFlag = program.getOptionValue('debug')
+const debugFlag = options.debug
 if (debugFlag) {
   launch.headless = false
 }
@@ -123,7 +120,7 @@ const debug = (message) => {
       await browser.close()
       debug('Browser Closed')
 
-      if (program.getOptionValue('crop')) {
+      if (options.crop) {
         await Jimp.read(tmp).then(img => img.autocrop(false).write(out))
         await fs.unlinkSync(tmp)
         debug('Image Cropped')

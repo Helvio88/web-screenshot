@@ -1,12 +1,12 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const commander_1 = require("commander");
-const fs_1 = (0, tslib_1.__importDefault)(require("fs"));
-const jimp_1 = (0, tslib_1.__importDefault)(require("jimp"));
-const puppeteer_1 = (0, tslib_1.__importDefault)(require("puppeteer"));
-const package_json_1 = (0, tslib_1.__importDefault)(require("./package.json"));
+const fs_1 = tslib_1.__importDefault(require("fs"));
+const jimp_1 = tslib_1.__importDefault(require("jimp"));
+const puppeteer_1 = tslib_1.__importDefault(require("puppeteer"));
+const package_json_1 = tslib_1.__importDefault(require("./package.json"));
 const program = new commander_1.Command();
 const help = () => {
     program.outputHelp();
@@ -26,7 +26,8 @@ program
     .addOption(new commander_1.Option('-d, --debug', 'Prints debug messages'))
     .addOption(new commander_1.Option('-a, --auth [auth]', 'NTLM Credentials in username:password format'))
     .parse(process.argv);
-let url = program.getOptionValue('url');
+const options = program.opts();
+let url = options.url;
 if (!url) {
     help();
 }
@@ -36,14 +37,14 @@ else {
 if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = `http://${url}`;
 }
-let out = program.getOptionValue('auth');
+let out = options.out;
 if (!out) {
     const sections = url.split('/');
     const count = url.endsWith('/') ? 2 : 1;
     out = `${sections[sections.length - count]}.png`;
 }
 let credentials;
-const auth = program.getOptionValue('auth');
+const auth = options.auth;
 if (auth && auth.indexOf(':') !== -1) {
     credentials = {
         username: auth.split(':')[0],
@@ -51,16 +52,12 @@ if (auth && auth.indexOf(':') !== -1) {
     };
 }
 const tmp = out + '_tmp.png';
-const time = Number(program.getOptionValue('t')) * 1000 || 0;
-const x = program.getOptionValue('x');
-const y = program.getOptionValue('y');
-const w = program.getOptionValue('width');
-const h = program.getOptionValue('height');
+const time = Number(options.time) * 1000 || 3000;
 const clip = {
-    x: Number(x),
-    y: Number(y),
-    width: Number(w),
-    height: Number(h)
+    x: Number(options.x),
+    y: Number(options.y),
+    width: Number(options.width),
+    height: Number(options.height)
 };
 const vPort = {
     width: 1920,
@@ -72,7 +69,7 @@ const screenshot = {
     path: tmp
 };
 const launch = { headless: true, args: ['--no-sandbox'] };
-const debugFlag = program.getOptionValue('debug');
+const debugFlag = options.debug;
 if (debugFlag) {
     launch.headless = false;
 }
@@ -102,7 +99,7 @@ const debug = (message) => {
         debug('Page Closed');
         await browser.close();
         debug('Browser Closed');
-        if (program.getOptionValue('crop')) {
+        if (options.crop) {
             await jimp_1.default.read(tmp).then(img => img.autocrop(false).write(out));
             await fs_1.default.unlinkSync(tmp);
             debug('Image Cropped');
@@ -111,7 +108,6 @@ const debug = (message) => {
             await fs_1.default.renameSync(tmp, out);
             debug('Image Saved');
         }
-        process.exit(0);
     }
     catch (e) {
         console.log('Screenshot Failed');
