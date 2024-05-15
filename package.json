@@ -21,10 +21,10 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^9.4.1",
-    "jimp": "^0.16.2",
-    "puppeteer": "^19.0.0",
-    "tslib": "^2.4.0"
+    "commander": "^12.0.0",
+    "jimp": "^0.22.12",
+    "puppeteer": "^22.8.2",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.40.0",
