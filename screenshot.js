@@ -100,7 +100,8 @@ const debug = (message) => {
         await browser.close();
         debug('Browser Closed');
         if (options.crop) {
-            await jimp_1.default.read(tmp).then(img => img.autocrop(false).write(out));
+            const jimp = await jimp_1.default.read(tmp);
+            await jimp.autocrop(false).write(out);
             await fs_1.default.unlinkSync(tmp);
             debug('Image Cropped');
         }
