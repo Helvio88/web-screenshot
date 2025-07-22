@@ -12,6 +12,9 @@
   "bin": {
     "web-screenshot": "screenshot.js"
   },
+  "scripts": {
+    "build": "npx esbuild --bundle screenshot.ts --minify --platform=node --outfile=screenshot.js"
+  },
   "license": "ISC",
   "preferGlobal": true,
   "author": "Helvio Pedreschi",
@@ -21,23 +24,14 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^12.0.0",
-    "jimp": "^0.22.12",
-    "puppeteer": "^22.8.2",
-    "tslib": "^2.6.2"
+    "commander": "^14.0.0",
+    "puppeteer": "^24.14.0",
+    "sharp": "^0.34.3",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
-    "@typescript-eslint/parser": "^5.40.0",
-    "eslint": "^8.25.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.1.0",
-    "eslint-plugin-simple-import-sort": "^8.0.0",
-    "plugin-import": "^1.0.52",
-    "prettier": "^2.7.1",
-    "prettier-plugin-apex": "^1.10.0",
+    "@biomejs/biome": "^2.1.2",
     "tsc": "^2.0.4",
-    "typescript": "^4.8.4"
+    "typescript": "^5.8.3"
   }
 }
