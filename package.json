@@ -13,7 +13,7 @@
     "web-screenshot": "dist/screenshot.js"
   },
   "scripts": {
-    "build": "npx esbuild --bundle src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js"
+    "build": "npx esbuild --bundle --external:puppeteer src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js"
   },
   "license": "ISC",
   "preferGlobal": true,
