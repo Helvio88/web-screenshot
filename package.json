@@ -8,12 +8,12 @@
     "png",
     "image"
   ],
-  "main": "screenshot.js",
+  "main": "dist/screenshot.js",
   "bin": {
-    "web-screenshot": "screenshot.js"
+    "web-screenshot": "dist/screenshot.js"
   },
   "scripts": {
-    "build": "npx esbuild --bundle screenshot.ts --minify --platform=node --outfile=screenshot.js"
+    "build": "npx esbuild --bundle src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js"
   },
   "license": "ISC",
   "preferGlobal": true,
