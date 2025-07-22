@@ -166,7 +166,7 @@ if (options.batch) {
 // Main function to take screenshots
 ;(async () => {
   try {
-    const browser = await puppeteer.launch({ headless: debug ? false : 'shell' })
+    const browser = await puppeteer.launch({ headless: debug ? false : 'shell', args: ['--no-sandbox'] })
     console.log('Browser Opened')
 
     const page = await browser.newPage()
