@@ -21,7 +21,7 @@ Usage: screenshot [options]
 Options:
   -V, --version          output the version number
   -u, --url <url>        URL (website) to screenshot
-  -t, --time [s]         Number of seconds to wait for page to load (default: 3)
+  -t, --time [s]         Number of seconds to wait for page to load (default: 5)
   -x, --x [x]            Leftmost Pixel (default: 0)
   -y, --y [y]            Top Pixel (default: 0)
   -w, --width [width]    Width (default: 1920)

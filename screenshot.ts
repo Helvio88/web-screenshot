@@ -19,7 +19,7 @@ const help = () => {
 program
   .version(pkg.version)
   .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot').makeOptionMandatory(true))
-  .addOption(new Option('-t, --time [s]', 'Number of seconds to wait for page to load').default(3))
+  .addOption(new Option('-t, --time [s]', 'Number of seconds to wait for page to load').default(5))
   .addOption(new Option('-x, --x [x]', 'Leftmost Pixel').default(0))
   .addOption(new Option('-y, --y [y]', 'Top Pixel').default(0))
   .addOption(new Option('-w, --width [width]', 'Width').default(1920))
@@ -81,8 +81,8 @@ if (auth && auth.indexOf(':') !== -1) {
 // Create the temporary file name
 const tmp = `${out}_tmp`
 
-// Read the timeout from options, defaulting to 3 seconds if not specified
-const time = Number(options.time) * 1000 || 3000
+// Read the timeout from options, defaulting to 5 seconds if not specified
+const time = Number(options.time) * 1000 || 5000
 
 // Validate the coordinates and dimensions
 const clip = {
