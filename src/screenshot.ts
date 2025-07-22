@@ -14,6 +14,7 @@ program
   .addHelpText('beforeAll', 'Web Screenshot Utility')
 
   // Screenshot options
+  .addOption(new Option('-p, --path [path]', 'Chrome executable path.'))
   .addOption(new Option('-d, --debug', 'Enable debug mode.').default(false))
   .addOption(new Option('-b, --batch [file]', 'Batch file with URLs to screenshot. Supersedes all other options.'))
   .addOption(new Option('-u, --url <url>', 'URL (website) to screenshot.'))
@@ -32,6 +33,7 @@ const options = program.opts()
 const screenshots: WebScreenshot[] = []
 
 const debug = options.debug || false
+const chromePath: string = options.path
 
 if (options.batch) {
   // If batch file is provided, read it and parse URLs
@@ -166,7 +168,11 @@ if (options.batch) {
 // Main function to take screenshots
 ;(async () => {
   try {
-    const browser = await puppeteer.launch({ headless: debug ? false : 'shell', args: ['--no-sandbox'] })
+    const browser = await puppeteer.launch({
+      headless: debug ? false : 'shell',
+      executablePath: chromePath,
+      args: ['--no-sandbox']
+    })
     console.log('Browser Opened')
 
     const page = await browser.newPage()
