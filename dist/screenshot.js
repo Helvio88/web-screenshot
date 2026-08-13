@@ -1,33 +1,3833 @@
 #!/usr/bin/env node
-var gt=Object.create;var Y=Object.defineProperty;var _t=Object.getOwnPropertyDescriptor;var bt=Object.getOwnPropertyNames;var Ot=Object.getPrototypeOf,Ct=Object.prototype.hasOwnProperty;var O=(r,t)=>()=>(t||r((t={exports:{}}).exports,t),t.exports);var wt=(r,t,e,i)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of bt(t))!Ct.call(r,n)&&n!==e&&Y(r,n,{get:()=>t[n],enumerable:!(i=_t(t,n))||i.enumerable});return r};var w=(r,t,e)=>(e=r!=null?gt(Ot(r)):{},wt(t||!r||!r.__esModule?Y(e,"default",{value:r,enumerable:!0}):e,r));var y=O(k=>{var A=class extends Error{constructor(t,e,i){super(i),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name,this.code=e,this.exitCode=t,this.nestedError=void 0}},v=class extends A{constructor(t){super(1,"commander.invalidArgument",t),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name}};k.CommanderError=A;k.InvalidArgumentError=v});var E=O(V=>{var{InvalidArgumentError:yt}=y(),H=class{constructor(t,e){switch(this.description=e||"",this.variadic=!1,this.parseArg=void 0,this.defaultValue=void 0,this.defaultValueDescription=void 0,this.argChoices=void 0,t[0]){case"<":this.required=!0,this._name=t.slice(1,-1);break;case"[":this.required=!1,this._name=t.slice(1,-1);break;default:this.required=!0,this._name=t;break}this._name.length>3&&this._name.slice(-3)==="..."&&(this.variadic=!0,this._name=this._name.slice(0,-3))}name(){return this._name}_concatValue(t,e){return e===this.defaultValue||!Array.isArray(e)?[t]:e.concat(t)}default(t,e){return this.defaultValue=t,this.defaultValueDescription=e,this}argParser(t){return this.parseArg=t,this}choices(t){return this.argChoices=t.slice(),this.parseArg=(e,i)=>{if(!this.argChoices.includes(e))throw new yt(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(e,i):e},this}argRequired(){return this.required=!0,this}argOptional(){return this.required=!1,this}};function xt(r){let t=r.name()+(r.variadic===!0?"...":"");return r.required?"<"+t+">":"["+t+"]"}V.Argument=H;V.humanReadableArgName=xt});var W=O(T=>{var{humanReadableArgName:At}=E(),P=class{constructor(){this.helpWidth=void 0,this.minWidthToWrap=40,this.sortSubcommands=!1,this.sortOptions=!1,this.showGlobalOptions=!1}prepareContext(t){this.helpWidth=this.helpWidth??t.helpWidth??80}visibleCommands(t){let e=t.commands.filter(n=>!n._hidden),i=t._getHelpCommand();return i&&!i._hidden&&e.push(i),this.sortSubcommands&&e.sort((n,s)=>n.name().localeCompare(s.name())),e}compareOptions(t,e){let i=n=>n.short?n.short.replace(/^-/,""):n.long.replace(/^--/,"");return i(t).localeCompare(i(e))}visibleOptions(t){let e=t.options.filter(n=>!n.hidden),i=t._getHelpOption();if(i&&!i.hidden){let n=i.short&&t._findOption(i.short),s=i.long&&t._findOption(i.long);!n&&!s?e.push(i):i.long&&!s?e.push(t.createOption(i.long,i.description)):i.short&&!n&&e.push(t.createOption(i.short,i.description))}return this.sortOptions&&e.sort(this.compareOptions),e}visibleGlobalOptions(t){if(!this.showGlobalOptions)return[];let e=[];for(let i=t.parent;i;i=i.parent){let n=i.options.filter(s=>!s.hidden);e.push(...n)}return this.sortOptions&&e.sort(this.compareOptions),e}visibleArguments(t){return t._argsDescription&&t.registeredArguments.forEach(e=>{e.description=e.description||t._argsDescription[e.name()]||""}),t.registeredArguments.find(e=>e.description)?t.registeredArguments:[]}subcommandTerm(t){let e=t.registeredArguments.map(i=>At(i)).join(" ");return t._name+(t._aliases[0]?"|"+t._aliases[0]:"")+(t.options.length?" [options]":"")+(e?" "+e:"")}optionTerm(t){return t.flags}argumentTerm(t){return t.name()}longestSubcommandTermLength(t,e){return e.visibleCommands(t).reduce((i,n)=>Math.max(i,this.displayWidth(e.styleSubcommandTerm(e.subcommandTerm(n)))),0)}longestOptionTermLength(t,e){return e.visibleOptions(t).reduce((i,n)=>Math.max(i,this.displayWidth(e.styleOptionTerm(e.optionTerm(n)))),0)}longestGlobalOptionTermLength(t,e){return e.visibleGlobalOptions(t).reduce((i,n)=>Math.max(i,this.displayWidth(e.styleOptionTerm(e.optionTerm(n)))),0)}longestArgumentTermLength(t,e){return e.visibleArguments(t).reduce((i,n)=>Math.max(i,this.displayWidth(e.styleArgumentTerm(e.argumentTerm(n)))),0)}commandUsage(t){let e=t._name;t._aliases[0]&&(e=e+"|"+t._aliases[0]);let i="";for(let n=t.parent;n;n=n.parent)i=n.name()+" "+i;return i+e+" "+t.usage()}commandDescription(t){return t.description()}subcommandDescription(t){return t.summary()||t.description()}optionDescription(t){let e=[];if(t.argChoices&&e.push(`choices: ${t.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),t.defaultValue!==void 0&&(t.required||t.optional||t.isBoolean()&&typeof t.defaultValue=="boolean")&&e.push(`default: ${t.defaultValueDescription||JSON.stringify(t.defaultValue)}`),t.presetArg!==void 0&&t.optional&&e.push(`preset: ${JSON.stringify(t.presetArg)}`),t.envVar!==void 0&&e.push(`env: ${t.envVar}`),e.length>0){let i=`(${e.join(", ")})`;return t.description?`${t.description} ${i}`:i}return t.description}argumentDescription(t){let e=[];if(t.argChoices&&e.push(`choices: ${t.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),t.defaultValue!==void 0&&e.push(`default: ${t.defaultValueDescription||JSON.stringify(t.defaultValue)}`),e.length>0){let i=`(${e.join(", ")})`;return t.description?`${t.description} ${i}`:i}return t.description}formatItemList(t,e,i){return e.length===0?[]:[i.styleTitle(t),...e,""]}groupItems(t,e,i){let n=new Map;return t.forEach(s=>{let o=i(s);n.has(o)||n.set(o,[])}),e.forEach(s=>{let o=i(s);n.has(o)||n.set(o,[]),n.get(o).push(s)}),n}formatHelp(t,e){let i=e.padWidth(t,e),n=e.helpWidth??80;function s(l,d){return e.formatItem(l,i,d,e)}let o=[`${e.styleTitle("Usage:")} ${e.styleUsage(e.commandUsage(t))}`,""],a=e.commandDescription(t);a.length>0&&(o=o.concat([e.boxWrap(e.styleCommandDescription(a),n),""]));let u=e.visibleArguments(t).map(l=>s(e.styleArgumentTerm(e.argumentTerm(l)),e.styleArgumentDescription(e.argumentDescription(l))));if(o=o.concat(this.formatItemList("Arguments:",u,e)),this.groupItems(t.options,e.visibleOptions(t),l=>l.helpGroupHeading??"Options:").forEach((l,d)=>{let C=l.map(b=>s(e.styleOptionTerm(e.optionTerm(b)),e.styleOptionDescription(e.optionDescription(b))));o=o.concat(this.formatItemList(d,C,e))}),e.showGlobalOptions){let l=e.visibleGlobalOptions(t).map(d=>s(e.styleOptionTerm(e.optionTerm(d)),e.styleOptionDescription(e.optionDescription(d))));o=o.concat(this.formatItemList("Global Options:",l,e))}return this.groupItems(t.commands,e.visibleCommands(t),l=>l.helpGroup()||"Commands:").forEach((l,d)=>{let C=l.map(b=>s(e.styleSubcommandTerm(e.subcommandTerm(b)),e.styleSubcommandDescription(e.subcommandDescription(b))));o=o.concat(this.formatItemList(d,C,e))}),o.join(`
-`)}displayWidth(t){return J(t).length}styleTitle(t){return t}styleUsage(t){return t.split(" ").map(e=>e==="[options]"?this.styleOptionText(e):e==="[command]"?this.styleSubcommandText(e):e[0]==="["||e[0]==="<"?this.styleArgumentText(e):this.styleCommandText(e)).join(" ")}styleCommandDescription(t){return this.styleDescriptionText(t)}styleOptionDescription(t){return this.styleDescriptionText(t)}styleSubcommandDescription(t){return this.styleDescriptionText(t)}styleArgumentDescription(t){return this.styleDescriptionText(t)}styleDescriptionText(t){return t}styleOptionTerm(t){return this.styleOptionText(t)}styleSubcommandTerm(t){return t.split(" ").map(e=>e==="[options]"?this.styleOptionText(e):e[0]==="["||e[0]==="<"?this.styleArgumentText(e):this.styleSubcommandText(e)).join(" ")}styleArgumentTerm(t){return this.styleArgumentText(t)}styleOptionText(t){return t}styleArgumentText(t){return t}styleSubcommandText(t){return t}styleCommandText(t){return t}padWidth(t,e){return Math.max(e.longestOptionTermLength(t,e),e.longestGlobalOptionTermLength(t,e),e.longestSubcommandTermLength(t,e),e.longestArgumentTermLength(t,e))}preformatted(t){return/\n[^\S\r\n]/.test(t)}formatItem(t,e,i,n){let o=" ".repeat(2);if(!i)return o+t;let a=t.padEnd(e+t.length-n.displayWidth(t)),u=2,c=(this.helpWidth??80)-e-u-2,l;return c<this.minWidthToWrap||n.preformatted(i)?l=i:l=n.boxWrap(i,c).replace(/\n/g,`
-`+" ".repeat(e+u)),o+a+" ".repeat(u)+l.replace(/\n/g,`
-${o}`)}boxWrap(t,e){if(e<this.minWidthToWrap)return t;let i=t.split(/\r\n|\n/),n=/[\s]*[^\s]+/g,s=[];return i.forEach(o=>{let a=o.match(n);if(a===null){s.push("");return}let u=[a.shift()],h=this.displayWidth(u[0]);a.forEach(c=>{let l=this.displayWidth(c);if(h+l<=e){u.push(c),h+=l;return}s.push(u.join(""));let d=c.trimStart();u=[d],h=this.displayWidth(d)}),s.push(u.join(""))}),s.join(`
-`)}};function J(r){let t=/\x1b\[\d*(;\d*)*m/g;return r.replace(t,"")}T.Help=P;T.stripColor=J});var G=O(D=>{var{InvalidArgumentError:Et}=y(),F=class{constructor(t,e){this.flags=t,this.description=e||"",this.required=t.includes("<"),this.optional=t.includes("["),this.variadic=/\w\.\.\.[>\]]$/.test(t),this.mandatory=!1;let i=St(t);this.short=i.shortFlag,this.long=i.longFlag,this.negate=!1,this.long&&(this.negate=this.long.startsWith("--no-")),this.defaultValue=void 0,this.defaultValueDescription=void 0,this.presetArg=void 0,this.envVar=void 0,this.parseArg=void 0,this.hidden=!1,this.argChoices=void 0,this.conflictsWith=[],this.implied=void 0,this.helpGroupHeading=void 0}default(t,e){return this.defaultValue=t,this.defaultValueDescription=e,this}preset(t){return this.presetArg=t,this}conflicts(t){return this.conflictsWith=this.conflictsWith.concat(t),this}implies(t){let e=t;return typeof t=="string"&&(e={[t]:!0}),this.implied=Object.assign(this.implied||{},e),this}env(t){return this.envVar=t,this}argParser(t){return this.parseArg=t,this}makeOptionMandatory(t=!0){return this.mandatory=!!t,this}hideHelp(t=!0){return this.hidden=!!t,this}_concatValue(t,e){return e===this.defaultValue||!Array.isArray(e)?[t]:e.concat(t)}choices(t){return this.argChoices=t.slice(),this.parseArg=(e,i)=>{if(!this.argChoices.includes(e))throw new Et(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(e,i):e},this}name(){return this.long?this.long.replace(/^--/,""):this.short.replace(/^-/,"")}attributeName(){return this.negate?K(this.name().replace(/^no-/,"")):K(this.name())}helpGroup(t){return this.helpGroupHeading=t,this}is(t){return this.short===t||this.long===t}isBoolean(){return!this.required&&!this.optional&&!this.negate}},I=class{constructor(t){this.positiveOptions=new Map,this.negativeOptions=new Map,this.dualOptions=new Set,t.forEach(e=>{e.negate?this.negativeOptions.set(e.attributeName(),e):this.positiveOptions.set(e.attributeName(),e)}),this.negativeOptions.forEach((e,i)=>{this.positiveOptions.has(i)&&this.dualOptions.add(i)})}valueFromOption(t,e){let i=e.attributeName();if(!this.dualOptions.has(i))return!0;let n=this.negativeOptions.get(i).presetArg,s=n!==void 0?n:!1;return e.negate===(s===t)}};function K(r){return r.split("-").reduce((t,e)=>t+e[0].toUpperCase()+e.slice(1))}function St(r){let t,e,i=/^-[^-]$/,n=/^--[^-]/,s=r.split(/[ |,]+/).concat("guard");if(i.test(s[0])&&(t=s.shift()),n.test(s[0])&&(e=s.shift()),!t&&i.test(s[0])&&(t=s.shift()),!t&&n.test(s[0])&&(t=e,e=s.shift()),s[0].startsWith("-")){let o=s[0],a=`option creation failed due to '${o}' in option flags '${r}'`;throw/^-[^-][^-]/.test(o)?new Error(`${a}
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// node_modules/commander/lib/error.js
+var require_error = __commonJS({
+  "node_modules/commander/lib/error.js"(exports2) {
+    var CommanderError2 = class extends Error {
+      /**
+       * Constructs the CommanderError class
+       * @param {number} exitCode suggested exit code which could be used with process.exit
+       * @param {string} code an id string representing the error
+       * @param {string} message human-readable description of the error
+       */
+      constructor(exitCode, code, message) {
+        super(message);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
+        this.code = code;
+        this.exitCode = exitCode;
+        this.nestedError = void 0;
+      }
+    };
+    var InvalidArgumentError2 = class extends CommanderError2 {
+      /**
+       * Constructs the InvalidArgumentError class
+       * @param {string} [message] explanation of why argument is invalid
+       */
+      constructor(message) {
+        super(1, "commander.invalidArgument", message);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
+      }
+    };
+    exports2.CommanderError = CommanderError2;
+    exports2.InvalidArgumentError = InvalidArgumentError2;
+  }
+});
+
+// node_modules/commander/lib/argument.js
+var require_argument = __commonJS({
+  "node_modules/commander/lib/argument.js"(exports2) {
+    var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var Argument2 = class {
+      /**
+       * Initialize a new command argument with the given name and description.
+       * The default is that the argument is required, and you can explicitly
+       * indicate this with <> around the name. Put [] around the name for an optional argument.
+       *
+       * @param {string} name
+       * @param {string} [description]
+       */
+      constructor(name, description) {
+        this.description = description || "";
+        this.variadic = false;
+        this.parseArg = void 0;
+        this.defaultValue = void 0;
+        this.defaultValueDescription = void 0;
+        this.argChoices = void 0;
+        switch (name[0]) {
+          case "<":
+            this.required = true;
+            this._name = name.slice(1, -1);
+            break;
+          case "[":
+            this.required = false;
+            this._name = name.slice(1, -1);
+            break;
+          default:
+            this.required = true;
+            this._name = name;
+            break;
+        }
+        if (this._name.length > 3 && this._name.slice(-3) === "...") {
+          this.variadic = true;
+          this._name = this._name.slice(0, -3);
+        }
+      }
+      /**
+       * Return argument name.
+       *
+       * @return {string}
+       */
+      name() {
+        return this._name;
+      }
+      /**
+       * @package
+       */
+      _concatValue(value, previous) {
+        if (previous === this.defaultValue || !Array.isArray(previous)) {
+          return [value];
+        }
+        return previous.concat(value);
+      }
+      /**
+       * Set the default value, and optionally supply the description to be displayed in the help.
+       *
+       * @param {*} value
+       * @param {string} [description]
+       * @return {Argument}
+       */
+      default(value, description) {
+        this.defaultValue = value;
+        this.defaultValueDescription = description;
+        return this;
+      }
+      /**
+       * Set the custom handler for processing CLI command arguments into argument values.
+       *
+       * @param {Function} [fn]
+       * @return {Argument}
+       */
+      argParser(fn) {
+        this.parseArg = fn;
+        return this;
+      }
+      /**
+       * Only allow argument value to be one of choices.
+       *
+       * @param {string[]} values
+       * @return {Argument}
+       */
+      choices(values) {
+        this.argChoices = values.slice();
+        this.parseArg = (arg, previous) => {
+          if (!this.argChoices.includes(arg)) {
+            throw new InvalidArgumentError2(
+              `Allowed choices are ${this.argChoices.join(", ")}.`
+            );
+          }
+          if (this.variadic) {
+            return this._concatValue(arg, previous);
+          }
+          return arg;
+        };
+        return this;
+      }
+      /**
+       * Make argument required.
+       *
+       * @returns {Argument}
+       */
+      argRequired() {
+        this.required = true;
+        return this;
+      }
+      /**
+       * Make argument optional.
+       *
+       * @returns {Argument}
+       */
+      argOptional() {
+        this.required = false;
+        return this;
+      }
+    };
+    function humanReadableArgName(arg) {
+      const nameOutput = arg.name() + (arg.variadic === true ? "..." : "");
+      return arg.required ? "<" + nameOutput + ">" : "[" + nameOutput + "]";
+    }
+    exports2.Argument = Argument2;
+    exports2.humanReadableArgName = humanReadableArgName;
+  }
+});
+
+// node_modules/commander/lib/help.js
+var require_help = __commonJS({
+  "node_modules/commander/lib/help.js"(exports2) {
+    var { humanReadableArgName } = require_argument();
+    var Help2 = class {
+      constructor() {
+        this.helpWidth = void 0;
+        this.minWidthToWrap = 40;
+        this.sortSubcommands = false;
+        this.sortOptions = false;
+        this.showGlobalOptions = false;
+      }
+      /**
+       * prepareContext is called by Commander after applying overrides from `Command.configureHelp()`
+       * and just before calling `formatHelp()`.
+       *
+       * Commander just uses the helpWidth and the rest is provided for optional use by more complex subclasses.
+       *
+       * @param {{ error?: boolean, helpWidth?: number, outputHasColors?: boolean }} contextOptions
+       */
+      prepareContext(contextOptions) {
+        this.helpWidth = this.helpWidth ?? contextOptions.helpWidth ?? 80;
+      }
+      /**
+       * Get an array of the visible subcommands. Includes a placeholder for the implicit help command, if there is one.
+       *
+       * @param {Command} cmd
+       * @returns {Command[]}
+       */
+      visibleCommands(cmd) {
+        const visibleCommands = cmd.commands.filter((cmd2) => !cmd2._hidden);
+        const helpCommand = cmd._getHelpCommand();
+        if (helpCommand && !helpCommand._hidden) {
+          visibleCommands.push(helpCommand);
+        }
+        if (this.sortSubcommands) {
+          visibleCommands.sort((a, b) => {
+            return a.name().localeCompare(b.name());
+          });
+        }
+        return visibleCommands;
+      }
+      /**
+       * Compare options for sort.
+       *
+       * @param {Option} a
+       * @param {Option} b
+       * @returns {number}
+       */
+      compareOptions(a, b) {
+        const getSortKey = (option) => {
+          return option.short ? option.short.replace(/^-/, "") : option.long.replace(/^--/, "");
+        };
+        return getSortKey(a).localeCompare(getSortKey(b));
+      }
+      /**
+       * Get an array of the visible options. Includes a placeholder for the implicit help option, if there is one.
+       *
+       * @param {Command} cmd
+       * @returns {Option[]}
+       */
+      visibleOptions(cmd) {
+        const visibleOptions = cmd.options.filter((option) => !option.hidden);
+        const helpOption = cmd._getHelpOption();
+        if (helpOption && !helpOption.hidden) {
+          const removeShort = helpOption.short && cmd._findOption(helpOption.short);
+          const removeLong = helpOption.long && cmd._findOption(helpOption.long);
+          if (!removeShort && !removeLong) {
+            visibleOptions.push(helpOption);
+          } else if (helpOption.long && !removeLong) {
+            visibleOptions.push(
+              cmd.createOption(helpOption.long, helpOption.description)
+            );
+          } else if (helpOption.short && !removeShort) {
+            visibleOptions.push(
+              cmd.createOption(helpOption.short, helpOption.description)
+            );
+          }
+        }
+        if (this.sortOptions) {
+          visibleOptions.sort(this.compareOptions);
+        }
+        return visibleOptions;
+      }
+      /**
+       * Get an array of the visible global options. (Not including help.)
+       *
+       * @param {Command} cmd
+       * @returns {Option[]}
+       */
+      visibleGlobalOptions(cmd) {
+        if (!this.showGlobalOptions) return [];
+        const globalOptions = [];
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          const visibleOptions = ancestorCmd.options.filter(
+            (option) => !option.hidden
+          );
+          globalOptions.push(...visibleOptions);
+        }
+        if (this.sortOptions) {
+          globalOptions.sort(this.compareOptions);
+        }
+        return globalOptions;
+      }
+      /**
+       * Get an array of the arguments if any have a description.
+       *
+       * @param {Command} cmd
+       * @returns {Argument[]}
+       */
+      visibleArguments(cmd) {
+        if (cmd._argsDescription) {
+          cmd.registeredArguments.forEach((argument) => {
+            argument.description = argument.description || cmd._argsDescription[argument.name()] || "";
+          });
+        }
+        if (cmd.registeredArguments.find((argument) => argument.description)) {
+          return cmd.registeredArguments;
+        }
+        return [];
+      }
+      /**
+       * Get the command term to show in the list of subcommands.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      subcommandTerm(cmd) {
+        const args = cmd.registeredArguments.map((arg) => humanReadableArgName(arg)).join(" ");
+        return cmd._name + (cmd._aliases[0] ? "|" + cmd._aliases[0] : "") + (cmd.options.length ? " [options]" : "") + // simplistic check for non-help option
+        (args ? " " + args : "");
+      }
+      /**
+       * Get the option term to show in the list of options.
+       *
+       * @param {Option} option
+       * @returns {string}
+       */
+      optionTerm(option) {
+        return option.flags;
+      }
+      /**
+       * Get the argument term to show in the list of arguments.
+       *
+       * @param {Argument} argument
+       * @returns {string}
+       */
+      argumentTerm(argument) {
+        return argument.name();
+      }
+      /**
+       * Get the longest command term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestSubcommandTermLength(cmd, helper) {
+        return helper.visibleCommands(cmd).reduce((max, command) => {
+          return Math.max(
+            max,
+            this.displayWidth(
+              helper.styleSubcommandTerm(helper.subcommandTerm(command))
+            )
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest option term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestOptionTermLength(cmd, helper) {
+        return helper.visibleOptions(cmd).reduce((max, option) => {
+          return Math.max(
+            max,
+            this.displayWidth(helper.styleOptionTerm(helper.optionTerm(option)))
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest global option term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestGlobalOptionTermLength(cmd, helper) {
+        return helper.visibleGlobalOptions(cmd).reduce((max, option) => {
+          return Math.max(
+            max,
+            this.displayWidth(helper.styleOptionTerm(helper.optionTerm(option)))
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest argument term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestArgumentTermLength(cmd, helper) {
+        return helper.visibleArguments(cmd).reduce((max, argument) => {
+          return Math.max(
+            max,
+            this.displayWidth(
+              helper.styleArgumentTerm(helper.argumentTerm(argument))
+            )
+          );
+        }, 0);
+      }
+      /**
+       * Get the command usage to be displayed at the top of the built-in help.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      commandUsage(cmd) {
+        let cmdName = cmd._name;
+        if (cmd._aliases[0]) {
+          cmdName = cmdName + "|" + cmd._aliases[0];
+        }
+        let ancestorCmdNames = "";
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          ancestorCmdNames = ancestorCmd.name() + " " + ancestorCmdNames;
+        }
+        return ancestorCmdNames + cmdName + " " + cmd.usage();
+      }
+      /**
+       * Get the description for the command.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      commandDescription(cmd) {
+        return cmd.description();
+      }
+      /**
+       * Get the subcommand summary to show in the list of subcommands.
+       * (Fallback to description for backwards compatibility.)
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      subcommandDescription(cmd) {
+        return cmd.summary() || cmd.description();
+      }
+      /**
+       * Get the option description to show in the list of options.
+       *
+       * @param {Option} option
+       * @return {string}
+       */
+      optionDescription(option) {
+        const extraInfo = [];
+        if (option.argChoices) {
+          extraInfo.push(
+            // use stringify to match the display of the default value
+            `choices: ${option.argChoices.map((choice) => JSON.stringify(choice)).join(", ")}`
+          );
+        }
+        if (option.defaultValue !== void 0) {
+          const showDefault = option.required || option.optional || option.isBoolean() && typeof option.defaultValue === "boolean";
+          if (showDefault) {
+            extraInfo.push(
+              `default: ${option.defaultValueDescription || JSON.stringify(option.defaultValue)}`
+            );
+          }
+        }
+        if (option.presetArg !== void 0 && option.optional) {
+          extraInfo.push(`preset: ${JSON.stringify(option.presetArg)}`);
+        }
+        if (option.envVar !== void 0) {
+          extraInfo.push(`env: ${option.envVar}`);
+        }
+        if (extraInfo.length > 0) {
+          const extraDescription = `(${extraInfo.join(", ")})`;
+          if (option.description) {
+            return `${option.description} ${extraDescription}`;
+          }
+          return extraDescription;
+        }
+        return option.description;
+      }
+      /**
+       * Get the argument description to show in the list of arguments.
+       *
+       * @param {Argument} argument
+       * @return {string}
+       */
+      argumentDescription(argument) {
+        const extraInfo = [];
+        if (argument.argChoices) {
+          extraInfo.push(
+            // use stringify to match the display of the default value
+            `choices: ${argument.argChoices.map((choice) => JSON.stringify(choice)).join(", ")}`
+          );
+        }
+        if (argument.defaultValue !== void 0) {
+          extraInfo.push(
+            `default: ${argument.defaultValueDescription || JSON.stringify(argument.defaultValue)}`
+          );
+        }
+        if (extraInfo.length > 0) {
+          const extraDescription = `(${extraInfo.join(", ")})`;
+          if (argument.description) {
+            return `${argument.description} ${extraDescription}`;
+          }
+          return extraDescription;
+        }
+        return argument.description;
+      }
+      /**
+       * Format a list of items, given a heading and an array of formatted items.
+       *
+       * @param {string} heading
+       * @param {string[]} items
+       * @param {Help} helper
+       * @returns string[]
+       */
+      formatItemList(heading, items, helper) {
+        if (items.length === 0) return [];
+        return [helper.styleTitle(heading), ...items, ""];
+      }
+      /**
+       * Group items by their help group heading.
+       *
+       * @param {Command[] | Option[]} unsortedItems
+       * @param {Command[] | Option[]} visibleItems
+       * @param {Function} getGroup
+       * @returns {Map<string, Command[] | Option[]>}
+       */
+      groupItems(unsortedItems, visibleItems, getGroup) {
+        const result = /* @__PURE__ */ new Map();
+        unsortedItems.forEach((item) => {
+          const group = getGroup(item);
+          if (!result.has(group)) result.set(group, []);
+        });
+        visibleItems.forEach((item) => {
+          const group = getGroup(item);
+          if (!result.has(group)) {
+            result.set(group, []);
+          }
+          result.get(group).push(item);
+        });
+        return result;
+      }
+      /**
+       * Generate the built-in help text.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {string}
+       */
+      formatHelp(cmd, helper) {
+        const termWidth = helper.padWidth(cmd, helper);
+        const helpWidth = helper.helpWidth ?? 80;
+        function callFormatItem(term, description) {
+          return helper.formatItem(term, termWidth, description, helper);
+        }
+        let output = [
+          `${helper.styleTitle("Usage:")} ${helper.styleUsage(helper.commandUsage(cmd))}`,
+          ""
+        ];
+        const commandDescription = helper.commandDescription(cmd);
+        if (commandDescription.length > 0) {
+          output = output.concat([
+            helper.boxWrap(
+              helper.styleCommandDescription(commandDescription),
+              helpWidth
+            ),
+            ""
+          ]);
+        }
+        const argumentList = helper.visibleArguments(cmd).map((argument) => {
+          return callFormatItem(
+            helper.styleArgumentTerm(helper.argumentTerm(argument)),
+            helper.styleArgumentDescription(helper.argumentDescription(argument))
+          );
+        });
+        output = output.concat(
+          this.formatItemList("Arguments:", argumentList, helper)
+        );
+        const optionGroups = this.groupItems(
+          cmd.options,
+          helper.visibleOptions(cmd),
+          (option) => option.helpGroupHeading ?? "Options:"
+        );
+        optionGroups.forEach((options2, group) => {
+          const optionList = options2.map((option) => {
+            return callFormatItem(
+              helper.styleOptionTerm(helper.optionTerm(option)),
+              helper.styleOptionDescription(helper.optionDescription(option))
+            );
+          });
+          output = output.concat(this.formatItemList(group, optionList, helper));
+        });
+        if (helper.showGlobalOptions) {
+          const globalOptionList = helper.visibleGlobalOptions(cmd).map((option) => {
+            return callFormatItem(
+              helper.styleOptionTerm(helper.optionTerm(option)),
+              helper.styleOptionDescription(helper.optionDescription(option))
+            );
+          });
+          output = output.concat(
+            this.formatItemList("Global Options:", globalOptionList, helper)
+          );
+        }
+        const commandGroups = this.groupItems(
+          cmd.commands,
+          helper.visibleCommands(cmd),
+          (sub) => sub.helpGroup() || "Commands:"
+        );
+        commandGroups.forEach((commands, group) => {
+          const commandList = commands.map((sub) => {
+            return callFormatItem(
+              helper.styleSubcommandTerm(helper.subcommandTerm(sub)),
+              helper.styleSubcommandDescription(helper.subcommandDescription(sub))
+            );
+          });
+          output = output.concat(this.formatItemList(group, commandList, helper));
+        });
+        return output.join("\n");
+      }
+      /**
+       * Return display width of string, ignoring ANSI escape sequences. Used in padding and wrapping calculations.
+       *
+       * @param {string} str
+       * @returns {number}
+       */
+      displayWidth(str) {
+        return stripColor(str).length;
+      }
+      /**
+       * Style the title for displaying in the help. Called with 'Usage:', 'Options:', etc.
+       *
+       * @param {string} str
+       * @returns {string}
+       */
+      styleTitle(str) {
+        return str;
+      }
+      styleUsage(str) {
+        return str.split(" ").map((word) => {
+          if (word === "[options]") return this.styleOptionText(word);
+          if (word === "[command]") return this.styleSubcommandText(word);
+          if (word[0] === "[" || word[0] === "<")
+            return this.styleArgumentText(word);
+          return this.styleCommandText(word);
+        }).join(" ");
+      }
+      styleCommandDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleOptionDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleSubcommandDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleArgumentDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleDescriptionText(str) {
+        return str;
+      }
+      styleOptionTerm(str) {
+        return this.styleOptionText(str);
+      }
+      styleSubcommandTerm(str) {
+        return str.split(" ").map((word) => {
+          if (word === "[options]") return this.styleOptionText(word);
+          if (word[0] === "[" || word[0] === "<")
+            return this.styleArgumentText(word);
+          return this.styleSubcommandText(word);
+        }).join(" ");
+      }
+      styleArgumentTerm(str) {
+        return this.styleArgumentText(str);
+      }
+      styleOptionText(str) {
+        return str;
+      }
+      styleArgumentText(str) {
+        return str;
+      }
+      styleSubcommandText(str) {
+        return str;
+      }
+      styleCommandText(str) {
+        return str;
+      }
+      /**
+       * Calculate the pad width from the maximum term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      padWidth(cmd, helper) {
+        return Math.max(
+          helper.longestOptionTermLength(cmd, helper),
+          helper.longestGlobalOptionTermLength(cmd, helper),
+          helper.longestSubcommandTermLength(cmd, helper),
+          helper.longestArgumentTermLength(cmd, helper)
+        );
+      }
+      /**
+       * Detect manually wrapped and indented strings by checking for line break followed by whitespace.
+       *
+       * @param {string} str
+       * @returns {boolean}
+       */
+      preformatted(str) {
+        return /\n[^\S\r\n]/.test(str);
+      }
+      /**
+       * Format the "item", which consists of a term and description. Pad the term and wrap the description, indenting the following lines.
+       *
+       * So "TTT", 5, "DDD DDDD DD DDD" might be formatted for this.helpWidth=17 like so:
+       *   TTT  DDD DDDD
+       *        DD DDD
+       *
+       * @param {string} term
+       * @param {number} termWidth
+       * @param {string} description
+       * @param {Help} helper
+       * @returns {string}
+       */
+      formatItem(term, termWidth, description, helper) {
+        const itemIndent = 2;
+        const itemIndentStr = " ".repeat(itemIndent);
+        if (!description) return itemIndentStr + term;
+        const paddedTerm = term.padEnd(
+          termWidth + term.length - helper.displayWidth(term)
+        );
+        const spacerWidth = 2;
+        const helpWidth = this.helpWidth ?? 80;
+        const remainingWidth = helpWidth - termWidth - spacerWidth - itemIndent;
+        let formattedDescription;
+        if (remainingWidth < this.minWidthToWrap || helper.preformatted(description)) {
+          formattedDescription = description;
+        } else {
+          const wrappedDescription = helper.boxWrap(description, remainingWidth);
+          formattedDescription = wrappedDescription.replace(
+            /\n/g,
+            "\n" + " ".repeat(termWidth + spacerWidth)
+          );
+        }
+        return itemIndentStr + paddedTerm + " ".repeat(spacerWidth) + formattedDescription.replace(/\n/g, `
+${itemIndentStr}`);
+      }
+      /**
+       * Wrap a string at whitespace, preserving existing line breaks.
+       * Wrapping is skipped if the width is less than `minWidthToWrap`.
+       *
+       * @param {string} str
+       * @param {number} width
+       * @returns {string}
+       */
+      boxWrap(str, width) {
+        if (width < this.minWidthToWrap) return str;
+        const rawLines = str.split(/\r\n|\n/);
+        const chunkPattern = /[\s]*[^\s]+/g;
+        const wrappedLines = [];
+        rawLines.forEach((line) => {
+          const chunks = line.match(chunkPattern);
+          if (chunks === null) {
+            wrappedLines.push("");
+            return;
+          }
+          let sumChunks = [chunks.shift()];
+          let sumWidth = this.displayWidth(sumChunks[0]);
+          chunks.forEach((chunk) => {
+            const visibleWidth = this.displayWidth(chunk);
+            if (sumWidth + visibleWidth <= width) {
+              sumChunks.push(chunk);
+              sumWidth += visibleWidth;
+              return;
+            }
+            wrappedLines.push(sumChunks.join(""));
+            const nextChunk = chunk.trimStart();
+            sumChunks = [nextChunk];
+            sumWidth = this.displayWidth(nextChunk);
+          });
+          wrappedLines.push(sumChunks.join(""));
+        });
+        return wrappedLines.join("\n");
+      }
+    };
+    function stripColor(str) {
+      const sgrPattern = /\x1b\[\d*(;\d*)*m/g;
+      return str.replace(sgrPattern, "");
+    }
+    exports2.Help = Help2;
+    exports2.stripColor = stripColor;
+  }
+});
+
+// node_modules/commander/lib/option.js
+var require_option = __commonJS({
+  "node_modules/commander/lib/option.js"(exports2) {
+    var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var Option2 = class {
+      /**
+       * Initialize a new `Option` with the given `flags` and `description`.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       */
+      constructor(flags, description) {
+        this.flags = flags;
+        this.description = description || "";
+        this.required = flags.includes("<");
+        this.optional = flags.includes("[");
+        this.variadic = /\w\.\.\.[>\]]$/.test(flags);
+        this.mandatory = false;
+        const optionFlags = splitOptionFlags(flags);
+        this.short = optionFlags.shortFlag;
+        this.long = optionFlags.longFlag;
+        this.negate = false;
+        if (this.long) {
+          this.negate = this.long.startsWith("--no-");
+        }
+        this.defaultValue = void 0;
+        this.defaultValueDescription = void 0;
+        this.presetArg = void 0;
+        this.envVar = void 0;
+        this.parseArg = void 0;
+        this.hidden = false;
+        this.argChoices = void 0;
+        this.conflictsWith = [];
+        this.implied = void 0;
+        this.helpGroupHeading = void 0;
+      }
+      /**
+       * Set the default value, and optionally supply the description to be displayed in the help.
+       *
+       * @param {*} value
+       * @param {string} [description]
+       * @return {Option}
+       */
+      default(value, description) {
+        this.defaultValue = value;
+        this.defaultValueDescription = description;
+        return this;
+      }
+      /**
+       * Preset to use when option used without option-argument, especially optional but also boolean and negated.
+       * The custom processing (parseArg) is called.
+       *
+       * @example
+       * new Option('--color').default('GREYSCALE').preset('RGB');
+       * new Option('--donate [amount]').preset('20').argParser(parseFloat);
+       *
+       * @param {*} arg
+       * @return {Option}
+       */
+      preset(arg) {
+        this.presetArg = arg;
+        return this;
+      }
+      /**
+       * Add option name(s) that conflict with this option.
+       * An error will be displayed if conflicting options are found during parsing.
+       *
+       * @example
+       * new Option('--rgb').conflicts('cmyk');
+       * new Option('--js').conflicts(['ts', 'jsx']);
+       *
+       * @param {(string | string[])} names
+       * @return {Option}
+       */
+      conflicts(names) {
+        this.conflictsWith = this.conflictsWith.concat(names);
+        return this;
+      }
+      /**
+       * Specify implied option values for when this option is set and the implied options are not.
+       *
+       * The custom processing (parseArg) is not called on the implied values.
+       *
+       * @example
+       * program
+       *   .addOption(new Option('--log', 'write logging information to file'))
+       *   .addOption(new Option('--trace', 'log extra details').implies({ log: 'trace.txt' }));
+       *
+       * @param {object} impliedOptionValues
+       * @return {Option}
+       */
+      implies(impliedOptionValues) {
+        let newImplied = impliedOptionValues;
+        if (typeof impliedOptionValues === "string") {
+          newImplied = { [impliedOptionValues]: true };
+        }
+        this.implied = Object.assign(this.implied || {}, newImplied);
+        return this;
+      }
+      /**
+       * Set environment variable to check for option value.
+       *
+       * An environment variable is only used if when processed the current option value is
+       * undefined, or the source of the current value is 'default' or 'config' or 'env'.
+       *
+       * @param {string} name
+       * @return {Option}
+       */
+      env(name) {
+        this.envVar = name;
+        return this;
+      }
+      /**
+       * Set the custom handler for processing CLI option arguments into option values.
+       *
+       * @param {Function} [fn]
+       * @return {Option}
+       */
+      argParser(fn) {
+        this.parseArg = fn;
+        return this;
+      }
+      /**
+       * Whether the option is mandatory and must have a value after parsing.
+       *
+       * @param {boolean} [mandatory=true]
+       * @return {Option}
+       */
+      makeOptionMandatory(mandatory = true) {
+        this.mandatory = !!mandatory;
+        return this;
+      }
+      /**
+       * Hide option in help.
+       *
+       * @param {boolean} [hide=true]
+       * @return {Option}
+       */
+      hideHelp(hide = true) {
+        this.hidden = !!hide;
+        return this;
+      }
+      /**
+       * @package
+       */
+      _concatValue(value, previous) {
+        if (previous === this.defaultValue || !Array.isArray(previous)) {
+          return [value];
+        }
+        return previous.concat(value);
+      }
+      /**
+       * Only allow option value to be one of choices.
+       *
+       * @param {string[]} values
+       * @return {Option}
+       */
+      choices(values) {
+        this.argChoices = values.slice();
+        this.parseArg = (arg, previous) => {
+          if (!this.argChoices.includes(arg)) {
+            throw new InvalidArgumentError2(
+              `Allowed choices are ${this.argChoices.join(", ")}.`
+            );
+          }
+          if (this.variadic) {
+            return this._concatValue(arg, previous);
+          }
+          return arg;
+        };
+        return this;
+      }
+      /**
+       * Return option name.
+       *
+       * @return {string}
+       */
+      name() {
+        if (this.long) {
+          return this.long.replace(/^--/, "");
+        }
+        return this.short.replace(/^-/, "");
+      }
+      /**
+       * Return option name, in a camelcase format that can be used
+       * as an object attribute key.
+       *
+       * @return {string}
+       */
+      attributeName() {
+        if (this.negate) {
+          return camelcase(this.name().replace(/^no-/, ""));
+        }
+        return camelcase(this.name());
+      }
+      /**
+       * Set the help group heading.
+       *
+       * @param {string} heading
+       * @return {Option}
+       */
+      helpGroup(heading) {
+        this.helpGroupHeading = heading;
+        return this;
+      }
+      /**
+       * Check if `arg` matches the short or long flag.
+       *
+       * @param {string} arg
+       * @return {boolean}
+       * @package
+       */
+      is(arg) {
+        return this.short === arg || this.long === arg;
+      }
+      /**
+       * Return whether a boolean option.
+       *
+       * Options are one of boolean, negated, required argument, or optional argument.
+       *
+       * @return {boolean}
+       * @package
+       */
+      isBoolean() {
+        return !this.required && !this.optional && !this.negate;
+      }
+    };
+    var DualOptions = class {
+      /**
+       * @param {Option[]} options
+       */
+      constructor(options2) {
+        this.positiveOptions = /* @__PURE__ */ new Map();
+        this.negativeOptions = /* @__PURE__ */ new Map();
+        this.dualOptions = /* @__PURE__ */ new Set();
+        options2.forEach((option) => {
+          if (option.negate) {
+            this.negativeOptions.set(option.attributeName(), option);
+          } else {
+            this.positiveOptions.set(option.attributeName(), option);
+          }
+        });
+        this.negativeOptions.forEach((value, key) => {
+          if (this.positiveOptions.has(key)) {
+            this.dualOptions.add(key);
+          }
+        });
+      }
+      /**
+       * Did the value come from the option, and not from possible matching dual option?
+       *
+       * @param {*} value
+       * @param {Option} option
+       * @returns {boolean}
+       */
+      valueFromOption(value, option) {
+        const optionKey = option.attributeName();
+        if (!this.dualOptions.has(optionKey)) return true;
+        const preset = this.negativeOptions.get(optionKey).presetArg;
+        const negativeValue = preset !== void 0 ? preset : false;
+        return option.negate === (negativeValue === value);
+      }
+    };
+    function camelcase(str) {
+      return str.split("-").reduce((str2, word) => {
+        return str2 + word[0].toUpperCase() + word.slice(1);
+      });
+    }
+    function splitOptionFlags(flags) {
+      let shortFlag;
+      let longFlag;
+      const shortFlagExp = /^-[^-]$/;
+      const longFlagExp = /^--[^-]/;
+      const flagParts = flags.split(/[ |,]+/).concat("guard");
+      if (shortFlagExp.test(flagParts[0])) shortFlag = flagParts.shift();
+      if (longFlagExp.test(flagParts[0])) longFlag = flagParts.shift();
+      if (!shortFlag && shortFlagExp.test(flagParts[0]))
+        shortFlag = flagParts.shift();
+      if (!shortFlag && longFlagExp.test(flagParts[0])) {
+        shortFlag = longFlag;
+        longFlag = flagParts.shift();
+      }
+      if (flagParts[0].startsWith("-")) {
+        const unsupportedFlag = flagParts[0];
+        const baseError = `option creation failed due to '${unsupportedFlag}' in option flags '${flags}'`;
+        if (/^-[^-][^-]/.test(unsupportedFlag))
+          throw new Error(
+            `${baseError}
 - a short flag is a single dash and a single character
   - either use a single dash and a single character (for a short flag)
-  - or use a double dash for a long option (and can have two, like '--ws, --workspace')`):i.test(o)?new Error(`${a}
-- too many short flags`):n.test(o)?new Error(`${a}
-- too many long flags`):new Error(`${a}
-- unrecognised flag format`)}if(t===void 0&&e===void 0)throw new Error(`option creation failed due to no flags found in '${r}'.`);return{shortFlag:t,longFlag:e}}D.Option=F;D.DualOptions=I});var Q=O(X=>{function $t(r,t){if(Math.abs(r.length-t.length)>3)return Math.max(r.length,t.length);let e=[];for(let i=0;i<=r.length;i++)e[i]=[i];for(let i=0;i<=t.length;i++)e[0][i]=i;for(let i=1;i<=t.length;i++)for(let n=1;n<=r.length;n++){let s=1;r[n-1]===t[i-1]?s=0:s=1,e[n][i]=Math.min(e[n-1][i]+1,e[n][i-1]+1,e[n-1][i-1]+s),n>1&&i>1&&r[n-1]===t[i-2]&&r[n-2]===t[i-1]&&(e[n][i]=Math.min(e[n][i],e[n-2][i-2]+1))}return e[r.length][t.length]}function vt(r,t){if(!t||t.length===0)return"";t=Array.from(new Set(t));let e=r.startsWith("--");e&&(r=r.slice(2),t=t.map(o=>o.slice(2)));let i=[],n=3,s=.4;return t.forEach(o=>{if(o.length<=1)return;let a=$t(r,o),u=Math.max(r.length,o.length);(u-a)/u>s&&(a<n?(n=a,i=[o]):a===n&&i.push(o))}),i.sort((o,a)=>o.localeCompare(a)),e&&(i=i.map(o=>`--${o}`)),i.length>1?`
-(Did you mean one of ${i.join(", ")}?)`:i.length===1?`
-(Did you mean ${i[0]}?)`:""}X.suggestSimilar=vt});var it=O(M=>{var kt=require("node:events").EventEmitter,j=require("node:child_process"),_=require("node:path"),S=require("node:fs"),p=require("node:process"),{Argument:Ht,humanReadableArgName:Vt}=E(),{CommanderError:N}=y(),{Help:Pt,stripColor:Tt}=W(),{Option:Z,DualOptions:Wt}=G(),{suggestSimilar:tt}=Q(),q=class r extends kt{constructor(t){super(),this.commands=[],this.options=[],this.parent=null,this._allowUnknownOption=!1,this._allowExcessArguments=!1,this.registeredArguments=[],this._args=this.registeredArguments,this.args=[],this.rawArgs=[],this.processedArgs=[],this._scriptPath=null,this._name=t||"",this._optionValues={},this._optionValueSources={},this._storeOptionsAsProperties=!1,this._actionHandler=null,this._executableHandler=!1,this._executableFile=null,this._executableDir=null,this._defaultCommandName=null,this._exitCallback=null,this._aliases=[],this._combineFlagAndOptionalValue=!0,this._description="",this._summary="",this._argsDescription=void 0,this._enablePositionalOptions=!1,this._passThroughOptions=!1,this._lifeCycleHooks={},this._showHelpAfterError=!1,this._showSuggestionAfterError=!0,this._savedState=null,this._outputConfiguration={writeOut:e=>p.stdout.write(e),writeErr:e=>p.stderr.write(e),outputError:(e,i)=>i(e),getOutHelpWidth:()=>p.stdout.isTTY?p.stdout.columns:void 0,getErrHelpWidth:()=>p.stderr.isTTY?p.stderr.columns:void 0,getOutHasColors:()=>L()??(p.stdout.isTTY&&p.stdout.hasColors?.()),getErrHasColors:()=>L()??(p.stderr.isTTY&&p.stderr.hasColors?.()),stripColor:e=>Tt(e)},this._hidden=!1,this._helpOption=void 0,this._addImplicitHelpCommand=void 0,this._helpCommand=void 0,this._helpConfiguration={},this._helpGroupHeading=void 0,this._defaultCommandGroup=void 0,this._defaultOptionGroup=void 0}copyInheritedSettings(t){return this._outputConfiguration=t._outputConfiguration,this._helpOption=t._helpOption,this._helpCommand=t._helpCommand,this._helpConfiguration=t._helpConfiguration,this._exitCallback=t._exitCallback,this._storeOptionsAsProperties=t._storeOptionsAsProperties,this._combineFlagAndOptionalValue=t._combineFlagAndOptionalValue,this._allowExcessArguments=t._allowExcessArguments,this._enablePositionalOptions=t._enablePositionalOptions,this._showHelpAfterError=t._showHelpAfterError,this._showSuggestionAfterError=t._showSuggestionAfterError,this}_getCommandAndAncestors(){let t=[];for(let e=this;e;e=e.parent)t.push(e);return t}command(t,e,i){let n=e,s=i;typeof n=="object"&&n!==null&&(s=n,n=null),s=s||{};let[,o,a]=t.match(/([^ ]+) *(.*)/),u=this.createCommand(o);return n&&(u.description(n),u._executableHandler=!0),s.isDefault&&(this._defaultCommandName=u._name),u._hidden=!!(s.noHelp||s.hidden),u._executableFile=s.executableFile||null,a&&u.arguments(a),this._registerCommand(u),u.parent=this,u.copyInheritedSettings(this),n?this:u}createCommand(t){return new r(t)}createHelp(){return Object.assign(new Pt,this.configureHelp())}configureHelp(t){return t===void 0?this._helpConfiguration:(this._helpConfiguration=t,this)}configureOutput(t){return t===void 0?this._outputConfiguration:(this._outputConfiguration=Object.assign({},this._outputConfiguration,t),this)}showHelpAfterError(t=!0){return typeof t!="string"&&(t=!!t),this._showHelpAfterError=t,this}showSuggestionAfterError(t=!0){return this._showSuggestionAfterError=!!t,this}addCommand(t,e){if(!t._name)throw new Error(`Command passed to .addCommand() must have a name
-- specify the name in Command constructor or using .name()`);return e=e||{},e.isDefault&&(this._defaultCommandName=t._name),(e.noHelp||e.hidden)&&(t._hidden=!0),this._registerCommand(t),t.parent=this,t._checkForBrokenPassThrough(),this}createArgument(t,e){return new Ht(t,e)}argument(t,e,i,n){let s=this.createArgument(t,e);return typeof i=="function"?s.default(n).argParser(i):s.default(i),this.addArgument(s),this}arguments(t){return t.trim().split(/ +/).forEach(e=>{this.argument(e)}),this}addArgument(t){let e=this.registeredArguments.slice(-1)[0];if(e&&e.variadic)throw new Error(`only the last argument can be variadic '${e.name()}'`);if(t.required&&t.defaultValue!==void 0&&t.parseArg===void 0)throw new Error(`a default value for a required argument is never used: '${t.name()}'`);return this.registeredArguments.push(t),this}helpCommand(t,e){if(typeof t=="boolean")return this._addImplicitHelpCommand=t,t&&this._defaultCommandGroup&&this._initCommandGroup(this._getHelpCommand()),this;let i=t??"help [command]",[,n,s]=i.match(/([^ ]+) *(.*)/),o=e??"display help for command",a=this.createCommand(n);return a.helpOption(!1),s&&a.arguments(s),o&&a.description(o),this._addImplicitHelpCommand=!0,this._helpCommand=a,(t||e)&&this._initCommandGroup(a),this}addHelpCommand(t,e){return typeof t!="object"?(this.helpCommand(t,e),this):(this._addImplicitHelpCommand=!0,this._helpCommand=t,this._initCommandGroup(t),this)}_getHelpCommand(){return this._addImplicitHelpCommand??(this.commands.length&&!this._actionHandler&&!this._findCommand("help"))?(this._helpCommand===void 0&&this.helpCommand(void 0,void 0),this._helpCommand):null}hook(t,e){let i=["preSubcommand","preAction","postAction"];if(!i.includes(t))throw new Error(`Unexpected value for event passed to hook : '${t}'.
-Expecting one of '${i.join("', '")}'`);return this._lifeCycleHooks[t]?this._lifeCycleHooks[t].push(e):this._lifeCycleHooks[t]=[e],this}exitOverride(t){return t?this._exitCallback=t:this._exitCallback=e=>{if(e.code!=="commander.executeSubCommandAsync")throw e},this}_exit(t,e,i){this._exitCallback&&this._exitCallback(new N(t,e,i)),p.exit(t)}action(t){let e=i=>{let n=this.registeredArguments.length,s=i.slice(0,n);return this._storeOptionsAsProperties?s[n]=this:s[n]=this.opts(),s.push(this),t.apply(this,s)};return this._actionHandler=e,this}createOption(t,e){return new Z(t,e)}_callParseArg(t,e,i,n){try{return t.parseArg(e,i)}catch(s){if(s.code==="commander.invalidArgument"){let o=`${n} ${s.message}`;this.error(o,{exitCode:s.exitCode,code:s.code})}throw s}}_registerOption(t){let e=t.short&&this._findOption(t.short)||t.long&&this._findOption(t.long);if(e){let i=t.long&&this._findOption(t.long)?t.long:t.short;throw new Error(`Cannot add option '${t.flags}'${this._name&&` to command '${this._name}'`} due to conflicting flag '${i}'
--  already used by option '${e.flags}'`)}this._initOptionGroup(t),this.options.push(t)}_registerCommand(t){let e=n=>[n.name()].concat(n.aliases()),i=e(t).find(n=>this._findCommand(n));if(i){let n=e(this._findCommand(i)).join("|"),s=e(t).join("|");throw new Error(`cannot add command '${s}' as already have command '${n}'`)}this._initCommandGroup(t),this.commands.push(t)}addOption(t){this._registerOption(t);let e=t.name(),i=t.attributeName();if(t.negate){let s=t.long.replace(/^--no-/,"--");this._findOption(s)||this.setOptionValueWithSource(i,t.defaultValue===void 0?!0:t.defaultValue,"default")}else t.defaultValue!==void 0&&this.setOptionValueWithSource(i,t.defaultValue,"default");let n=(s,o,a)=>{s==null&&t.presetArg!==void 0&&(s=t.presetArg);let u=this.getOptionValue(i);s!==null&&t.parseArg?s=this._callParseArg(t,s,u,o):s!==null&&t.variadic&&(s=t._concatValue(s,u)),s==null&&(t.negate?s=!1:t.isBoolean()||t.optional?s=!0:s=""),this.setOptionValueWithSource(i,s,a)};return this.on("option:"+e,s=>{let o=`error: option '${t.flags}' argument '${s}' is invalid.`;n(s,o,"cli")}),t.envVar&&this.on("optionEnv:"+e,s=>{let o=`error: option '${t.flags}' value '${s}' from env '${t.envVar}' is invalid.`;n(s,o,"env")}),this}_optionEx(t,e,i,n,s){if(typeof e=="object"&&e instanceof Z)throw new Error("To add an Option object use addOption() instead of option() or requiredOption()");let o=this.createOption(e,i);if(o.makeOptionMandatory(!!t.mandatory),typeof n=="function")o.default(s).argParser(n);else if(n instanceof RegExp){let a=n;n=(u,h)=>{let c=a.exec(u);return c?c[0]:h},o.default(s).argParser(n)}else o.default(n);return this.addOption(o)}option(t,e,i,n){return this._optionEx({},t,e,i,n)}requiredOption(t,e,i,n){return this._optionEx({mandatory:!0},t,e,i,n)}combineFlagAndOptionalValue(t=!0){return this._combineFlagAndOptionalValue=!!t,this}allowUnknownOption(t=!0){return this._allowUnknownOption=!!t,this}allowExcessArguments(t=!0){return this._allowExcessArguments=!!t,this}enablePositionalOptions(t=!0){return this._enablePositionalOptions=!!t,this}passThroughOptions(t=!0){return this._passThroughOptions=!!t,this._checkForBrokenPassThrough(),this}_checkForBrokenPassThrough(){if(this.parent&&this._passThroughOptions&&!this.parent._enablePositionalOptions)throw new Error(`passThroughOptions cannot be used for '${this._name}' without turning on enablePositionalOptions for parent command(s)`)}storeOptionsAsProperties(t=!0){if(this.options.length)throw new Error("call .storeOptionsAsProperties() before adding options");if(Object.keys(this._optionValues).length)throw new Error("call .storeOptionsAsProperties() before setting option values");return this._storeOptionsAsProperties=!!t,this}getOptionValue(t){return this._storeOptionsAsProperties?this[t]:this._optionValues[t]}setOptionValue(t,e){return this.setOptionValueWithSource(t,e,void 0)}setOptionValueWithSource(t,e,i){return this._storeOptionsAsProperties?this[t]=e:this._optionValues[t]=e,this._optionValueSources[t]=i,this}getOptionValueSource(t){return this._optionValueSources[t]}getOptionValueSourceWithGlobals(t){let e;return this._getCommandAndAncestors().forEach(i=>{i.getOptionValueSource(t)!==void 0&&(e=i.getOptionValueSource(t))}),e}_prepareUserArgs(t,e){if(t!==void 0&&!Array.isArray(t))throw new Error("first parameter to parse must be array or undefined");if(e=e||{},t===void 0&&e.from===void 0){p.versions?.electron&&(e.from="electron");let n=p.execArgv??[];(n.includes("-e")||n.includes("--eval")||n.includes("-p")||n.includes("--print"))&&(e.from="eval")}t===void 0&&(t=p.argv),this.rawArgs=t.slice();let i;switch(e.from){case void 0:case"node":this._scriptPath=t[1],i=t.slice(2);break;case"electron":p.defaultApp?(this._scriptPath=t[1],i=t.slice(2)):i=t.slice(1);break;case"user":i=t.slice(0);break;case"eval":i=t.slice(1);break;default:throw new Error(`unexpected parse option { from: '${e.from}' }`)}return!this._name&&this._scriptPath&&this.nameFromFilename(this._scriptPath),this._name=this._name||"program",i}parse(t,e){this._prepareForParse();let i=this._prepareUserArgs(t,e);return this._parseCommand([],i),this}async parseAsync(t,e){this._prepareForParse();let i=this._prepareUserArgs(t,e);return await this._parseCommand([],i),this}_prepareForParse(){this._savedState===null?this.saveStateBeforeParse():this.restoreStateBeforeParse()}saveStateBeforeParse(){this._savedState={_name:this._name,_optionValues:{...this._optionValues},_optionValueSources:{...this._optionValueSources}}}restoreStateBeforeParse(){if(this._storeOptionsAsProperties)throw new Error(`Can not call parse again when storeOptionsAsProperties is true.
-- either make a new Command for each call to parse, or stop storing options as properties`);this._name=this._savedState._name,this._scriptPath=null,this.rawArgs=[],this._optionValues={...this._savedState._optionValues},this._optionValueSources={...this._savedState._optionValueSources},this.args=[],this.processedArgs=[]}_checkForMissingExecutable(t,e,i){if(S.existsSync(t))return;let n=e?`searched for local subcommand relative to directory '${e}'`:"no directory for search for local subcommand, use .executableDir() to supply a custom directory",s=`'${t}' does not exist
- - if '${i}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
+  - or use a double dash for a long option (and can have two, like '--ws, --workspace')`
+          );
+        if (shortFlagExp.test(unsupportedFlag))
+          throw new Error(`${baseError}
+- too many short flags`);
+        if (longFlagExp.test(unsupportedFlag))
+          throw new Error(`${baseError}
+- too many long flags`);
+        throw new Error(`${baseError}
+- unrecognised flag format`);
+      }
+      if (shortFlag === void 0 && longFlag === void 0)
+        throw new Error(
+          `option creation failed due to no flags found in '${flags}'.`
+        );
+      return { shortFlag, longFlag };
+    }
+    exports2.Option = Option2;
+    exports2.DualOptions = DualOptions;
+  }
+});
+
+// node_modules/commander/lib/suggestSimilar.js
+var require_suggestSimilar = __commonJS({
+  "node_modules/commander/lib/suggestSimilar.js"(exports2) {
+    var maxDistance = 3;
+    function editDistance(a, b) {
+      if (Math.abs(a.length - b.length) > maxDistance)
+        return Math.max(a.length, b.length);
+      const d = [];
+      for (let i = 0; i <= a.length; i++) {
+        d[i] = [i];
+      }
+      for (let j = 0; j <= b.length; j++) {
+        d[0][j] = j;
+      }
+      for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+          let cost = 1;
+          if (a[i - 1] === b[j - 1]) {
+            cost = 0;
+          } else {
+            cost = 1;
+          }
+          d[i][j] = Math.min(
+            d[i - 1][j] + 1,
+            // deletion
+            d[i][j - 1] + 1,
+            // insertion
+            d[i - 1][j - 1] + cost
+            // substitution
+          );
+          if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+            d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+          }
+        }
+      }
+      return d[a.length][b.length];
+    }
+    function suggestSimilar(word, candidates) {
+      if (!candidates || candidates.length === 0) return "";
+      candidates = Array.from(new Set(candidates));
+      const searchingOptions = word.startsWith("--");
+      if (searchingOptions) {
+        word = word.slice(2);
+        candidates = candidates.map((candidate) => candidate.slice(2));
+      }
+      let similar = [];
+      let bestDistance = maxDistance;
+      const minSimilarity = 0.4;
+      candidates.forEach((candidate) => {
+        if (candidate.length <= 1) return;
+        const distance = editDistance(word, candidate);
+        const length = Math.max(word.length, candidate.length);
+        const similarity = (length - distance) / length;
+        if (similarity > minSimilarity) {
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            similar = [candidate];
+          } else if (distance === bestDistance) {
+            similar.push(candidate);
+          }
+        }
+      });
+      similar.sort((a, b) => a.localeCompare(b));
+      if (searchingOptions) {
+        similar = similar.map((candidate) => `--${candidate}`);
+      }
+      if (similar.length > 1) {
+        return `
+(Did you mean one of ${similar.join(", ")}?)`;
+      }
+      if (similar.length === 1) {
+        return `
+(Did you mean ${similar[0]}?)`;
+      }
+      return "";
+    }
+    exports2.suggestSimilar = suggestSimilar;
+  }
+});
+
+// node_modules/commander/lib/command.js
+var require_command = __commonJS({
+  "node_modules/commander/lib/command.js"(exports2) {
+    var EventEmitter = require("node:events").EventEmitter;
+    var childProcess = require("node:child_process");
+    var path = require("node:path");
+    var fs4 = require("node:fs");
+    var process2 = require("node:process");
+    var { Argument: Argument2, humanReadableArgName } = require_argument();
+    var { CommanderError: CommanderError2 } = require_error();
+    var { Help: Help2, stripColor } = require_help();
+    var { Option: Option2, DualOptions } = require_option();
+    var { suggestSimilar } = require_suggestSimilar();
+    var Command2 = class _Command extends EventEmitter {
+      /**
+       * Initialize a new `Command`.
+       *
+       * @param {string} [name]
+       */
+      constructor(name) {
+        super();
+        this.commands = [];
+        this.options = [];
+        this.parent = null;
+        this._allowUnknownOption = false;
+        this._allowExcessArguments = false;
+        this.registeredArguments = [];
+        this._args = this.registeredArguments;
+        this.args = [];
+        this.rawArgs = [];
+        this.processedArgs = [];
+        this._scriptPath = null;
+        this._name = name || "";
+        this._optionValues = {};
+        this._optionValueSources = {};
+        this._storeOptionsAsProperties = false;
+        this._actionHandler = null;
+        this._executableHandler = false;
+        this._executableFile = null;
+        this._executableDir = null;
+        this._defaultCommandName = null;
+        this._exitCallback = null;
+        this._aliases = [];
+        this._combineFlagAndOptionalValue = true;
+        this._description = "";
+        this._summary = "";
+        this._argsDescription = void 0;
+        this._enablePositionalOptions = false;
+        this._passThroughOptions = false;
+        this._lifeCycleHooks = {};
+        this._showHelpAfterError = false;
+        this._showSuggestionAfterError = true;
+        this._savedState = null;
+        this._outputConfiguration = {
+          writeOut: (str) => process2.stdout.write(str),
+          writeErr: (str) => process2.stderr.write(str),
+          outputError: (str, write) => write(str),
+          getOutHelpWidth: () => process2.stdout.isTTY ? process2.stdout.columns : void 0,
+          getErrHelpWidth: () => process2.stderr.isTTY ? process2.stderr.columns : void 0,
+          getOutHasColors: () => useColor() ?? (process2.stdout.isTTY && process2.stdout.hasColors?.()),
+          getErrHasColors: () => useColor() ?? (process2.stderr.isTTY && process2.stderr.hasColors?.()),
+          stripColor: (str) => stripColor(str)
+        };
+        this._hidden = false;
+        this._helpOption = void 0;
+        this._addImplicitHelpCommand = void 0;
+        this._helpCommand = void 0;
+        this._helpConfiguration = {};
+        this._helpGroupHeading = void 0;
+        this._defaultCommandGroup = void 0;
+        this._defaultOptionGroup = void 0;
+      }
+      /**
+       * Copy settings that are useful to have in common across root command and subcommands.
+       *
+       * (Used internally when adding a command using `.command()` so subcommands inherit parent settings.)
+       *
+       * @param {Command} sourceCommand
+       * @return {Command} `this` command for chaining
+       */
+      copyInheritedSettings(sourceCommand) {
+        this._outputConfiguration = sourceCommand._outputConfiguration;
+        this._helpOption = sourceCommand._helpOption;
+        this._helpCommand = sourceCommand._helpCommand;
+        this._helpConfiguration = sourceCommand._helpConfiguration;
+        this._exitCallback = sourceCommand._exitCallback;
+        this._storeOptionsAsProperties = sourceCommand._storeOptionsAsProperties;
+        this._combineFlagAndOptionalValue = sourceCommand._combineFlagAndOptionalValue;
+        this._allowExcessArguments = sourceCommand._allowExcessArguments;
+        this._enablePositionalOptions = sourceCommand._enablePositionalOptions;
+        this._showHelpAfterError = sourceCommand._showHelpAfterError;
+        this._showSuggestionAfterError = sourceCommand._showSuggestionAfterError;
+        return this;
+      }
+      /**
+       * @returns {Command[]}
+       * @private
+       */
+      _getCommandAndAncestors() {
+        const result = [];
+        for (let command = this; command; command = command.parent) {
+          result.push(command);
+        }
+        return result;
+      }
+      /**
+       * Define a command.
+       *
+       * There are two styles of command: pay attention to where to put the description.
+       *
+       * @example
+       * // Command implemented using action handler (description is supplied separately to `.command`)
+       * program
+       *   .command('clone <source> [destination]')
+       *   .description('clone a repository into a newly created directory')
+       *   .action((source, destination) => {
+       *     console.log('clone command called');
+       *   });
+       *
+       * // Command implemented using separate executable file (description is second parameter to `.command`)
+       * program
+       *   .command('start <service>', 'start named service')
+       *   .command('stop [service]', 'stop named service, or all if no name supplied');
+       *
+       * @param {string} nameAndArgs - command name and arguments, args are `<required>` or `[optional]` and last may also be `variadic...`
+       * @param {(object | string)} [actionOptsOrExecDesc] - configuration options (for action), or description (for executable)
+       * @param {object} [execOpts] - configuration options (for executable)
+       * @return {Command} returns new command for action handler, or `this` for executable command
+       */
+      command(nameAndArgs, actionOptsOrExecDesc, execOpts) {
+        let desc = actionOptsOrExecDesc;
+        let opts = execOpts;
+        if (typeof desc === "object" && desc !== null) {
+          opts = desc;
+          desc = null;
+        }
+        opts = opts || {};
+        const [, name, args] = nameAndArgs.match(/([^ ]+) *(.*)/);
+        const cmd = this.createCommand(name);
+        if (desc) {
+          cmd.description(desc);
+          cmd._executableHandler = true;
+        }
+        if (opts.isDefault) this._defaultCommandName = cmd._name;
+        cmd._hidden = !!(opts.noHelp || opts.hidden);
+        cmd._executableFile = opts.executableFile || null;
+        if (args) cmd.arguments(args);
+        this._registerCommand(cmd);
+        cmd.parent = this;
+        cmd.copyInheritedSettings(this);
+        if (desc) return this;
+        return cmd;
+      }
+      /**
+       * Factory routine to create a new unattached command.
+       *
+       * See .command() for creating an attached subcommand, which uses this routine to
+       * create the command. You can override createCommand to customise subcommands.
+       *
+       * @param {string} [name]
+       * @return {Command} new command
+       */
+      createCommand(name) {
+        return new _Command(name);
+      }
+      /**
+       * You can customise the help with a subclass of Help by overriding createHelp,
+       * or by overriding Help properties using configureHelp().
+       *
+       * @return {Help}
+       */
+      createHelp() {
+        return Object.assign(new Help2(), this.configureHelp());
+      }
+      /**
+       * You can customise the help by overriding Help properties using configureHelp(),
+       * or with a subclass of Help by overriding createHelp().
+       *
+       * @param {object} [configuration] - configuration options
+       * @return {(Command | object)} `this` command for chaining, or stored configuration
+       */
+      configureHelp(configuration) {
+        if (configuration === void 0) return this._helpConfiguration;
+        this._helpConfiguration = configuration;
+        return this;
+      }
+      /**
+       * The default output goes to stdout and stderr. You can customise this for special
+       * applications. You can also customise the display of errors by overriding outputError.
+       *
+       * The configuration properties are all functions:
+       *
+       *     // change how output being written, defaults to stdout and stderr
+       *     writeOut(str)
+       *     writeErr(str)
+       *     // change how output being written for errors, defaults to writeErr
+       *     outputError(str, write) // used for displaying errors and not used for displaying help
+       *     // specify width for wrapping help
+       *     getOutHelpWidth()
+       *     getErrHelpWidth()
+       *     // color support, currently only used with Help
+       *     getOutHasColors()
+       *     getErrHasColors()
+       *     stripColor() // used to remove ANSI escape codes if output does not have colors
+       *
+       * @param {object} [configuration] - configuration options
+       * @return {(Command | object)} `this` command for chaining, or stored configuration
+       */
+      configureOutput(configuration) {
+        if (configuration === void 0) return this._outputConfiguration;
+        this._outputConfiguration = Object.assign(
+          {},
+          this._outputConfiguration,
+          configuration
+        );
+        return this;
+      }
+      /**
+       * Display the help or a custom message after an error occurs.
+       *
+       * @param {(boolean|string)} [displayHelp]
+       * @return {Command} `this` command for chaining
+       */
+      showHelpAfterError(displayHelp = true) {
+        if (typeof displayHelp !== "string") displayHelp = !!displayHelp;
+        this._showHelpAfterError = displayHelp;
+        return this;
+      }
+      /**
+       * Display suggestion of similar commands for unknown commands, or options for unknown options.
+       *
+       * @param {boolean} [displaySuggestion]
+       * @return {Command} `this` command for chaining
+       */
+      showSuggestionAfterError(displaySuggestion = true) {
+        this._showSuggestionAfterError = !!displaySuggestion;
+        return this;
+      }
+      /**
+       * Add a prepared subcommand.
+       *
+       * See .command() for creating an attached subcommand which inherits settings from its parent.
+       *
+       * @param {Command} cmd - new subcommand
+       * @param {object} [opts] - configuration options
+       * @return {Command} `this` command for chaining
+       */
+      addCommand(cmd, opts) {
+        if (!cmd._name) {
+          throw new Error(`Command passed to .addCommand() must have a name
+- specify the name in Command constructor or using .name()`);
+        }
+        opts = opts || {};
+        if (opts.isDefault) this._defaultCommandName = cmd._name;
+        if (opts.noHelp || opts.hidden) cmd._hidden = true;
+        this._registerCommand(cmd);
+        cmd.parent = this;
+        cmd._checkForBrokenPassThrough();
+        return this;
+      }
+      /**
+       * Factory routine to create a new unattached argument.
+       *
+       * See .argument() for creating an attached argument, which uses this routine to
+       * create the argument. You can override createArgument to return a custom argument.
+       *
+       * @param {string} name
+       * @param {string} [description]
+       * @return {Argument} new argument
+       */
+      createArgument(name, description) {
+        return new Argument2(name, description);
+      }
+      /**
+       * Define argument syntax for command.
+       *
+       * The default is that the argument is required, and you can explicitly
+       * indicate this with <> around the name. Put [] around the name for an optional argument.
+       *
+       * @example
+       * program.argument('<input-file>');
+       * program.argument('[output-file]');
+       *
+       * @param {string} name
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom argument processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      argument(name, description, parseArg, defaultValue) {
+        const argument = this.createArgument(name, description);
+        if (typeof parseArg === "function") {
+          argument.default(defaultValue).argParser(parseArg);
+        } else {
+          argument.default(parseArg);
+        }
+        this.addArgument(argument);
+        return this;
+      }
+      /**
+       * Define argument syntax for command, adding multiple at once (without descriptions).
+       *
+       * See also .argument().
+       *
+       * @example
+       * program.arguments('<cmd> [env]');
+       *
+       * @param {string} names
+       * @return {Command} `this` command for chaining
+       */
+      arguments(names) {
+        names.trim().split(/ +/).forEach((detail) => {
+          this.argument(detail);
+        });
+        return this;
+      }
+      /**
+       * Define argument syntax for command, adding a prepared argument.
+       *
+       * @param {Argument} argument
+       * @return {Command} `this` command for chaining
+       */
+      addArgument(argument) {
+        const previousArgument = this.registeredArguments.slice(-1)[0];
+        if (previousArgument && previousArgument.variadic) {
+          throw new Error(
+            `only the last argument can be variadic '${previousArgument.name()}'`
+          );
+        }
+        if (argument.required && argument.defaultValue !== void 0 && argument.parseArg === void 0) {
+          throw new Error(
+            `a default value for a required argument is never used: '${argument.name()}'`
+          );
+        }
+        this.registeredArguments.push(argument);
+        return this;
+      }
+      /**
+       * Customise or override default help command. By default a help command is automatically added if your command has subcommands.
+       *
+       * @example
+       *    program.helpCommand('help [cmd]');
+       *    program.helpCommand('help [cmd]', 'show help');
+       *    program.helpCommand(false); // suppress default help command
+       *    program.helpCommand(true); // add help command even if no subcommands
+       *
+       * @param {string|boolean} enableOrNameAndArgs - enable with custom name and/or arguments, or boolean to override whether added
+       * @param {string} [description] - custom description
+       * @return {Command} `this` command for chaining
+       */
+      helpCommand(enableOrNameAndArgs, description) {
+        if (typeof enableOrNameAndArgs === "boolean") {
+          this._addImplicitHelpCommand = enableOrNameAndArgs;
+          if (enableOrNameAndArgs && this._defaultCommandGroup) {
+            this._initCommandGroup(this._getHelpCommand());
+          }
+          return this;
+        }
+        const nameAndArgs = enableOrNameAndArgs ?? "help [command]";
+        const [, helpName, helpArgs] = nameAndArgs.match(/([^ ]+) *(.*)/);
+        const helpDescription = description ?? "display help for command";
+        const helpCommand = this.createCommand(helpName);
+        helpCommand.helpOption(false);
+        if (helpArgs) helpCommand.arguments(helpArgs);
+        if (helpDescription) helpCommand.description(helpDescription);
+        this._addImplicitHelpCommand = true;
+        this._helpCommand = helpCommand;
+        if (enableOrNameAndArgs || description) this._initCommandGroup(helpCommand);
+        return this;
+      }
+      /**
+       * Add prepared custom help command.
+       *
+       * @param {(Command|string|boolean)} helpCommand - custom help command, or deprecated enableOrNameAndArgs as for `.helpCommand()`
+       * @param {string} [deprecatedDescription] - deprecated custom description used with custom name only
+       * @return {Command} `this` command for chaining
+       */
+      addHelpCommand(helpCommand, deprecatedDescription) {
+        if (typeof helpCommand !== "object") {
+          this.helpCommand(helpCommand, deprecatedDescription);
+          return this;
+        }
+        this._addImplicitHelpCommand = true;
+        this._helpCommand = helpCommand;
+        this._initCommandGroup(helpCommand);
+        return this;
+      }
+      /**
+       * Lazy create help command.
+       *
+       * @return {(Command|null)}
+       * @package
+       */
+      _getHelpCommand() {
+        const hasImplicitHelpCommand = this._addImplicitHelpCommand ?? (this.commands.length && !this._actionHandler && !this._findCommand("help"));
+        if (hasImplicitHelpCommand) {
+          if (this._helpCommand === void 0) {
+            this.helpCommand(void 0, void 0);
+          }
+          return this._helpCommand;
+        }
+        return null;
+      }
+      /**
+       * Add hook for life cycle event.
+       *
+       * @param {string} event
+       * @param {Function} listener
+       * @return {Command} `this` command for chaining
+       */
+      hook(event, listener) {
+        const allowedValues = ["preSubcommand", "preAction", "postAction"];
+        if (!allowedValues.includes(event)) {
+          throw new Error(`Unexpected value for event passed to hook : '${event}'.
+Expecting one of '${allowedValues.join("', '")}'`);
+        }
+        if (this._lifeCycleHooks[event]) {
+          this._lifeCycleHooks[event].push(listener);
+        } else {
+          this._lifeCycleHooks[event] = [listener];
+        }
+        return this;
+      }
+      /**
+       * Register callback to use as replacement for calling process.exit.
+       *
+       * @param {Function} [fn] optional callback which will be passed a CommanderError, defaults to throwing
+       * @return {Command} `this` command for chaining
+       */
+      exitOverride(fn) {
+        if (fn) {
+          this._exitCallback = fn;
+        } else {
+          this._exitCallback = (err) => {
+            if (err.code !== "commander.executeSubCommandAsync") {
+              throw err;
+            } else {
+            }
+          };
+        }
+        return this;
+      }
+      /**
+       * Call process.exit, and _exitCallback if defined.
+       *
+       * @param {number} exitCode exit code for using with process.exit
+       * @param {string} code an id string representing the error
+       * @param {string} message human-readable description of the error
+       * @return never
+       * @private
+       */
+      _exit(exitCode, code, message) {
+        if (this._exitCallback) {
+          this._exitCallback(new CommanderError2(exitCode, code, message));
+        }
+        process2.exit(exitCode);
+      }
+      /**
+       * Register callback `fn` for the command.
+       *
+       * @example
+       * program
+       *   .command('serve')
+       *   .description('start service')
+       *   .action(function() {
+       *      // do work here
+       *   });
+       *
+       * @param {Function} fn
+       * @return {Command} `this` command for chaining
+       */
+      action(fn) {
+        const listener = (args) => {
+          const expectedArgsCount = this.registeredArguments.length;
+          const actionArgs = args.slice(0, expectedArgsCount);
+          if (this._storeOptionsAsProperties) {
+            actionArgs[expectedArgsCount] = this;
+          } else {
+            actionArgs[expectedArgsCount] = this.opts();
+          }
+          actionArgs.push(this);
+          return fn.apply(this, actionArgs);
+        };
+        this._actionHandler = listener;
+        return this;
+      }
+      /**
+       * Factory routine to create a new unattached option.
+       *
+       * See .option() for creating an attached option, which uses this routine to
+       * create the option. You can override createOption to return a custom option.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @return {Option} new option
+       */
+      createOption(flags, description) {
+        return new Option2(flags, description);
+      }
+      /**
+       * Wrap parseArgs to catch 'commander.invalidArgument'.
+       *
+       * @param {(Option | Argument)} target
+       * @param {string} value
+       * @param {*} previous
+       * @param {string} invalidArgumentMessage
+       * @private
+       */
+      _callParseArg(target, value, previous, invalidArgumentMessage) {
+        try {
+          return target.parseArg(value, previous);
+        } catch (err) {
+          if (err.code === "commander.invalidArgument") {
+            const message = `${invalidArgumentMessage} ${err.message}`;
+            this.error(message, { exitCode: err.exitCode, code: err.code });
+          }
+          throw err;
+        }
+      }
+      /**
+       * Check for option flag conflicts.
+       * Register option if no conflicts found, or throw on conflict.
+       *
+       * @param {Option} option
+       * @private
+       */
+      _registerOption(option) {
+        const matchingOption = option.short && this._findOption(option.short) || option.long && this._findOption(option.long);
+        if (matchingOption) {
+          const matchingFlag = option.long && this._findOption(option.long) ? option.long : option.short;
+          throw new Error(`Cannot add option '${option.flags}'${this._name && ` to command '${this._name}'`} due to conflicting flag '${matchingFlag}'
+-  already used by option '${matchingOption.flags}'`);
+        }
+        this._initOptionGroup(option);
+        this.options.push(option);
+      }
+      /**
+       * Check for command name and alias conflicts with existing commands.
+       * Register command if no conflicts found, or throw on conflict.
+       *
+       * @param {Command} command
+       * @private
+       */
+      _registerCommand(command) {
+        const knownBy = (cmd) => {
+          return [cmd.name()].concat(cmd.aliases());
+        };
+        const alreadyUsed = knownBy(command).find(
+          (name) => this._findCommand(name)
+        );
+        if (alreadyUsed) {
+          const existingCmd = knownBy(this._findCommand(alreadyUsed)).join("|");
+          const newCmd = knownBy(command).join("|");
+          throw new Error(
+            `cannot add command '${newCmd}' as already have command '${existingCmd}'`
+          );
+        }
+        this._initCommandGroup(command);
+        this.commands.push(command);
+      }
+      /**
+       * Add an option.
+       *
+       * @param {Option} option
+       * @return {Command} `this` command for chaining
+       */
+      addOption(option) {
+        this._registerOption(option);
+        const oname = option.name();
+        const name = option.attributeName();
+        if (option.negate) {
+          const positiveLongFlag = option.long.replace(/^--no-/, "--");
+          if (!this._findOption(positiveLongFlag)) {
+            this.setOptionValueWithSource(
+              name,
+              option.defaultValue === void 0 ? true : option.defaultValue,
+              "default"
+            );
+          }
+        } else if (option.defaultValue !== void 0) {
+          this.setOptionValueWithSource(name, option.defaultValue, "default");
+        }
+        const handleOptionValue = (val, invalidValueMessage, valueSource) => {
+          if (val == null && option.presetArg !== void 0) {
+            val = option.presetArg;
+          }
+          const oldValue = this.getOptionValue(name);
+          if (val !== null && option.parseArg) {
+            val = this._callParseArg(option, val, oldValue, invalidValueMessage);
+          } else if (val !== null && option.variadic) {
+            val = option._concatValue(val, oldValue);
+          }
+          if (val == null) {
+            if (option.negate) {
+              val = false;
+            } else if (option.isBoolean() || option.optional) {
+              val = true;
+            } else {
+              val = "";
+            }
+          }
+          this.setOptionValueWithSource(name, val, valueSource);
+        };
+        this.on("option:" + oname, (val) => {
+          const invalidValueMessage = `error: option '${option.flags}' argument '${val}' is invalid.`;
+          handleOptionValue(val, invalidValueMessage, "cli");
+        });
+        if (option.envVar) {
+          this.on("optionEnv:" + oname, (val) => {
+            const invalidValueMessage = `error: option '${option.flags}' value '${val}' from env '${option.envVar}' is invalid.`;
+            handleOptionValue(val, invalidValueMessage, "env");
+          });
+        }
+        return this;
+      }
+      /**
+       * Internal implementation shared by .option() and .requiredOption()
+       *
+       * @return {Command} `this` command for chaining
+       * @private
+       */
+      _optionEx(config, flags, description, fn, defaultValue) {
+        if (typeof flags === "object" && flags instanceof Option2) {
+          throw new Error(
+            "To add an Option object use addOption() instead of option() or requiredOption()"
+          );
+        }
+        const option = this.createOption(flags, description);
+        option.makeOptionMandatory(!!config.mandatory);
+        if (typeof fn === "function") {
+          option.default(defaultValue).argParser(fn);
+        } else if (fn instanceof RegExp) {
+          const regex = fn;
+          fn = (val, def) => {
+            const m = regex.exec(val);
+            return m ? m[0] : def;
+          };
+          option.default(defaultValue).argParser(fn);
+        } else {
+          option.default(fn);
+        }
+        return this.addOption(option);
+      }
+      /**
+       * Define option with `flags`, `description`, and optional argument parsing function or `defaultValue` or both.
+       *
+       * The `flags` string contains the short and/or long flags, separated by comma, a pipe or space. A required
+       * option-argument is indicated by `<>` and an optional option-argument by `[]`.
+       *
+       * See the README for more details, and see also addOption() and requiredOption().
+       *
+       * @example
+       * program
+       *     .option('-p, --pepper', 'add pepper')
+       *     .option('--pt, --pizza-type <TYPE>', 'type of pizza') // required option-argument
+       *     .option('-c, --cheese [CHEESE]', 'add extra cheese', 'mozzarella') // optional option-argument with default
+       *     .option('-t, --tip <VALUE>', 'add tip to purchase cost', parseFloat) // custom parse function
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom option processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      option(flags, description, parseArg, defaultValue) {
+        return this._optionEx({}, flags, description, parseArg, defaultValue);
+      }
+      /**
+       * Add a required option which must have a value after parsing. This usually means
+       * the option must be specified on the command line. (Otherwise the same as .option().)
+       *
+       * The `flags` string contains the short and/or long flags, separated by comma, a pipe or space.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom option processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      requiredOption(flags, description, parseArg, defaultValue) {
+        return this._optionEx(
+          { mandatory: true },
+          flags,
+          description,
+          parseArg,
+          defaultValue
+        );
+      }
+      /**
+       * Alter parsing of short flags with optional values.
+       *
+       * @example
+       * // for `.option('-f,--flag [value]'):
+       * program.combineFlagAndOptionalValue(true);  // `-f80` is treated like `--flag=80`, this is the default behaviour
+       * program.combineFlagAndOptionalValue(false) // `-fb` is treated like `-f -b`
+       *
+       * @param {boolean} [combine] - if `true` or omitted, an optional value can be specified directly after the flag.
+       * @return {Command} `this` command for chaining
+       */
+      combineFlagAndOptionalValue(combine = true) {
+        this._combineFlagAndOptionalValue = !!combine;
+        return this;
+      }
+      /**
+       * Allow unknown options on the command line.
+       *
+       * @param {boolean} [allowUnknown] - if `true` or omitted, no error will be thrown for unknown options.
+       * @return {Command} `this` command for chaining
+       */
+      allowUnknownOption(allowUnknown = true) {
+        this._allowUnknownOption = !!allowUnknown;
+        return this;
+      }
+      /**
+       * Allow excess command-arguments on the command line. Pass false to make excess arguments an error.
+       *
+       * @param {boolean} [allowExcess] - if `true` or omitted, no error will be thrown for excess arguments.
+       * @return {Command} `this` command for chaining
+       */
+      allowExcessArguments(allowExcess = true) {
+        this._allowExcessArguments = !!allowExcess;
+        return this;
+      }
+      /**
+       * Enable positional options. Positional means global options are specified before subcommands which lets
+       * subcommands reuse the same option names, and also enables subcommands to turn on passThroughOptions.
+       * The default behaviour is non-positional and global options may appear anywhere on the command line.
+       *
+       * @param {boolean} [positional]
+       * @return {Command} `this` command for chaining
+       */
+      enablePositionalOptions(positional = true) {
+        this._enablePositionalOptions = !!positional;
+        return this;
+      }
+      /**
+       * Pass through options that come after command-arguments rather than treat them as command-options,
+       * so actual command-options come before command-arguments. Turning this on for a subcommand requires
+       * positional options to have been enabled on the program (parent commands).
+       * The default behaviour is non-positional and options may appear before or after command-arguments.
+       *
+       * @param {boolean} [passThrough] for unknown options.
+       * @return {Command} `this` command for chaining
+       */
+      passThroughOptions(passThrough = true) {
+        this._passThroughOptions = !!passThrough;
+        this._checkForBrokenPassThrough();
+        return this;
+      }
+      /**
+       * @private
+       */
+      _checkForBrokenPassThrough() {
+        if (this.parent && this._passThroughOptions && !this.parent._enablePositionalOptions) {
+          throw new Error(
+            `passThroughOptions cannot be used for '${this._name}' without turning on enablePositionalOptions for parent command(s)`
+          );
+        }
+      }
+      /**
+       * Whether to store option values as properties on command object,
+       * or store separately (specify false). In both cases the option values can be accessed using .opts().
+       *
+       * @param {boolean} [storeAsProperties=true]
+       * @return {Command} `this` command for chaining
+       */
+      storeOptionsAsProperties(storeAsProperties = true) {
+        if (this.options.length) {
+          throw new Error("call .storeOptionsAsProperties() before adding options");
+        }
+        if (Object.keys(this._optionValues).length) {
+          throw new Error(
+            "call .storeOptionsAsProperties() before setting option values"
+          );
+        }
+        this._storeOptionsAsProperties = !!storeAsProperties;
+        return this;
+      }
+      /**
+       * Retrieve option value.
+       *
+       * @param {string} key
+       * @return {object} value
+       */
+      getOptionValue(key) {
+        if (this._storeOptionsAsProperties) {
+          return this[key];
+        }
+        return this._optionValues[key];
+      }
+      /**
+       * Store option value.
+       *
+       * @param {string} key
+       * @param {object} value
+       * @return {Command} `this` command for chaining
+       */
+      setOptionValue(key, value) {
+        return this.setOptionValueWithSource(key, value, void 0);
+      }
+      /**
+       * Store option value and where the value came from.
+       *
+       * @param {string} key
+       * @param {object} value
+       * @param {string} source - expected values are default/config/env/cli/implied
+       * @return {Command} `this` command for chaining
+       */
+      setOptionValueWithSource(key, value, source) {
+        if (this._storeOptionsAsProperties) {
+          this[key] = value;
+        } else {
+          this._optionValues[key] = value;
+        }
+        this._optionValueSources[key] = source;
+        return this;
+      }
+      /**
+       * Get source of option value.
+       * Expected values are default | config | env | cli | implied
+       *
+       * @param {string} key
+       * @return {string}
+       */
+      getOptionValueSource(key) {
+        return this._optionValueSources[key];
+      }
+      /**
+       * Get source of option value. See also .optsWithGlobals().
+       * Expected values are default | config | env | cli | implied
+       *
+       * @param {string} key
+       * @return {string}
+       */
+      getOptionValueSourceWithGlobals(key) {
+        let source;
+        this._getCommandAndAncestors().forEach((cmd) => {
+          if (cmd.getOptionValueSource(key) !== void 0) {
+            source = cmd.getOptionValueSource(key);
+          }
+        });
+        return source;
+      }
+      /**
+       * Get user arguments from implied or explicit arguments.
+       * Side-effects: set _scriptPath if args included script. Used for default program name, and subcommand searches.
+       *
+       * @private
+       */
+      _prepareUserArgs(argv, parseOptions) {
+        if (argv !== void 0 && !Array.isArray(argv)) {
+          throw new Error("first parameter to parse must be array or undefined");
+        }
+        parseOptions = parseOptions || {};
+        if (argv === void 0 && parseOptions.from === void 0) {
+          if (process2.versions?.electron) {
+            parseOptions.from = "electron";
+          }
+          const execArgv = process2.execArgv ?? [];
+          if (execArgv.includes("-e") || execArgv.includes("--eval") || execArgv.includes("-p") || execArgv.includes("--print")) {
+            parseOptions.from = "eval";
+          }
+        }
+        if (argv === void 0) {
+          argv = process2.argv;
+        }
+        this.rawArgs = argv.slice();
+        let userArgs;
+        switch (parseOptions.from) {
+          case void 0:
+          case "node":
+            this._scriptPath = argv[1];
+            userArgs = argv.slice(2);
+            break;
+          case "electron":
+            if (process2.defaultApp) {
+              this._scriptPath = argv[1];
+              userArgs = argv.slice(2);
+            } else {
+              userArgs = argv.slice(1);
+            }
+            break;
+          case "user":
+            userArgs = argv.slice(0);
+            break;
+          case "eval":
+            userArgs = argv.slice(1);
+            break;
+          default:
+            throw new Error(
+              `unexpected parse option { from: '${parseOptions.from}' }`
+            );
+        }
+        if (!this._name && this._scriptPath)
+          this.nameFromFilename(this._scriptPath);
+        this._name = this._name || "program";
+        return userArgs;
+      }
+      /**
+       * Parse `argv`, setting options and invoking commands when defined.
+       *
+       * Use parseAsync instead of parse if any of your action handlers are async.
+       *
+       * Call with no parameters to parse `process.argv`. Detects Electron and special node options like `node --eval`. Easy mode!
+       *
+       * Or call with an array of strings to parse, and optionally where the user arguments start by specifying where the arguments are `from`:
+       * - `'node'`: default, `argv[0]` is the application and `argv[1]` is the script being run, with user arguments after that
+       * - `'electron'`: `argv[0]` is the application and `argv[1]` varies depending on whether the electron application is packaged
+       * - `'user'`: just user arguments
+       *
+       * @example
+       * program.parse(); // parse process.argv and auto-detect electron and special node flags
+       * program.parse(process.argv); // assume argv[0] is app and argv[1] is script
+       * program.parse(my-args, { from: 'user' }); // just user supplied arguments, nothing special about argv[0]
+       *
+       * @param {string[]} [argv] - optional, defaults to process.argv
+       * @param {object} [parseOptions] - optionally specify style of options with from: node/user/electron
+       * @param {string} [parseOptions.from] - where the args are from: 'node', 'user', 'electron'
+       * @return {Command} `this` command for chaining
+       */
+      parse(argv, parseOptions) {
+        this._prepareForParse();
+        const userArgs = this._prepareUserArgs(argv, parseOptions);
+        this._parseCommand([], userArgs);
+        return this;
+      }
+      /**
+       * Parse `argv`, setting options and invoking commands when defined.
+       *
+       * Call with no parameters to parse `process.argv`. Detects Electron and special node options like `node --eval`. Easy mode!
+       *
+       * Or call with an array of strings to parse, and optionally where the user arguments start by specifying where the arguments are `from`:
+       * - `'node'`: default, `argv[0]` is the application and `argv[1]` is the script being run, with user arguments after that
+       * - `'electron'`: `argv[0]` is the application and `argv[1]` varies depending on whether the electron application is packaged
+       * - `'user'`: just user arguments
+       *
+       * @example
+       * await program.parseAsync(); // parse process.argv and auto-detect electron and special node flags
+       * await program.parseAsync(process.argv); // assume argv[0] is app and argv[1] is script
+       * await program.parseAsync(my-args, { from: 'user' }); // just user supplied arguments, nothing special about argv[0]
+       *
+       * @param {string[]} [argv]
+       * @param {object} [parseOptions]
+       * @param {string} parseOptions.from - where the args are from: 'node', 'user', 'electron'
+       * @return {Promise}
+       */
+      async parseAsync(argv, parseOptions) {
+        this._prepareForParse();
+        const userArgs = this._prepareUserArgs(argv, parseOptions);
+        await this._parseCommand([], userArgs);
+        return this;
+      }
+      _prepareForParse() {
+        if (this._savedState === null) {
+          this.saveStateBeforeParse();
+        } else {
+          this.restoreStateBeforeParse();
+        }
+      }
+      /**
+       * Called the first time parse is called to save state and allow a restore before subsequent calls to parse.
+       * Not usually called directly, but available for subclasses to save their custom state.
+       *
+       * This is called in a lazy way. Only commands used in parsing chain will have state saved.
+       */
+      saveStateBeforeParse() {
+        this._savedState = {
+          // name is stable if supplied by author, but may be unspecified for root command and deduced during parsing
+          _name: this._name,
+          // option values before parse have default values (including false for negated options)
+          // shallow clones
+          _optionValues: { ...this._optionValues },
+          _optionValueSources: { ...this._optionValueSources }
+        };
+      }
+      /**
+       * Restore state before parse for calls after the first.
+       * Not usually called directly, but available for subclasses to save their custom state.
+       *
+       * This is called in a lazy way. Only commands used in parsing chain will have state restored.
+       */
+      restoreStateBeforeParse() {
+        if (this._storeOptionsAsProperties)
+          throw new Error(`Can not call parse again when storeOptionsAsProperties is true.
+- either make a new Command for each call to parse, or stop storing options as properties`);
+        this._name = this._savedState._name;
+        this._scriptPath = null;
+        this.rawArgs = [];
+        this._optionValues = { ...this._savedState._optionValues };
+        this._optionValueSources = { ...this._savedState._optionValueSources };
+        this.args = [];
+        this.processedArgs = [];
+      }
+      /**
+       * Throw if expected executable is missing. Add lots of help for author.
+       *
+       * @param {string} executableFile
+       * @param {string} executableDir
+       * @param {string} subcommandName
+       */
+      _checkForMissingExecutable(executableFile, executableDir, subcommandName) {
+        if (fs4.existsSync(executableFile)) return;
+        const executableDirMessage = executableDir ? `searched for local subcommand relative to directory '${executableDir}'` : "no directory for search for local subcommand, use .executableDir() to supply a custom directory";
+        const executableMissing = `'${executableFile}' does not exist
+ - if '${subcommandName}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
  - if the default executable name is not suitable, use the executableFile option to supply a custom name or path
- - ${n}`;throw new Error(s)}_executeSubCommand(t,e){e=e.slice();let i=!1,n=[".js",".ts",".tsx",".mjs",".cjs"];function s(c,l){let d=_.resolve(c,l);if(S.existsSync(d))return d;if(n.includes(_.extname(l)))return;let C=n.find(b=>S.existsSync(`${d}${b}`));if(C)return`${d}${C}`}this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let o=t._executableFile||`${this._name}-${t._name}`,a=this._executableDir||"";if(this._scriptPath){let c;try{c=S.realpathSync(this._scriptPath)}catch{c=this._scriptPath}a=_.resolve(_.dirname(c),a)}if(a){let c=s(a,o);if(!c&&!t._executableFile&&this._scriptPath){let l=_.basename(this._scriptPath,_.extname(this._scriptPath));l!==this._name&&(c=s(a,`${l}-${t._name}`))}o=c||o}i=n.includes(_.extname(o));let u;p.platform!=="win32"?i?(e.unshift(o),e=et(p.execArgv).concat(e),u=j.spawn(p.argv[0],e,{stdio:"inherit"})):u=j.spawn(o,e,{stdio:"inherit"}):(this._checkForMissingExecutable(o,a,t._name),e.unshift(o),e=et(p.execArgv).concat(e),u=j.spawn(p.execPath,e,{stdio:"inherit"})),u.killed||["SIGUSR1","SIGUSR2","SIGTERM","SIGINT","SIGHUP"].forEach(l=>{p.on(l,()=>{u.killed===!1&&u.exitCode===null&&u.kill(l)})});let h=this._exitCallback;u.on("close",c=>{c=c??1,h?h(new N(c,"commander.executeSubCommandAsync","(close)")):p.exit(c)}),u.on("error",c=>{if(c.code==="ENOENT")this._checkForMissingExecutable(o,a,t._name);else if(c.code==="EACCES")throw new Error(`'${o}' not executable`);if(!h)p.exit(1);else{let l=new N(1,"commander.executeSubCommandAsync","(error)");l.nestedError=c,h(l)}}),this.runningCommand=u}_dispatchSubcommand(t,e,i){let n=this._findCommand(t);n||this.help({error:!0}),n._prepareForParse();let s;return s=this._chainOrCallSubCommandHook(s,n,"preSubcommand"),s=this._chainOrCall(s,()=>{if(n._executableHandler)this._executeSubCommand(n,e.concat(i));else return n._parseCommand(e,i)}),s}_dispatchHelpCommand(t){t||this.help();let e=this._findCommand(t);return e&&!e._executableHandler&&e.help(),this._dispatchSubcommand(t,[],[this._getHelpOption()?.long??this._getHelpOption()?.short??"--help"])}_checkNumberOfArguments(){this.registeredArguments.forEach((t,e)=>{t.required&&this.args[e]==null&&this.missingArgument(t.name())}),!(this.registeredArguments.length>0&&this.registeredArguments[this.registeredArguments.length-1].variadic)&&this.args.length>this.registeredArguments.length&&this._excessArguments(this.args)}_processArguments(){let t=(i,n,s)=>{let o=n;if(n!==null&&i.parseArg){let a=`error: command-argument value '${n}' is invalid for argument '${i.name()}'.`;o=this._callParseArg(i,n,s,a)}return o};this._checkNumberOfArguments();let e=[];this.registeredArguments.forEach((i,n)=>{let s=i.defaultValue;i.variadic?n<this.args.length?(s=this.args.slice(n),i.parseArg&&(s=s.reduce((o,a)=>t(i,a,o),i.defaultValue))):s===void 0&&(s=[]):n<this.args.length&&(s=this.args[n],i.parseArg&&(s=t(i,s,i.defaultValue))),e[n]=s}),this.processedArgs=e}_chainOrCall(t,e){return t&&t.then&&typeof t.then=="function"?t.then(()=>e()):e()}_chainOrCallHooks(t,e){let i=t,n=[];return this._getCommandAndAncestors().reverse().filter(s=>s._lifeCycleHooks[e]!==void 0).forEach(s=>{s._lifeCycleHooks[e].forEach(o=>{n.push({hookedCommand:s,callback:o})})}),e==="postAction"&&n.reverse(),n.forEach(s=>{i=this._chainOrCall(i,()=>s.callback(s.hookedCommand,this))}),i}_chainOrCallSubCommandHook(t,e,i){let n=t;return this._lifeCycleHooks[i]!==void 0&&this._lifeCycleHooks[i].forEach(s=>{n=this._chainOrCall(n,()=>s(this,e))}),n}_parseCommand(t,e){let i=this.parseOptions(e);if(this._parseOptionsEnv(),this._parseOptionsImplied(),t=t.concat(i.operands),e=i.unknown,this.args=t.concat(e),t&&this._findCommand(t[0]))return this._dispatchSubcommand(t[0],t.slice(1),e);if(this._getHelpCommand()&&t[0]===this._getHelpCommand().name())return this._dispatchHelpCommand(t[1]);if(this._defaultCommandName)return this._outputHelpIfRequested(e),this._dispatchSubcommand(this._defaultCommandName,t,e);this.commands.length&&this.args.length===0&&!this._actionHandler&&!this._defaultCommandName&&this.help({error:!0}),this._outputHelpIfRequested(i.unknown),this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let n=()=>{i.unknown.length>0&&this.unknownOption(i.unknown[0])},s=`command:${this.name()}`;if(this._actionHandler){n(),this._processArguments();let o;return o=this._chainOrCallHooks(o,"preAction"),o=this._chainOrCall(o,()=>this._actionHandler(this.processedArgs)),this.parent&&(o=this._chainOrCall(o,()=>{this.parent.emit(s,t,e)})),o=this._chainOrCallHooks(o,"postAction"),o}if(this.parent&&this.parent.listenerCount(s))n(),this._processArguments(),this.parent.emit(s,t,e);else if(t.length){if(this._findCommand("*"))return this._dispatchSubcommand("*",t,e);this.listenerCount("command:*")?this.emit("command:*",t,e):this.commands.length?this.unknownCommand():(n(),this._processArguments())}else this.commands.length?(n(),this.help({error:!0})):(n(),this._processArguments())}_findCommand(t){if(t)return this.commands.find(e=>e._name===t||e._aliases.includes(t))}_findOption(t){return this.options.find(e=>e.is(t))}_checkForMissingMandatoryOptions(){this._getCommandAndAncestors().forEach(t=>{t.options.forEach(e=>{e.mandatory&&t.getOptionValue(e.attributeName())===void 0&&t.missingMandatoryOptionValue(e)})})}_checkForConflictingLocalOptions(){let t=this.options.filter(i=>{let n=i.attributeName();return this.getOptionValue(n)===void 0?!1:this.getOptionValueSource(n)!=="default"});t.filter(i=>i.conflictsWith.length>0).forEach(i=>{let n=t.find(s=>i.conflictsWith.includes(s.attributeName()));n&&this._conflictingOption(i,n)})}_checkForConflictingOptions(){this._getCommandAndAncestors().forEach(t=>{t._checkForConflictingLocalOptions()})}parseOptions(t){let e=[],i=[],n=e,s=t.slice();function o(h){return h.length>1&&h[0]==="-"}let a=h=>/^-\d*\.?\d+(e[+-]?\d+)?$/.test(h)?!this._getCommandAndAncestors().some(c=>c.options.map(l=>l.short).some(l=>/^-\d$/.test(l))):!1,u=null;for(;s.length;){let h=s.shift();if(h==="--"){n===i&&n.push(h),n.push(...s);break}if(u&&(!o(h)||a(h))){this.emit(`option:${u.name()}`,h);continue}if(u=null,o(h)){let c=this._findOption(h);if(c){if(c.required){let l=s.shift();l===void 0&&this.optionMissingArgument(c),this.emit(`option:${c.name()}`,l)}else if(c.optional){let l=null;s.length>0&&(!o(s[0])||a(s[0]))&&(l=s.shift()),this.emit(`option:${c.name()}`,l)}else this.emit(`option:${c.name()}`);u=c.variadic?c:null;continue}}if(h.length>2&&h[0]==="-"&&h[1]!=="-"){let c=this._findOption(`-${h[1]}`);if(c){c.required||c.optional&&this._combineFlagAndOptionalValue?this.emit(`option:${c.name()}`,h.slice(2)):(this.emit(`option:${c.name()}`),s.unshift(`-${h.slice(2)}`));continue}}if(/^--[^=]+=/.test(h)){let c=h.indexOf("="),l=this._findOption(h.slice(0,c));if(l&&(l.required||l.optional)){this.emit(`option:${l.name()}`,h.slice(c+1));continue}}if(n===e&&o(h)&&!(this.commands.length===0&&a(h))&&(n=i),(this._enablePositionalOptions||this._passThroughOptions)&&e.length===0&&i.length===0){if(this._findCommand(h)){e.push(h),s.length>0&&i.push(...s);break}else if(this._getHelpCommand()&&h===this._getHelpCommand().name()){e.push(h),s.length>0&&e.push(...s);break}else if(this._defaultCommandName){i.push(h),s.length>0&&i.push(...s);break}}if(this._passThroughOptions){n.push(h),s.length>0&&n.push(...s);break}n.push(h)}return{operands:e,unknown:i}}opts(){if(this._storeOptionsAsProperties){let t={},e=this.options.length;for(let i=0;i<e;i++){let n=this.options[i].attributeName();t[n]=n===this._versionOptionName?this._version:this[n]}return t}return this._optionValues}optsWithGlobals(){return this._getCommandAndAncestors().reduce((t,e)=>Object.assign(t,e.opts()),{})}error(t,e){this._outputConfiguration.outputError(`${t}
-`,this._outputConfiguration.writeErr),typeof this._showHelpAfterError=="string"?this._outputConfiguration.writeErr(`${this._showHelpAfterError}
-`):this._showHelpAfterError&&(this._outputConfiguration.writeErr(`
-`),this.outputHelp({error:!0}));let i=e||{},n=i.exitCode||1,s=i.code||"commander.error";this._exit(n,s,t)}_parseOptionsEnv(){this.options.forEach(t=>{if(t.envVar&&t.envVar in p.env){let e=t.attributeName();(this.getOptionValue(e)===void 0||["default","config","env"].includes(this.getOptionValueSource(e)))&&(t.required||t.optional?this.emit(`optionEnv:${t.name()}`,p.env[t.envVar]):this.emit(`optionEnv:${t.name()}`))}})}_parseOptionsImplied(){let t=new Wt(this.options),e=i=>this.getOptionValue(i)!==void 0&&!["default","implied"].includes(this.getOptionValueSource(i));this.options.filter(i=>i.implied!==void 0&&e(i.attributeName())&&t.valueFromOption(this.getOptionValue(i.attributeName()),i)).forEach(i=>{Object.keys(i.implied).filter(n=>!e(n)).forEach(n=>{this.setOptionValueWithSource(n,i.implied[n],"implied")})})}missingArgument(t){let e=`error: missing required argument '${t}'`;this.error(e,{code:"commander.missingArgument"})}optionMissingArgument(t){let e=`error: option '${t.flags}' argument missing`;this.error(e,{code:"commander.optionMissingArgument"})}missingMandatoryOptionValue(t){let e=`error: required option '${t.flags}' not specified`;this.error(e,{code:"commander.missingMandatoryOptionValue"})}_conflictingOption(t,e){let i=o=>{let a=o.attributeName(),u=this.getOptionValue(a),h=this.options.find(l=>l.negate&&a===l.attributeName()),c=this.options.find(l=>!l.negate&&a===l.attributeName());return h&&(h.presetArg===void 0&&u===!1||h.presetArg!==void 0&&u===h.presetArg)?h:c||o},n=o=>{let a=i(o),u=a.attributeName();return this.getOptionValueSource(u)==="env"?`environment variable '${a.envVar}'`:`option '${a.flags}'`},s=`error: ${n(t)} cannot be used with ${n(e)}`;this.error(s,{code:"commander.conflictingOption"})}unknownOption(t){if(this._allowUnknownOption)return;let e="";if(t.startsWith("--")&&this._showSuggestionAfterError){let n=[],s=this;do{let o=s.createHelp().visibleOptions(s).filter(a=>a.long).map(a=>a.long);n=n.concat(o),s=s.parent}while(s&&!s._enablePositionalOptions);e=tt(t,n)}let i=`error: unknown option '${t}'${e}`;this.error(i,{code:"commander.unknownOption"})}_excessArguments(t){if(this._allowExcessArguments)return;let e=this.registeredArguments.length,i=e===1?"":"s",s=`error: too many arguments${this.parent?` for '${this.name()}'`:""}. Expected ${e} argument${i} but got ${t.length}.`;this.error(s,{code:"commander.excessArguments"})}unknownCommand(){let t=this.args[0],e="";if(this._showSuggestionAfterError){let n=[];this.createHelp().visibleCommands(this).forEach(s=>{n.push(s.name()),s.alias()&&n.push(s.alias())}),e=tt(t,n)}let i=`error: unknown command '${t}'${e}`;this.error(i,{code:"commander.unknownCommand"})}version(t,e,i){if(t===void 0)return this._version;this._version=t,e=e||"-V, --version",i=i||"output the version number";let n=this.createOption(e,i);return this._versionOptionName=n.attributeName(),this._registerOption(n),this.on("option:"+n.name(),()=>{this._outputConfiguration.writeOut(`${t}
-`),this._exit(0,"commander.version",t)}),this}description(t,e){return t===void 0&&e===void 0?this._description:(this._description=t,e&&(this._argsDescription=e),this)}summary(t){return t===void 0?this._summary:(this._summary=t,this)}alias(t){if(t===void 0)return this._aliases[0];let e=this;if(this.commands.length!==0&&this.commands[this.commands.length-1]._executableHandler&&(e=this.commands[this.commands.length-1]),t===e._name)throw new Error("Command alias can't be the same as its name");let i=this.parent?._findCommand(t);if(i){let n=[i.name()].concat(i.aliases()).join("|");throw new Error(`cannot add alias '${t}' to command '${this.name()}' as already have command '${n}'`)}return e._aliases.push(t),this}aliases(t){return t===void 0?this._aliases:(t.forEach(e=>this.alias(e)),this)}usage(t){if(t===void 0){if(this._usage)return this._usage;let e=this.registeredArguments.map(i=>Vt(i));return[].concat(this.options.length||this._helpOption!==null?"[options]":[],this.commands.length?"[command]":[],this.registeredArguments.length?e:[]).join(" ")}return this._usage=t,this}name(t){return t===void 0?this._name:(this._name=t,this)}helpGroup(t){return t===void 0?this._helpGroupHeading??"":(this._helpGroupHeading=t,this)}commandsGroup(t){return t===void 0?this._defaultCommandGroup??"":(this._defaultCommandGroup=t,this)}optionsGroup(t){return t===void 0?this._defaultOptionGroup??"":(this._defaultOptionGroup=t,this)}_initOptionGroup(t){this._defaultOptionGroup&&!t.helpGroupHeading&&t.helpGroup(this._defaultOptionGroup)}_initCommandGroup(t){this._defaultCommandGroup&&!t.helpGroup()&&t.helpGroup(this._defaultCommandGroup)}nameFromFilename(t){return this._name=_.basename(t,_.extname(t)),this}executableDir(t){return t===void 0?this._executableDir:(this._executableDir=t,this)}helpInformation(t){let e=this.createHelp(),i=this._getOutputContext(t);e.prepareContext({error:i.error,helpWidth:i.helpWidth,outputHasColors:i.hasColors});let n=e.formatHelp(this,e);return i.hasColors?n:this._outputConfiguration.stripColor(n)}_getOutputContext(t){t=t||{};let e=!!t.error,i,n,s;return e?(i=a=>this._outputConfiguration.writeErr(a),n=this._outputConfiguration.getErrHasColors(),s=this._outputConfiguration.getErrHelpWidth()):(i=a=>this._outputConfiguration.writeOut(a),n=this._outputConfiguration.getOutHasColors(),s=this._outputConfiguration.getOutHelpWidth()),{error:e,write:a=>(n||(a=this._outputConfiguration.stripColor(a)),i(a)),hasColors:n,helpWidth:s}}outputHelp(t){let e;typeof t=="function"&&(e=t,t=void 0);let i=this._getOutputContext(t),n={error:i.error,write:i.write,command:this};this._getCommandAndAncestors().reverse().forEach(o=>o.emit("beforeAllHelp",n)),this.emit("beforeHelp",n);let s=this.helpInformation({error:i.error});if(e&&(s=e(s),typeof s!="string"&&!Buffer.isBuffer(s)))throw new Error("outputHelp callback must return a string or a Buffer");i.write(s),this._getHelpOption()?.long&&this.emit(this._getHelpOption().long),this.emit("afterHelp",n),this._getCommandAndAncestors().forEach(o=>o.emit("afterAllHelp",n))}helpOption(t,e){return typeof t=="boolean"?(t?(this._helpOption===null&&(this._helpOption=void 0),this._defaultOptionGroup&&this._initOptionGroup(this._getHelpOption())):this._helpOption=null,this):(this._helpOption=this.createOption(t??"-h, --help",e??"display help for command"),(t||e)&&this._initOptionGroup(this._helpOption),this)}_getHelpOption(){return this._helpOption===void 0&&this.helpOption(void 0,void 0),this._helpOption}addHelpOption(t){return this._helpOption=t,this._initOptionGroup(t),this}help(t){this.outputHelp(t);let e=Number(p.exitCode??0);e===0&&t&&typeof t!="function"&&t.error&&(e=1),this._exit(e,"commander.help","(outputHelp)")}addHelpText(t,e){let i=["beforeAll","before","after","afterAll"];if(!i.includes(t))throw new Error(`Unexpected value for position to addHelpText.
-Expecting one of '${i.join("', '")}'`);let n=`${t}Help`;return this.on(n,s=>{let o;typeof e=="function"?o=e({error:s.error,command:s.command}):o=e,o&&s.write(`${o}
-`)}),this}_outputHelpIfRequested(t){let e=this._getHelpOption();e&&t.find(n=>e.is(n))&&(this.outputHelp(),this._exit(0,"commander.helpDisplayed","(outputHelp)"))}};function et(r){return r.map(t=>{if(!t.startsWith("--inspect"))return t;let e,i="127.0.0.1",n="9229",s;return(s=t.match(/^(--inspect(-brk)?)$/))!==null?e=s[1]:(s=t.match(/^(--inspect(-brk|-port)?)=([^:]+)$/))!==null?(e=s[1],/^\d+$/.test(s[3])?n=s[3]:i=s[3]):(s=t.match(/^(--inspect(-brk|-port)?)=([^:]+):(\d+)$/))!==null&&(e=s[1],i=s[3],n=s[4]),e&&n!=="0"?`${e}=${i}:${parseInt(n)+1}`:t})}function L(){if(p.env.NO_COLOR||p.env.FORCE_COLOR==="0"||p.env.FORCE_COLOR==="false")return!1;if(p.env.FORCE_COLOR||p.env.CLICOLOR_FORCE!==void 0)return!0}M.Command=q;M.useColor=L});var ot=O(f=>{var{Argument:nt}=E(),{Command:R}=it(),{CommanderError:Ft,InvalidArgumentError:st}=y(),{Help:It}=W(),{Option:rt}=G();f.program=new R;f.createCommand=r=>new R(r);f.createOption=(r,t)=>new rt(r,t);f.createArgument=(r,t)=>new nt(r,t);f.Command=R;f.Option=rt;f.Argument=nt;f.Help=It;f.CommanderError=Ft;f.InvalidArgumentError=st;f.InvalidOptionArgumentError=st});var Ut=w(require("node:fs"));var jt=w(require("node:fs"));var at=w(ot(),1),{program:ee,createCommand:ie,createArgument:ne,createOption:se,CommanderError:re,InvalidArgumentError:oe,InvalidOptionArgumentError:ae,Command:ut,Argument:ue,Option:m,Help:he}=at.default;var ht={name:"@helvio/web-screenshot",version:"2.1.0",description:"CLI to take webpage screenshots with Puppeteer and optional Sharp crop",keywords:["screenshot","webpage","png","image","cli","puppeteer"],main:"dist/screenshot.js",bin:{"web-screenshot":"dist/screenshot.js"},files:["dist"],scripts:{build:"esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js",lint:"biome check src test",format:"biome check --write src test",test:"tsx --test test/*.test.ts",typecheck:"tsc --noEmit",prepublishOnly:"npm run build"},license:"ISC",preferGlobal:!0,author:"Helvio Pedreschi (https://github.com/Helvio88)",repository:{type:"git",url:"git+https://github.com/Helvio88/web-screenshot.git"},bugs:"https://github.com/Helvio88/web-screenshot/issues",homepage:"https://github.com/Helvio88/web-screenshot",publishConfig:{access:"public"},engines:{node:">=20"},dependencies:{commander:"^14.0.0",puppeteer:"^24.14.0",sharp:"^0.34.3"},devDependencies:{"@biomejs/biome":"^2.1.2","@types/node":"^22.16.5",esbuild:"^0.25.8",tsx:"^4.20.3",typescript:"^5.8.3"}};function x(r){if(typeof r=="boolean"||r==null)return;let t=typeof r=="number"?r:Number(String(r).trim());return Number.isInteger(t)?t:void 0}var Gt={sanitizeUrl(r){return r=r.trim(),!r.startsWith("http://")&&!r.startsWith("https://")&&(r=`http://${r}`),r},sanitizeTime(r){let t=x(r);return t!==void 0&&t>=1&&t<=600?t*1e3:5e3},sanitizeX(r){let t=x(r);return t!==void 0&&t>=0&&t<=1920?t:0},sanitizeY(r){let t=x(r);return t!==void 0&&t>=0&&t<=1080?t:0},sanitizeWidth(r){let t=x(r);return t!==void 0&&t>=0&&t<=1920?t:1920},sanitizeHeight(r){let t=x(r);return t!==void 0&&t>=0&&t<=1080?t:1080},sanitizeOutput(r,t,e){let i=typeof e=="string"?e:void 0,n="png";if(!i||/\.(png|jpg|jpeg|webp)$/i.test(i))if(i)n=(i.split(".").pop()??"png").toLowerCase().replace("jpg","jpeg"),i=i.substring(0,i.lastIndexOf("."));else{let s=r.split("/"),o=r.endsWith("/")?2:1;i=s[s.length-o]}return t&&(i=`${i}_tmp`),{path:i,ext:n}},sanitizeAuth(r){if(r)return/^[^:]+:[^:]+$/.test(r)?r:void 0}},g=Gt;function lt(r){let t=[],e="",i=null,n=!1;for(let s of r){if(n){e+=s,n=!1;continue}if(s==="\\"&&i!=="'"){n=!0;continue}if(i){s===i?i=null:e+=s;continue}if(s==='"'||s==="'"){i=s;continue}if(/\s/.test(s)){e.length>0&&(t.push(e),e="");continue}e+=s}return n&&(e+="\\"),e.length>0&&t.push(e),t}function U(){let r=new ut;return r.name("web-screenshot").description("Take screenshots of web pages").version(ht.version).addHelpText("beforeAll","Web Screenshot Utility").showHelpAfterError().addOption(new m("-p, --path [path]","Chrome executable path.")).addOption(new m("-d, --debug","Enable debug mode.").default(!1)).addOption(new m("-b, --batch [file]","Batch file with URLs to screenshot. Supersedes all other options.")).addOption(new m("-u, --url <url>","URL (website) to screenshot.")).addOption(new m("-t, --time [s]","Extra seconds to wait after the page is idle.").default(3)).addOption(new m("-x, --x [x]","Leftmost pixel.").default(0)).addOption(new m("-y, --y [y]","Top pixel.").default(0)).addOption(new m("-w, --width [width]","Image width in pixels. 0 takes a full-page screenshot.").default(1920)).addOption(new m("-h, --height [height]","Image height in pixels. 0 takes a full-page screenshot.").default(1080)).addOption(new m("-o, --out [out]","Absolute or relative path to save the screenshot.")).addOption(new m("-c, --crop","Auto crop same-color borders.")).addOption(new m("-a, --auth [auth]","NTLM credentials in username:password format.")).addHelpText("after",`
+ - ${executableDirMessage}`;
+        throw new Error(executableMissing);
+      }
+      /**
+       * Execute a sub-command executable.
+       *
+       * @private
+       */
+      _executeSubCommand(subcommand, args) {
+        args = args.slice();
+        let launchWithNode = false;
+        const sourceExt = [".js", ".ts", ".tsx", ".mjs", ".cjs"];
+        function findFile(baseDir, baseName) {
+          const localBin = path.resolve(baseDir, baseName);
+          if (fs4.existsSync(localBin)) return localBin;
+          if (sourceExt.includes(path.extname(baseName))) return void 0;
+          const foundExt = sourceExt.find(
+            (ext) => fs4.existsSync(`${localBin}${ext}`)
+          );
+          if (foundExt) return `${localBin}${foundExt}`;
+          return void 0;
+        }
+        this._checkForMissingMandatoryOptions();
+        this._checkForConflictingOptions();
+        let executableFile = subcommand._executableFile || `${this._name}-${subcommand._name}`;
+        let executableDir = this._executableDir || "";
+        if (this._scriptPath) {
+          let resolvedScriptPath;
+          try {
+            resolvedScriptPath = fs4.realpathSync(this._scriptPath);
+          } catch {
+            resolvedScriptPath = this._scriptPath;
+          }
+          executableDir = path.resolve(
+            path.dirname(resolvedScriptPath),
+            executableDir
+          );
+        }
+        if (executableDir) {
+          let localFile = findFile(executableDir, executableFile);
+          if (!localFile && !subcommand._executableFile && this._scriptPath) {
+            const legacyName = path.basename(
+              this._scriptPath,
+              path.extname(this._scriptPath)
+            );
+            if (legacyName !== this._name) {
+              localFile = findFile(
+                executableDir,
+                `${legacyName}-${subcommand._name}`
+              );
+            }
+          }
+          executableFile = localFile || executableFile;
+        }
+        launchWithNode = sourceExt.includes(path.extname(executableFile));
+        let proc;
+        if (process2.platform !== "win32") {
+          if (launchWithNode) {
+            args.unshift(executableFile);
+            args = incrementNodeInspectorPort(process2.execArgv).concat(args);
+            proc = childProcess.spawn(process2.argv[0], args, { stdio: "inherit" });
+          } else {
+            proc = childProcess.spawn(executableFile, args, { stdio: "inherit" });
+          }
+        } else {
+          this._checkForMissingExecutable(
+            executableFile,
+            executableDir,
+            subcommand._name
+          );
+          args.unshift(executableFile);
+          args = incrementNodeInspectorPort(process2.execArgv).concat(args);
+          proc = childProcess.spawn(process2.execPath, args, { stdio: "inherit" });
+        }
+        if (!proc.killed) {
+          const signals = ["SIGUSR1", "SIGUSR2", "SIGTERM", "SIGINT", "SIGHUP"];
+          signals.forEach((signal) => {
+            process2.on(signal, () => {
+              if (proc.killed === false && proc.exitCode === null) {
+                proc.kill(signal);
+              }
+            });
+          });
+        }
+        const exitCallback = this._exitCallback;
+        proc.on("close", (code) => {
+          code = code ?? 1;
+          if (!exitCallback) {
+            process2.exit(code);
+          } else {
+            exitCallback(
+              new CommanderError2(
+                code,
+                "commander.executeSubCommandAsync",
+                "(close)"
+              )
+            );
+          }
+        });
+        proc.on("error", (err) => {
+          if (err.code === "ENOENT") {
+            this._checkForMissingExecutable(
+              executableFile,
+              executableDir,
+              subcommand._name
+            );
+          } else if (err.code === "EACCES") {
+            throw new Error(`'${executableFile}' not executable`);
+          }
+          if (!exitCallback) {
+            process2.exit(1);
+          } else {
+            const wrappedError = new CommanderError2(
+              1,
+              "commander.executeSubCommandAsync",
+              "(error)"
+            );
+            wrappedError.nestedError = err;
+            exitCallback(wrappedError);
+          }
+        });
+        this.runningCommand = proc;
+      }
+      /**
+       * @private
+       */
+      _dispatchSubcommand(commandName, operands, unknown) {
+        const subCommand = this._findCommand(commandName);
+        if (!subCommand) this.help({ error: true });
+        subCommand._prepareForParse();
+        let promiseChain;
+        promiseChain = this._chainOrCallSubCommandHook(
+          promiseChain,
+          subCommand,
+          "preSubcommand"
+        );
+        promiseChain = this._chainOrCall(promiseChain, () => {
+          if (subCommand._executableHandler) {
+            this._executeSubCommand(subCommand, operands.concat(unknown));
+          } else {
+            return subCommand._parseCommand(operands, unknown);
+          }
+        });
+        return promiseChain;
+      }
+      /**
+       * Invoke help directly if possible, or dispatch if necessary.
+       * e.g. help foo
+       *
+       * @private
+       */
+      _dispatchHelpCommand(subcommandName) {
+        if (!subcommandName) {
+          this.help();
+        }
+        const subCommand = this._findCommand(subcommandName);
+        if (subCommand && !subCommand._executableHandler) {
+          subCommand.help();
+        }
+        return this._dispatchSubcommand(
+          subcommandName,
+          [],
+          [this._getHelpOption()?.long ?? this._getHelpOption()?.short ?? "--help"]
+        );
+      }
+      /**
+       * Check this.args against expected this.registeredArguments.
+       *
+       * @private
+       */
+      _checkNumberOfArguments() {
+        this.registeredArguments.forEach((arg, i) => {
+          if (arg.required && this.args[i] == null) {
+            this.missingArgument(arg.name());
+          }
+        });
+        if (this.registeredArguments.length > 0 && this.registeredArguments[this.registeredArguments.length - 1].variadic) {
+          return;
+        }
+        if (this.args.length > this.registeredArguments.length) {
+          this._excessArguments(this.args);
+        }
+      }
+      /**
+       * Process this.args using this.registeredArguments and save as this.processedArgs!
+       *
+       * @private
+       */
+      _processArguments() {
+        const myParseArg = (argument, value, previous) => {
+          let parsedValue = value;
+          if (value !== null && argument.parseArg) {
+            const invalidValueMessage = `error: command-argument value '${value}' is invalid for argument '${argument.name()}'.`;
+            parsedValue = this._callParseArg(
+              argument,
+              value,
+              previous,
+              invalidValueMessage
+            );
+          }
+          return parsedValue;
+        };
+        this._checkNumberOfArguments();
+        const processedArgs = [];
+        this.registeredArguments.forEach((declaredArg, index) => {
+          let value = declaredArg.defaultValue;
+          if (declaredArg.variadic) {
+            if (index < this.args.length) {
+              value = this.args.slice(index);
+              if (declaredArg.parseArg) {
+                value = value.reduce((processed, v) => {
+                  return myParseArg(declaredArg, v, processed);
+                }, declaredArg.defaultValue);
+              }
+            } else if (value === void 0) {
+              value = [];
+            }
+          } else if (index < this.args.length) {
+            value = this.args[index];
+            if (declaredArg.parseArg) {
+              value = myParseArg(declaredArg, value, declaredArg.defaultValue);
+            }
+          }
+          processedArgs[index] = value;
+        });
+        this.processedArgs = processedArgs;
+      }
+      /**
+       * Once we have a promise we chain, but call synchronously until then.
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {Function} fn
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCall(promise, fn) {
+        if (promise && promise.then && typeof promise.then === "function") {
+          return promise.then(() => fn());
+        }
+        return fn();
+      }
+      /**
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {string} event
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCallHooks(promise, event) {
+        let result = promise;
+        const hooks = [];
+        this._getCommandAndAncestors().reverse().filter((cmd) => cmd._lifeCycleHooks[event] !== void 0).forEach((hookedCommand) => {
+          hookedCommand._lifeCycleHooks[event].forEach((callback) => {
+            hooks.push({ hookedCommand, callback });
+          });
+        });
+        if (event === "postAction") {
+          hooks.reverse();
+        }
+        hooks.forEach((hookDetail) => {
+          result = this._chainOrCall(result, () => {
+            return hookDetail.callback(hookDetail.hookedCommand, this);
+          });
+        });
+        return result;
+      }
+      /**
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {Command} subCommand
+       * @param {string} event
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCallSubCommandHook(promise, subCommand, event) {
+        let result = promise;
+        if (this._lifeCycleHooks[event] !== void 0) {
+          this._lifeCycleHooks[event].forEach((hook) => {
+            result = this._chainOrCall(result, () => {
+              return hook(this, subCommand);
+            });
+          });
+        }
+        return result;
+      }
+      /**
+       * Process arguments in context of this command.
+       * Returns action result, in case it is a promise.
+       *
+       * @private
+       */
+      _parseCommand(operands, unknown) {
+        const parsed = this.parseOptions(unknown);
+        this._parseOptionsEnv();
+        this._parseOptionsImplied();
+        operands = operands.concat(parsed.operands);
+        unknown = parsed.unknown;
+        this.args = operands.concat(unknown);
+        if (operands && this._findCommand(operands[0])) {
+          return this._dispatchSubcommand(operands[0], operands.slice(1), unknown);
+        }
+        if (this._getHelpCommand() && operands[0] === this._getHelpCommand().name()) {
+          return this._dispatchHelpCommand(operands[1]);
+        }
+        if (this._defaultCommandName) {
+          this._outputHelpIfRequested(unknown);
+          return this._dispatchSubcommand(
+            this._defaultCommandName,
+            operands,
+            unknown
+          );
+        }
+        if (this.commands.length && this.args.length === 0 && !this._actionHandler && !this._defaultCommandName) {
+          this.help({ error: true });
+        }
+        this._outputHelpIfRequested(parsed.unknown);
+        this._checkForMissingMandatoryOptions();
+        this._checkForConflictingOptions();
+        const checkForUnknownOptions = () => {
+          if (parsed.unknown.length > 0) {
+            this.unknownOption(parsed.unknown[0]);
+          }
+        };
+        const commandEvent = `command:${this.name()}`;
+        if (this._actionHandler) {
+          checkForUnknownOptions();
+          this._processArguments();
+          let promiseChain;
+          promiseChain = this._chainOrCallHooks(promiseChain, "preAction");
+          promiseChain = this._chainOrCall(
+            promiseChain,
+            () => this._actionHandler(this.processedArgs)
+          );
+          if (this.parent) {
+            promiseChain = this._chainOrCall(promiseChain, () => {
+              this.parent.emit(commandEvent, operands, unknown);
+            });
+          }
+          promiseChain = this._chainOrCallHooks(promiseChain, "postAction");
+          return promiseChain;
+        }
+        if (this.parent && this.parent.listenerCount(commandEvent)) {
+          checkForUnknownOptions();
+          this._processArguments();
+          this.parent.emit(commandEvent, operands, unknown);
+        } else if (operands.length) {
+          if (this._findCommand("*")) {
+            return this._dispatchSubcommand("*", operands, unknown);
+          }
+          if (this.listenerCount("command:*")) {
+            this.emit("command:*", operands, unknown);
+          } else if (this.commands.length) {
+            this.unknownCommand();
+          } else {
+            checkForUnknownOptions();
+            this._processArguments();
+          }
+        } else if (this.commands.length) {
+          checkForUnknownOptions();
+          this.help({ error: true });
+        } else {
+          checkForUnknownOptions();
+          this._processArguments();
+        }
+      }
+      /**
+       * Find matching command.
+       *
+       * @private
+       * @return {Command | undefined}
+       */
+      _findCommand(name) {
+        if (!name) return void 0;
+        return this.commands.find(
+          (cmd) => cmd._name === name || cmd._aliases.includes(name)
+        );
+      }
+      /**
+       * Return an option matching `arg` if any.
+       *
+       * @param {string} arg
+       * @return {Option}
+       * @package
+       */
+      _findOption(arg) {
+        return this.options.find((option) => option.is(arg));
+      }
+      /**
+       * Display an error message if a mandatory option does not have a value.
+       * Called after checking for help flags in leaf subcommand.
+       *
+       * @private
+       */
+      _checkForMissingMandatoryOptions() {
+        this._getCommandAndAncestors().forEach((cmd) => {
+          cmd.options.forEach((anOption) => {
+            if (anOption.mandatory && cmd.getOptionValue(anOption.attributeName()) === void 0) {
+              cmd.missingMandatoryOptionValue(anOption);
+            }
+          });
+        });
+      }
+      /**
+       * Display an error message if conflicting options are used together in this.
+       *
+       * @private
+       */
+      _checkForConflictingLocalOptions() {
+        const definedNonDefaultOptions = this.options.filter((option) => {
+          const optionKey = option.attributeName();
+          if (this.getOptionValue(optionKey) === void 0) {
+            return false;
+          }
+          return this.getOptionValueSource(optionKey) !== "default";
+        });
+        const optionsWithConflicting = definedNonDefaultOptions.filter(
+          (option) => option.conflictsWith.length > 0
+        );
+        optionsWithConflicting.forEach((option) => {
+          const conflictingAndDefined = definedNonDefaultOptions.find(
+            (defined) => option.conflictsWith.includes(defined.attributeName())
+          );
+          if (conflictingAndDefined) {
+            this._conflictingOption(option, conflictingAndDefined);
+          }
+        });
+      }
+      /**
+       * Display an error message if conflicting options are used together.
+       * Called after checking for help flags in leaf subcommand.
+       *
+       * @private
+       */
+      _checkForConflictingOptions() {
+        this._getCommandAndAncestors().forEach((cmd) => {
+          cmd._checkForConflictingLocalOptions();
+        });
+      }
+      /**
+       * Parse options from `argv` removing known options,
+       * and return argv split into operands and unknown arguments.
+       *
+       * Side effects: modifies command by storing options. Does not reset state if called again.
+       *
+       * Examples:
+       *
+       *     argv => operands, unknown
+       *     --known kkk op => [op], []
+       *     op --known kkk => [op], []
+       *     sub --unknown uuu op => [sub], [--unknown uuu op]
+       *     sub -- --unknown uuu op => [sub --unknown uuu op], []
+       *
+       * @param {string[]} argv
+       * @return {{operands: string[], unknown: string[]}}
+       */
+      parseOptions(argv) {
+        const operands = [];
+        const unknown = [];
+        let dest = operands;
+        const args = argv.slice();
+        function maybeOption(arg) {
+          return arg.length > 1 && arg[0] === "-";
+        }
+        const negativeNumberArg = (arg) => {
+          if (!/^-\d*\.?\d+(e[+-]?\d+)?$/.test(arg)) return false;
+          return !this._getCommandAndAncestors().some(
+            (cmd) => cmd.options.map((opt) => opt.short).some((short) => /^-\d$/.test(short))
+          );
+        };
+        let activeVariadicOption = null;
+        while (args.length) {
+          const arg = args.shift();
+          if (arg === "--") {
+            if (dest === unknown) dest.push(arg);
+            dest.push(...args);
+            break;
+          }
+          if (activeVariadicOption && (!maybeOption(arg) || negativeNumberArg(arg))) {
+            this.emit(`option:${activeVariadicOption.name()}`, arg);
+            continue;
+          }
+          activeVariadicOption = null;
+          if (maybeOption(arg)) {
+            const option = this._findOption(arg);
+            if (option) {
+              if (option.required) {
+                const value = args.shift();
+                if (value === void 0) this.optionMissingArgument(option);
+                this.emit(`option:${option.name()}`, value);
+              } else if (option.optional) {
+                let value = null;
+                if (args.length > 0 && (!maybeOption(args[0]) || negativeNumberArg(args[0]))) {
+                  value = args.shift();
+                }
+                this.emit(`option:${option.name()}`, value);
+              } else {
+                this.emit(`option:${option.name()}`);
+              }
+              activeVariadicOption = option.variadic ? option : null;
+              continue;
+            }
+          }
+          if (arg.length > 2 && arg[0] === "-" && arg[1] !== "-") {
+            const option = this._findOption(`-${arg[1]}`);
+            if (option) {
+              if (option.required || option.optional && this._combineFlagAndOptionalValue) {
+                this.emit(`option:${option.name()}`, arg.slice(2));
+              } else {
+                this.emit(`option:${option.name()}`);
+                args.unshift(`-${arg.slice(2)}`);
+              }
+              continue;
+            }
+          }
+          if (/^--[^=]+=/.test(arg)) {
+            const index = arg.indexOf("=");
+            const option = this._findOption(arg.slice(0, index));
+            if (option && (option.required || option.optional)) {
+              this.emit(`option:${option.name()}`, arg.slice(index + 1));
+              continue;
+            }
+          }
+          if (dest === operands && maybeOption(arg) && !(this.commands.length === 0 && negativeNumberArg(arg))) {
+            dest = unknown;
+          }
+          if ((this._enablePositionalOptions || this._passThroughOptions) && operands.length === 0 && unknown.length === 0) {
+            if (this._findCommand(arg)) {
+              operands.push(arg);
+              if (args.length > 0) unknown.push(...args);
+              break;
+            } else if (this._getHelpCommand() && arg === this._getHelpCommand().name()) {
+              operands.push(arg);
+              if (args.length > 0) operands.push(...args);
+              break;
+            } else if (this._defaultCommandName) {
+              unknown.push(arg);
+              if (args.length > 0) unknown.push(...args);
+              break;
+            }
+          }
+          if (this._passThroughOptions) {
+            dest.push(arg);
+            if (args.length > 0) dest.push(...args);
+            break;
+          }
+          dest.push(arg);
+        }
+        return { operands, unknown };
+      }
+      /**
+       * Return an object containing local option values as key-value pairs.
+       *
+       * @return {object}
+       */
+      opts() {
+        if (this._storeOptionsAsProperties) {
+          const result = {};
+          const len = this.options.length;
+          for (let i = 0; i < len; i++) {
+            const key = this.options[i].attributeName();
+            result[key] = key === this._versionOptionName ? this._version : this[key];
+          }
+          return result;
+        }
+        return this._optionValues;
+      }
+      /**
+       * Return an object containing merged local and global option values as key-value pairs.
+       *
+       * @return {object}
+       */
+      optsWithGlobals() {
+        return this._getCommandAndAncestors().reduce(
+          (combinedOptions, cmd) => Object.assign(combinedOptions, cmd.opts()),
+          {}
+        );
+      }
+      /**
+       * Display error message and exit (or call exitOverride).
+       *
+       * @param {string} message
+       * @param {object} [errorOptions]
+       * @param {string} [errorOptions.code] - an id string representing the error
+       * @param {number} [errorOptions.exitCode] - used with process.exit
+       */
+      error(message, errorOptions) {
+        this._outputConfiguration.outputError(
+          `${message}
+`,
+          this._outputConfiguration.writeErr
+        );
+        if (typeof this._showHelpAfterError === "string") {
+          this._outputConfiguration.writeErr(`${this._showHelpAfterError}
+`);
+        } else if (this._showHelpAfterError) {
+          this._outputConfiguration.writeErr("\n");
+          this.outputHelp({ error: true });
+        }
+        const config = errorOptions || {};
+        const exitCode = config.exitCode || 1;
+        const code = config.code || "commander.error";
+        this._exit(exitCode, code, message);
+      }
+      /**
+       * Apply any option related environment variables, if option does
+       * not have a value from cli or client code.
+       *
+       * @private
+       */
+      _parseOptionsEnv() {
+        this.options.forEach((option) => {
+          if (option.envVar && option.envVar in process2.env) {
+            const optionKey = option.attributeName();
+            if (this.getOptionValue(optionKey) === void 0 || ["default", "config", "env"].includes(
+              this.getOptionValueSource(optionKey)
+            )) {
+              if (option.required || option.optional) {
+                this.emit(`optionEnv:${option.name()}`, process2.env[option.envVar]);
+              } else {
+                this.emit(`optionEnv:${option.name()}`);
+              }
+            }
+          }
+        });
+      }
+      /**
+       * Apply any implied option values, if option is undefined or default value.
+       *
+       * @private
+       */
+      _parseOptionsImplied() {
+        const dualHelper = new DualOptions(this.options);
+        const hasCustomOptionValue = (optionKey) => {
+          return this.getOptionValue(optionKey) !== void 0 && !["default", "implied"].includes(this.getOptionValueSource(optionKey));
+        };
+        this.options.filter(
+          (option) => option.implied !== void 0 && hasCustomOptionValue(option.attributeName()) && dualHelper.valueFromOption(
+            this.getOptionValue(option.attributeName()),
+            option
+          )
+        ).forEach((option) => {
+          Object.keys(option.implied).filter((impliedKey) => !hasCustomOptionValue(impliedKey)).forEach((impliedKey) => {
+            this.setOptionValueWithSource(
+              impliedKey,
+              option.implied[impliedKey],
+              "implied"
+            );
+          });
+        });
+      }
+      /**
+       * Argument `name` is missing.
+       *
+       * @param {string} name
+       * @private
+       */
+      missingArgument(name) {
+        const message = `error: missing required argument '${name}'`;
+        this.error(message, { code: "commander.missingArgument" });
+      }
+      /**
+       * `Option` is missing an argument.
+       *
+       * @param {Option} option
+       * @private
+       */
+      optionMissingArgument(option) {
+        const message = `error: option '${option.flags}' argument missing`;
+        this.error(message, { code: "commander.optionMissingArgument" });
+      }
+      /**
+       * `Option` does not have a value, and is a mandatory option.
+       *
+       * @param {Option} option
+       * @private
+       */
+      missingMandatoryOptionValue(option) {
+        const message = `error: required option '${option.flags}' not specified`;
+        this.error(message, { code: "commander.missingMandatoryOptionValue" });
+      }
+      /**
+       * `Option` conflicts with another option.
+       *
+       * @param {Option} option
+       * @param {Option} conflictingOption
+       * @private
+       */
+      _conflictingOption(option, conflictingOption) {
+        const findBestOptionFromValue = (option2) => {
+          const optionKey = option2.attributeName();
+          const optionValue = this.getOptionValue(optionKey);
+          const negativeOption = this.options.find(
+            (target) => target.negate && optionKey === target.attributeName()
+          );
+          const positiveOption = this.options.find(
+            (target) => !target.negate && optionKey === target.attributeName()
+          );
+          if (negativeOption && (negativeOption.presetArg === void 0 && optionValue === false || negativeOption.presetArg !== void 0 && optionValue === negativeOption.presetArg)) {
+            return negativeOption;
+          }
+          return positiveOption || option2;
+        };
+        const getErrorMessage = (option2) => {
+          const bestOption = findBestOptionFromValue(option2);
+          const optionKey = bestOption.attributeName();
+          const source = this.getOptionValueSource(optionKey);
+          if (source === "env") {
+            return `environment variable '${bestOption.envVar}'`;
+          }
+          return `option '${bestOption.flags}'`;
+        };
+        const message = `error: ${getErrorMessage(option)} cannot be used with ${getErrorMessage(conflictingOption)}`;
+        this.error(message, { code: "commander.conflictingOption" });
+      }
+      /**
+       * Unknown option `flag`.
+       *
+       * @param {string} flag
+       * @private
+       */
+      unknownOption(flag) {
+        if (this._allowUnknownOption) return;
+        let suggestion = "";
+        if (flag.startsWith("--") && this._showSuggestionAfterError) {
+          let candidateFlags = [];
+          let command = this;
+          do {
+            const moreFlags = command.createHelp().visibleOptions(command).filter((option) => option.long).map((option) => option.long);
+            candidateFlags = candidateFlags.concat(moreFlags);
+            command = command.parent;
+          } while (command && !command._enablePositionalOptions);
+          suggestion = suggestSimilar(flag, candidateFlags);
+        }
+        const message = `error: unknown option '${flag}'${suggestion}`;
+        this.error(message, { code: "commander.unknownOption" });
+      }
+      /**
+       * Excess arguments, more than expected.
+       *
+       * @param {string[]} receivedArgs
+       * @private
+       */
+      _excessArguments(receivedArgs) {
+        if (this._allowExcessArguments) return;
+        const expected = this.registeredArguments.length;
+        const s = expected === 1 ? "" : "s";
+        const forSubcommand = this.parent ? ` for '${this.name()}'` : "";
+        const message = `error: too many arguments${forSubcommand}. Expected ${expected} argument${s} but got ${receivedArgs.length}.`;
+        this.error(message, { code: "commander.excessArguments" });
+      }
+      /**
+       * Unknown command.
+       *
+       * @private
+       */
+      unknownCommand() {
+        const unknownName = this.args[0];
+        let suggestion = "";
+        if (this._showSuggestionAfterError) {
+          const candidateNames = [];
+          this.createHelp().visibleCommands(this).forEach((command) => {
+            candidateNames.push(command.name());
+            if (command.alias()) candidateNames.push(command.alias());
+          });
+          suggestion = suggestSimilar(unknownName, candidateNames);
+        }
+        const message = `error: unknown command '${unknownName}'${suggestion}`;
+        this.error(message, { code: "commander.unknownCommand" });
+      }
+      /**
+       * Get or set the program version.
+       *
+       * This method auto-registers the "-V, --version" option which will print the version number.
+       *
+       * You can optionally supply the flags and description to override the defaults.
+       *
+       * @param {string} [str]
+       * @param {string} [flags]
+       * @param {string} [description]
+       * @return {(this | string | undefined)} `this` command for chaining, or version string if no arguments
+       */
+      version(str, flags, description) {
+        if (str === void 0) return this._version;
+        this._version = str;
+        flags = flags || "-V, --version";
+        description = description || "output the version number";
+        const versionOption = this.createOption(flags, description);
+        this._versionOptionName = versionOption.attributeName();
+        this._registerOption(versionOption);
+        this.on("option:" + versionOption.name(), () => {
+          this._outputConfiguration.writeOut(`${str}
+`);
+          this._exit(0, "commander.version", str);
+        });
+        return this;
+      }
+      /**
+       * Set the description.
+       *
+       * @param {string} [str]
+       * @param {object} [argsDescription]
+       * @return {(string|Command)}
+       */
+      description(str, argsDescription) {
+        if (str === void 0 && argsDescription === void 0)
+          return this._description;
+        this._description = str;
+        if (argsDescription) {
+          this._argsDescription = argsDescription;
+        }
+        return this;
+      }
+      /**
+       * Set the summary. Used when listed as subcommand of parent.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      summary(str) {
+        if (str === void 0) return this._summary;
+        this._summary = str;
+        return this;
+      }
+      /**
+       * Set an alias for the command.
+       *
+       * You may call more than once to add multiple aliases. Only the first alias is shown in the auto-generated help.
+       *
+       * @param {string} [alias]
+       * @return {(string|Command)}
+       */
+      alias(alias) {
+        if (alias === void 0) return this._aliases[0];
+        let command = this;
+        if (this.commands.length !== 0 && this.commands[this.commands.length - 1]._executableHandler) {
+          command = this.commands[this.commands.length - 1];
+        }
+        if (alias === command._name)
+          throw new Error("Command alias can't be the same as its name");
+        const matchingCommand = this.parent?._findCommand(alias);
+        if (matchingCommand) {
+          const existingCmd = [matchingCommand.name()].concat(matchingCommand.aliases()).join("|");
+          throw new Error(
+            `cannot add alias '${alias}' to command '${this.name()}' as already have command '${existingCmd}'`
+          );
+        }
+        command._aliases.push(alias);
+        return this;
+      }
+      /**
+       * Set aliases for the command.
+       *
+       * Only the first alias is shown in the auto-generated help.
+       *
+       * @param {string[]} [aliases]
+       * @return {(string[]|Command)}
+       */
+      aliases(aliases) {
+        if (aliases === void 0) return this._aliases;
+        aliases.forEach((alias) => this.alias(alias));
+        return this;
+      }
+      /**
+       * Set / get the command usage `str`.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      usage(str) {
+        if (str === void 0) {
+          if (this._usage) return this._usage;
+          const args = this.registeredArguments.map((arg) => {
+            return humanReadableArgName(arg);
+          });
+          return [].concat(
+            this.options.length || this._helpOption !== null ? "[options]" : [],
+            this.commands.length ? "[command]" : [],
+            this.registeredArguments.length ? args : []
+          ).join(" ");
+        }
+        this._usage = str;
+        return this;
+      }
+      /**
+       * Get or set the name of the command.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      name(str) {
+        if (str === void 0) return this._name;
+        this._name = str;
+        return this;
+      }
+      /**
+       * Set/get the help group heading for this subcommand in parent command's help.
+       *
+       * @param {string} [heading]
+       * @return {Command | string}
+       */
+      helpGroup(heading) {
+        if (heading === void 0) return this._helpGroupHeading ?? "";
+        this._helpGroupHeading = heading;
+        return this;
+      }
+      /**
+       * Set/get the default help group heading for subcommands added to this command.
+       * (This does not override a group set directly on the subcommand using .helpGroup().)
+       *
+       * @example
+       * program.commandsGroup('Development Commands:);
+       * program.command('watch')...
+       * program.command('lint')...
+       * ...
+       *
+       * @param {string} [heading]
+       * @returns {Command | string}
+       */
+      commandsGroup(heading) {
+        if (heading === void 0) return this._defaultCommandGroup ?? "";
+        this._defaultCommandGroup = heading;
+        return this;
+      }
+      /**
+       * Set/get the default help group heading for options added to this command.
+       * (This does not override a group set directly on the option using .helpGroup().)
+       *
+       * @example
+       * program
+       *   .optionsGroup('Development Options:')
+       *   .option('-d, --debug', 'output extra debugging')
+       *   .option('-p, --profile', 'output profiling information')
+       *
+       * @param {string} [heading]
+       * @returns {Command | string}
+       */
+      optionsGroup(heading) {
+        if (heading === void 0) return this._defaultOptionGroup ?? "";
+        this._defaultOptionGroup = heading;
+        return this;
+      }
+      /**
+       * @param {Option} option
+       * @private
+       */
+      _initOptionGroup(option) {
+        if (this._defaultOptionGroup && !option.helpGroupHeading)
+          option.helpGroup(this._defaultOptionGroup);
+      }
+      /**
+       * @param {Command} cmd
+       * @private
+       */
+      _initCommandGroup(cmd) {
+        if (this._defaultCommandGroup && !cmd.helpGroup())
+          cmd.helpGroup(this._defaultCommandGroup);
+      }
+      /**
+       * Set the name of the command from script filename, such as process.argv[1],
+       * or require.main.filename, or __filename.
+       *
+       * (Used internally and public although not documented in README.)
+       *
+       * @example
+       * program.nameFromFilename(require.main.filename);
+       *
+       * @param {string} filename
+       * @return {Command}
+       */
+      nameFromFilename(filename) {
+        this._name = path.basename(filename, path.extname(filename));
+        return this;
+      }
+      /**
+       * Get or set the directory for searching for executable subcommands of this command.
+       *
+       * @example
+       * program.executableDir(__dirname);
+       * // or
+       * program.executableDir('subcommands');
+       *
+       * @param {string} [path]
+       * @return {(string|null|Command)}
+       */
+      executableDir(path2) {
+        if (path2 === void 0) return this._executableDir;
+        this._executableDir = path2;
+        return this;
+      }
+      /**
+       * Return program help documentation.
+       *
+       * @param {{ error: boolean }} [contextOptions] - pass {error:true} to wrap for stderr instead of stdout
+       * @return {string}
+       */
+      helpInformation(contextOptions) {
+        const helper = this.createHelp();
+        const context = this._getOutputContext(contextOptions);
+        helper.prepareContext({
+          error: context.error,
+          helpWidth: context.helpWidth,
+          outputHasColors: context.hasColors
+        });
+        const text = helper.formatHelp(this, helper);
+        if (context.hasColors) return text;
+        return this._outputConfiguration.stripColor(text);
+      }
+      /**
+       * @typedef HelpContext
+       * @type {object}
+       * @property {boolean} error
+       * @property {number} helpWidth
+       * @property {boolean} hasColors
+       * @property {function} write - includes stripColor if needed
+       *
+       * @returns {HelpContext}
+       * @private
+       */
+      _getOutputContext(contextOptions) {
+        contextOptions = contextOptions || {};
+        const error = !!contextOptions.error;
+        let baseWrite;
+        let hasColors;
+        let helpWidth;
+        if (error) {
+          baseWrite = (str) => this._outputConfiguration.writeErr(str);
+          hasColors = this._outputConfiguration.getErrHasColors();
+          helpWidth = this._outputConfiguration.getErrHelpWidth();
+        } else {
+          baseWrite = (str) => this._outputConfiguration.writeOut(str);
+          hasColors = this._outputConfiguration.getOutHasColors();
+          helpWidth = this._outputConfiguration.getOutHelpWidth();
+        }
+        const write = (str) => {
+          if (!hasColors) str = this._outputConfiguration.stripColor(str);
+          return baseWrite(str);
+        };
+        return { error, write, hasColors, helpWidth };
+      }
+      /**
+       * Output help information for this command.
+       *
+       * Outputs built-in help, and custom text added using `.addHelpText()`.
+       *
+       * @param {{ error: boolean } | Function} [contextOptions] - pass {error:true} to write to stderr instead of stdout
+       */
+      outputHelp(contextOptions) {
+        let deprecatedCallback;
+        if (typeof contextOptions === "function") {
+          deprecatedCallback = contextOptions;
+          contextOptions = void 0;
+        }
+        const outputContext = this._getOutputContext(contextOptions);
+        const eventContext = {
+          error: outputContext.error,
+          write: outputContext.write,
+          command: this
+        };
+        this._getCommandAndAncestors().reverse().forEach((command) => command.emit("beforeAllHelp", eventContext));
+        this.emit("beforeHelp", eventContext);
+        let helpInformation = this.helpInformation({ error: outputContext.error });
+        if (deprecatedCallback) {
+          helpInformation = deprecatedCallback(helpInformation);
+          if (typeof helpInformation !== "string" && !Buffer.isBuffer(helpInformation)) {
+            throw new Error("outputHelp callback must return a string or a Buffer");
+          }
+        }
+        outputContext.write(helpInformation);
+        if (this._getHelpOption()?.long) {
+          this.emit(this._getHelpOption().long);
+        }
+        this.emit("afterHelp", eventContext);
+        this._getCommandAndAncestors().forEach(
+          (command) => command.emit("afterAllHelp", eventContext)
+        );
+      }
+      /**
+       * You can pass in flags and a description to customise the built-in help option.
+       * Pass in false to disable the built-in help option.
+       *
+       * @example
+       * program.helpOption('-?, --help' 'show help'); // customise
+       * program.helpOption(false); // disable
+       *
+       * @param {(string | boolean)} flags
+       * @param {string} [description]
+       * @return {Command} `this` command for chaining
+       */
+      helpOption(flags, description) {
+        if (typeof flags === "boolean") {
+          if (flags) {
+            if (this._helpOption === null) this._helpOption = void 0;
+            if (this._defaultOptionGroup) {
+              this._initOptionGroup(this._getHelpOption());
+            }
+          } else {
+            this._helpOption = null;
+          }
+          return this;
+        }
+        this._helpOption = this.createOption(
+          flags ?? "-h, --help",
+          description ?? "display help for command"
+        );
+        if (flags || description) this._initOptionGroup(this._helpOption);
+        return this;
+      }
+      /**
+       * Lazy create help option.
+       * Returns null if has been disabled with .helpOption(false).
+       *
+       * @returns {(Option | null)} the help option
+       * @package
+       */
+      _getHelpOption() {
+        if (this._helpOption === void 0) {
+          this.helpOption(void 0, void 0);
+        }
+        return this._helpOption;
+      }
+      /**
+       * Supply your own option to use for the built-in help option.
+       * This is an alternative to using helpOption() to customise the flags and description etc.
+       *
+       * @param {Option} option
+       * @return {Command} `this` command for chaining
+       */
+      addHelpOption(option) {
+        this._helpOption = option;
+        this._initOptionGroup(option);
+        return this;
+      }
+      /**
+       * Output help information and exit.
+       *
+       * Outputs built-in help, and custom text added using `.addHelpText()`.
+       *
+       * @param {{ error: boolean }} [contextOptions] - pass {error:true} to write to stderr instead of stdout
+       */
+      help(contextOptions) {
+        this.outputHelp(contextOptions);
+        let exitCode = Number(process2.exitCode ?? 0);
+        if (exitCode === 0 && contextOptions && typeof contextOptions !== "function" && contextOptions.error) {
+          exitCode = 1;
+        }
+        this._exit(exitCode, "commander.help", "(outputHelp)");
+      }
+      /**
+       * // Do a little typing to coordinate emit and listener for the help text events.
+       * @typedef HelpTextEventContext
+       * @type {object}
+       * @property {boolean} error
+       * @property {Command} command
+       * @property {function} write
+       */
+      /**
+       * Add additional text to be displayed with the built-in help.
+       *
+       * Position is 'before' or 'after' to affect just this command,
+       * and 'beforeAll' or 'afterAll' to affect this command and all its subcommands.
+       *
+       * @param {string} position - before or after built-in help
+       * @param {(string | Function)} text - string to add, or a function returning a string
+       * @return {Command} `this` command for chaining
+       */
+      addHelpText(position, text) {
+        const allowedValues = ["beforeAll", "before", "after", "afterAll"];
+        if (!allowedValues.includes(position)) {
+          throw new Error(`Unexpected value for position to addHelpText.
+Expecting one of '${allowedValues.join("', '")}'`);
+        }
+        const helpEvent = `${position}Help`;
+        this.on(helpEvent, (context) => {
+          let helpStr;
+          if (typeof text === "function") {
+            helpStr = text({ error: context.error, command: context.command });
+          } else {
+            helpStr = text;
+          }
+          if (helpStr) {
+            context.write(`${helpStr}
+`);
+          }
+        });
+        return this;
+      }
+      /**
+       * Output help information if help flags specified
+       *
+       * @param {Array} args - array of options to search for help flags
+       * @private
+       */
+      _outputHelpIfRequested(args) {
+        const helpOption = this._getHelpOption();
+        const helpRequested = helpOption && args.find((arg) => helpOption.is(arg));
+        if (helpRequested) {
+          this.outputHelp();
+          this._exit(0, "commander.helpDisplayed", "(outputHelp)");
+        }
+      }
+    };
+    function incrementNodeInspectorPort(args) {
+      return args.map((arg) => {
+        if (!arg.startsWith("--inspect")) {
+          return arg;
+        }
+        let debugOption;
+        let debugHost = "127.0.0.1";
+        let debugPort = "9229";
+        let match;
+        if ((match = arg.match(/^(--inspect(-brk)?)$/)) !== null) {
+          debugOption = match[1];
+        } else if ((match = arg.match(/^(--inspect(-brk|-port)?)=([^:]+)$/)) !== null) {
+          debugOption = match[1];
+          if (/^\d+$/.test(match[3])) {
+            debugPort = match[3];
+          } else {
+            debugHost = match[3];
+          }
+        } else if ((match = arg.match(/^(--inspect(-brk|-port)?)=([^:]+):(\d+)$/)) !== null) {
+          debugOption = match[1];
+          debugHost = match[3];
+          debugPort = match[4];
+        }
+        if (debugOption && debugPort !== "0") {
+          return `${debugOption}=${debugHost}:${parseInt(debugPort) + 1}`;
+        }
+        return arg;
+      });
+    }
+    function useColor() {
+      if (process2.env.NO_COLOR || process2.env.FORCE_COLOR === "0" || process2.env.FORCE_COLOR === "false")
+        return false;
+      if (process2.env.FORCE_COLOR || process2.env.CLICOLOR_FORCE !== void 0)
+        return true;
+      return void 0;
+    }
+    exports2.Command = Command2;
+    exports2.useColor = useColor;
+  }
+});
+
+// node_modules/commander/index.js
+var require_commander = __commonJS({
+  "node_modules/commander/index.js"(exports2) {
+    var { Argument: Argument2 } = require_argument();
+    var { Command: Command2 } = require_command();
+    var { CommanderError: CommanderError2, InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var { Help: Help2 } = require_help();
+    var { Option: Option2 } = require_option();
+    exports2.program = new Command2();
+    exports2.createCommand = (name) => new Command2(name);
+    exports2.createOption = (flags, description) => new Option2(flags, description);
+    exports2.createArgument = (name, description) => new Argument2(name, description);
+    exports2.Command = Command2;
+    exports2.Option = Option2;
+    exports2.Argument = Argument2;
+    exports2.Help = Help2;
+    exports2.CommanderError = CommanderError2;
+    exports2.InvalidArgumentError = InvalidArgumentError2;
+    exports2.InvalidOptionArgumentError = InvalidArgumentError2;
+  }
+});
+
+// src/screenshot.ts
+var fs3 = __toESM(require("node:fs"));
+
+// src/cli.ts
+var fs = __toESM(require("node:fs"));
+
+// node_modules/commander/esm.mjs
+var import_index = __toESM(require_commander(), 1);
+var {
+  program,
+  createCommand,
+  createArgument,
+  createOption,
+  CommanderError,
+  InvalidArgumentError,
+  InvalidOptionArgumentError,
+  // deprecated old name
+  Command,
+  Argument,
+  Option,
+  Help
+} = import_index.default;
+
+// package.json
+var package_default = {
+  name: "@helvio/web-screenshot",
+  version: "2.1.0",
+  description: "CLI to take webpage screenshots with Puppeteer and optional Sharp crop",
+  keywords: [
+    "screenshot",
+    "webpage",
+    "png",
+    "image",
+    "cli",
+    "puppeteer"
+  ],
+  main: "dist/screenshot.js",
+  bin: {
+    "web-screenshot": "dist/screenshot.js"
+  },
+  files: [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  scripts: {
+    build: "esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --platform=node --outfile=dist/screenshot.js",
+    lint: "biome check src test",
+    format: "biome check --write src test",
+    test: "tsx --test test/*.test.ts",
+    typecheck: "tsc --noEmit",
+    prepublishOnly: "npm run build"
+  },
+  license: "ISC",
+  preferGlobal: true,
+  author: "Helvio Pedreschi (https://github.com/Helvio88)",
+  repository: {
+    type: "git",
+    url: "git+https://github.com/Helvio88/web-screenshot.git"
+  },
+  bugs: "https://github.com/Helvio88/web-screenshot/issues",
+  homepage: "https://github.com/Helvio88/web-screenshot",
+  publishConfig: {
+    access: "public"
+  },
+  engines: {
+    node: ">=20"
+  },
+  dependencies: {
+    commander: "^14.0.0",
+    puppeteer: "^24.14.0",
+    sharp: "^0.34.3"
+  },
+  devDependencies: {
+    "@biomejs/biome": "^2.1.2",
+    "@types/node": "^22.16.5",
+    esbuild: "^0.25.8",
+    tsx: "^4.20.3",
+    typescript: "^5.8.3"
+  }
+};
+
+// src/Sanitizer.ts
+function parseInteger(value) {
+  if (typeof value === "boolean" || value == null) return void 0;
+  const n = typeof value === "number" ? value : Number(String(value).trim());
+  return Number.isInteger(n) ? n : void 0;
+}
+var Sanitizer = {
+  // Sanitize URL, ensuring it starts with http:// or https://
+  // If it doesn't, prepend http://
+  sanitizeUrl(url) {
+    url = url.trim();
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = `http://${url}`;
+    }
+    return url;
+  },
+  // Sanitize time in seconds, ensuring it's an integer between 1 and 600.
+  // Exceptions = 5000 ms (5 seconds)
+  sanitizeTime(time) {
+    const n = parseInteger(time);
+    return n !== void 0 && n >= 1 && n <= 600 ? n * 1e3 : 5e3;
+  },
+  // Sanitize x (starting x coordinate), ensuring it's an integer between 0 and 1920.
+  // Exceptions = 0
+  sanitizeX(x) {
+    const n = parseInteger(x);
+    return n !== void 0 && n >= 0 && n <= 1920 ? n : 0;
+  },
+  // Sanitize y (starting y coordinate), ensuring it's an integer between 0 and 1080.
+  // Exceptions = 0
+  sanitizeY(y) {
+    const n = parseInteger(y);
+    return n !== void 0 && n >= 0 && n <= 1080 ? n : 0;
+  },
+  // Sanitize width, ensuring it's an integer between 0 and 1920.
+  // 0 = full-page screenshot. Invalid values default to 1920.
+  sanitizeWidth(width) {
+    const n = parseInteger(width);
+    return n !== void 0 && n >= 0 && n <= 1920 ? n : 1920;
+  },
+  // Sanitize height, ensuring it's an integer between 0 and 1080.
+  // 0 = full-page screenshot. Invalid values default to 1080.
+  sanitizeHeight(height) {
+    const n = parseInteger(height);
+    return n !== void 0 && n >= 0 && n <= 1080 ? n : 1080;
+  },
+  sanitizeOutput(url, tmp, output) {
+    let path = typeof output === "string" ? output : void 0;
+    let ext = "png";
+    if (!path || /\.(png|jpg|jpeg|webp)$/i.test(path)) {
+      if (path) {
+        const rawExt = path.split(".").pop() ?? "png";
+        ext = rawExt.toLowerCase().replace("jpg", "jpeg");
+        path = path.substring(0, path.lastIndexOf("."));
+      } else {
+        const sections = url.split("/");
+        const count = url.endsWith("/") ? 2 : 1;
+        path = sections[sections.length - count];
+      }
+    }
+    if (tmp) path = `${path}_tmp`;
+    return { path, ext };
+  },
+  // Sanitize NTLM credentials. Format: username:password (no extra colons).
+  sanitizeAuth(auth) {
+    if (!auth) return void 0;
+    return /^[^:]+:[^:]+$/.test(auth) ? auth : void 0;
+  }
+};
+var Sanitizer_default = Sanitizer;
+
+// src/splitArgv.ts
+function splitArgv(line) {
+  const args = [];
+  let current = "";
+  let quote = null;
+  let escaped = false;
+  for (const char of line) {
+    if (escaped) {
+      current += char;
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote !== "'") {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (current.length > 0) {
+        args.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += char;
+  }
+  if (escaped) current += "\\";
+  if (current.length > 0) args.push(current);
+  return args;
+}
+
+// src/cli.ts
+function createProgram() {
+  const program3 = new Command();
+  program3.name("web-screenshot").description("Take screenshots of web pages").version(package_default.version).addHelpText("beforeAll", "Web Screenshot Utility").showHelpAfterError().addOption(new Option("-p, --path [path]", "Chrome executable path.")).addOption(new Option("-d, --debug", "Enable debug mode.").default(false)).addOption(new Option("-b, --batch [file]", "Batch file with URLs to screenshot. Supersedes all other options.")).addOption(new Option("-u, --url <url>", "URL (website) to screenshot.")).addOption(new Option("-t, --time [s]", "Extra seconds to wait after the page is idle.").default(3)).addOption(new Option("-x, --x [x]", "Leftmost pixel.").default(0)).addOption(new Option("-y, --y [y]", "Top pixel.").default(0)).addOption(
+    new Option("-w, --width [width]", "Image width in pixels. 0 takes a full-page screenshot.").default(1920)
+  ).addOption(
+    new Option("-h, --height [height]", "Image height in pixels. 0 takes a full-page screenshot.").default(1080)
+  ).addOption(new Option("-o, --out [out]", "Absolute or relative path to save the screenshot.")).addOption(new Option("-c, --crop", "Auto crop same-color borders.")).addOption(new Option("-a, --auth [auth]", "NTLM credentials in username:password format.")).addHelpText(
+    "after",
+    `
 Examples:
   $ web-screenshot -u https://example.com
   $ web-screenshot -u github.com -w 0 -h 0 -o full.png
   $ web-screenshot -u https://google.com -x 700 -y 190 -w 700 -h 180 -o google_logo.png --crop
   $ web-screenshot -b jobs.txt
-`),r}function ct(r){if(!r.url||typeof r.url!="string")return;let t=g.sanitizeUrl(r.url),e=typeof r.out=="string"?r.out:void 0,i=g.sanitizeOutput(t,!1,e),n=g.sanitizeOutput(t,!0,e),s=typeof r.auth=="string"?r.auth:void 0;return{url:t,time:g.sanitizeTime(r.time),x:g.sanitizeX(r.x),y:g.sanitizeY(r.y),width:g.sanitizeWidth(r.width),height:g.sanitizeHeight(r.height),path:i.path,tmp:n.path,ext:i.ext,auth:g.sanitizeAuth(s),crop:!!r.crop}}function Nt(r,t=!1){let e=[];for(let i of r.split(/\r?\n/)){let n=i.trim();if(n===""||n.startsWith("#"))continue;let s=lt(n);t&&console.log("Parsed arguments:",s);try{let o=U();o.exitOverride(),o.configureOutput({writeOut:()=>{},writeErr:()=>{}}),o.parse(s,{from:"user"});let a=ct(o.opts());if(!a){t&&console.log("No URL found in line, skipping:",n);continue}e.push(a)}catch(o){t&&console.log("Invalid batch line, skipping:",n,o)}}return e}function pt(r,t=jt,e=!1){if(r.batch){let n=String(r.batch);if(!t.existsSync(n))throw new Error(`Batch file "${n}" does not exist.`);return Nt(t.readFileSync(n,"utf-8"),e)}let i=ct(r);return i?[i]:[]}var Lt=w(require("node:fs"));function qt(r,t){return r===0||t===0}function dt(r){let t=`${r.tmp}.${r.ext}`,e=qt(r.width,r.height)?{path:t,fullPage:!0}:{path:t,clip:{x:r.x,y:r.y,width:r.width,height:r.height}};return{goto:{url:r.url,waitUntil:"networkidle2"},extraWaitMs:r.time,screenshot:e}}var Mt=r=>new Promise(t=>setTimeout(t,r));async function Rt(r,t){let e=(await import("sharp")).default;await e(r).trim({threshold:0}).toFile(t)}async function mt(r,t){let e=t.sleep??Mt,i=t.fs??Lt,n=t.trimToFile??Rt,s={headless:t.debug?!1:"shell",args:["--no-sandbox"]};t.chromePath&&(s.executablePath=t.chromePath);let o=await t.launch(s);console.log("Browser Opened");try{let a=await o.newPage();console.log("Page Created"),await a.setViewport({width:1920,height:1080}),console.log("Viewport Set");try{for(let u of r){if(u.auth){let[c,l]=u.auth.split(":");await a.authenticate({username:c,password:l??""}),console.log("Credentials Entered")}let h=dt(u);await a.goto(h.goto.url,{waitUntil:h.goto.waitUntil}),console.log(`Navigated to ${u.url}`),console.log(`Waiting for ${u.time/1e3} seconds`),await e(h.extraWaitMs),console.log("Page Loaded"),await a.screenshot(h.screenshot),console.log(`Temp screenshot taken: ${u.tmp}.${u.ext}`),u.crop?(await n(`${u.tmp}.${u.ext}`,`${u.path}.${u.ext}`),i.unlinkSync(`${u.tmp}.${u.ext}`),console.log(`Image cropped and saved to ${u.path}.${u.ext}`)):(i.renameSync(`${u.tmp}.${u.ext}`,`${u.path}.${u.ext}`),console.log(`Image saved to ${u.path}.${u.ext}`))}}finally{await a.close(),console.log("Page Closed")}}finally{await o.close(),console.log("Browser Closed")}}var B=U();B.parse(process.argv);var $=B.opts(),ft=!!$.debug,Bt=typeof $.path=="string"?$.path:void 0,z=[];try{z=pt($,Ut,ft)}catch(r){console.error(r.message),process.exit(1)}z.length===0&&B.error("Specify --url <url> or --batch <file> with at least one -u/--url line.");(async()=>{try{let r=await import("puppeteer");await mt(z,{debug:ft,chromePath:Bt,launch:t=>r.launch(t)}),console.log("Screenshot Process Completed Successfully"),process.exit(0)}catch(r){console.error("Screenshot Failed"),console.error(r),process.exit(1)}})();
+`
+  );
+  return program3;
+}
+function optionsToScreenshot(options2) {
+  if (!options2.url || typeof options2.url !== "string") return void 0;
+  const url = Sanitizer_default.sanitizeUrl(options2.url);
+  const outValue = typeof options2.out === "string" ? options2.out : void 0;
+  const outSanitized = Sanitizer_default.sanitizeOutput(url, false, outValue);
+  const tmpSanitized = Sanitizer_default.sanitizeOutput(url, true, outValue);
+  const authValue = typeof options2.auth === "string" ? options2.auth : void 0;
+  return {
+    url,
+    time: Sanitizer_default.sanitizeTime(options2.time),
+    x: Sanitizer_default.sanitizeX(options2.x),
+    y: Sanitizer_default.sanitizeY(options2.y),
+    width: Sanitizer_default.sanitizeWidth(options2.width),
+    height: Sanitizer_default.sanitizeHeight(options2.height),
+    path: outSanitized.path,
+    tmp: tmpSanitized.path,
+    ext: outSanitized.ext,
+    auth: Sanitizer_default.sanitizeAuth(authValue),
+    crop: Boolean(options2.crop)
+  };
+}
+function parseBatchContent(content, debug2 = false) {
+  const screenshots = [];
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line === "" || line.startsWith("#")) continue;
+    const args = splitArgv(line);
+    if (debug2) console.log("Parsed arguments:", args);
+    try {
+      const program3 = createProgram();
+      program3.exitOverride();
+      program3.configureOutput({
+        writeOut: () => {
+        },
+        writeErr: () => {
+        }
+      });
+      program3.parse(args, { from: "user" });
+      const screenshot = optionsToScreenshot(program3.opts());
+      if (!screenshot) {
+        if (debug2) console.log("No URL found in line, skipping:", line);
+        continue;
+      }
+      screenshots.push(screenshot);
+    } catch (error) {
+      if (debug2) console.log("Invalid batch line, skipping:", line, error);
+    }
+  }
+  return screenshots;
+}
+function jobsFromOptions(options2, io = fs, debug2 = false) {
+  if (options2.batch) {
+    const batchFile = String(options2.batch);
+    if (!io.existsSync(batchFile)) {
+      throw new Error(`Batch file "${batchFile}" does not exist.`);
+    }
+    return parseBatchContent(io.readFileSync(batchFile, "utf-8"), debug2);
+  }
+  const screenshot = optionsToScreenshot(options2);
+  return screenshot ? [screenshot] : [];
+}
+
+// src/runScreenshots.ts
+var fs2 = __toESM(require("node:fs"));
+
+// src/capture.ts
+function isFullPage(width, height) {
+  return width === 0 || height === 0;
+}
+function planCapture(ss) {
+  const path = `${ss.tmp}.${ss.ext}`;
+  const screenshot = isFullPage(ss.width, ss.height) ? { path, fullPage: true } : { path, clip: { x: ss.x, y: ss.y, width: ss.width, height: ss.height } };
+  return {
+    goto: { url: ss.url, waitUntil: "networkidle2" },
+    extraWaitMs: ss.time,
+    screenshot
+  };
+}
+
+// src/runScreenshots.ts
+var defaultSleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+async function defaultTrimToFile(input, output) {
+  const sharp = (await import("sharp")).default;
+  await sharp(input).trim({ threshold: 0 }).toFile(output);
+}
+async function runScreenshots(jobs2, runtime) {
+  const sleep = runtime.sleep ?? defaultSleep;
+  const fileOps = runtime.fs ?? fs2;
+  const trimToFile = runtime.trimToFile ?? defaultTrimToFile;
+  const launchOptions = {
+    headless: runtime.debug ? false : "shell",
+    args: ["--no-sandbox"]
+  };
+  if (runtime.chromePath) launchOptions.executablePath = runtime.chromePath;
+  const browser = await runtime.launch(launchOptions);
+  console.log("Browser Opened");
+  try {
+    const page = await browser.newPage();
+    console.log("Page Created");
+    await page.setViewport({ width: 1920, height: 1080 });
+    console.log("Viewport Set");
+    try {
+      for (const ss of jobs2) {
+        if (ss.auth) {
+          const [username, password] = ss.auth.split(":");
+          await page.authenticate({ username, password: password ?? "" });
+          console.log("Credentials Entered");
+        }
+        const plan = planCapture(ss);
+        await page.goto(plan.goto.url, { waitUntil: plan.goto.waitUntil });
+        console.log(`Navigated to ${ss.url}`);
+        console.log(`Waiting for ${ss.time / 1e3} seconds`);
+        await sleep(plan.extraWaitMs);
+        console.log("Page Loaded");
+        await page.screenshot(plan.screenshot);
+        console.log(`Temp screenshot taken: ${ss.tmp}.${ss.ext}`);
+        if (ss.crop) {
+          await trimToFile(`${ss.tmp}.${ss.ext}`, `${ss.path}.${ss.ext}`);
+          fileOps.unlinkSync(`${ss.tmp}.${ss.ext}`);
+          console.log(`Image cropped and saved to ${ss.path}.${ss.ext}`);
+        } else {
+          fileOps.renameSync(`${ss.tmp}.${ss.ext}`, `${ss.path}.${ss.ext}`);
+          console.log(`Image saved to ${ss.path}.${ss.ext}`);
+        }
+      }
+    } finally {
+      await page.close();
+      console.log("Page Closed");
+    }
+  } finally {
+    await browser.close();
+    console.log("Browser Closed");
+  }
+}
+
+// src/screenshot.ts
+var program2 = createProgram();
+program2.parse(process.argv);
+var options = program2.opts();
+var debug = Boolean(options.debug);
+var chromePath = typeof options.path === "string" ? options.path : void 0;
+var jobs = [];
+try {
+  jobs = jobsFromOptions(options, fs3, debug);
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+if (jobs.length === 0) {
+  program2.error("Specify --url <url> or --batch <file> with at least one -u/--url line.");
+}
+(async () => {
+  try {
+    const puppeteer = await import("puppeteer");
+    await runScreenshots(jobs, {
+      debug,
+      chromePath,
+      launch: (launchOptions) => puppeteer.launch(launchOptions)
+    });
+    console.log("Screenshot Process Completed Successfully");
+    process.exit(0);
+  } catch (error) {
+    console.error("Screenshot Failed");
+    console.error(error);
+    process.exit(1);
+  }
+})();

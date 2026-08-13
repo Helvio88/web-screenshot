@@ -19,7 +19,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js",
+    "build": "esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --platform=node --outfile=dist/screenshot.js",
     "lint": "biome check src test",
     "format": "biome check --write src test",
     "test": "tsx --test test/*.test.ts",

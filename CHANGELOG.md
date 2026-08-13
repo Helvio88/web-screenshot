@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Batch lines are split with quote-aware argv parsing, then fed through Commander, so paths with spaces work.
 - README install/help text matches the current CLI (`web-screenshot`, including `-p`/`--path`). Dropped the dead Travis badge and `--unsafe-perm`.
 - Publish workflow uses Node 22 and `npm run build` (esbuild) instead of Node 16 + `tsc`.
+- Committed `dist/screenshot.js` is bundled without minify so CI rebuilds match.
 
 ### Fixed
 - `sanitizeTime` / clip sanitizers treat CLI string numbers as integers, so `-t 3` waits 3 seconds instead of falling back to 5.
