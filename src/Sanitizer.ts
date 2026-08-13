@@ -80,6 +80,26 @@ const Sanitizer = {
     if (!auth) return undefined
     return /^[^:]+:[^:]+$/.test(auth) ? auth : undefined
   },
+
+  // CSS selector to wait for. Empty or non-string values are ignored.
+  sanitizeWaitFor(selector: unknown): string | undefined {
+    if (typeof selector !== 'string') return undefined
+    const trimmed = selector.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  },
+
+  // Seconds to wait for --wait-for. Integer 1–600, otherwise 30s (30000 ms).
+  sanitizeWaitTimeout(timeout: unknown): number {
+    const n = parseInteger(timeout)
+    return n !== undefined && n >= 1 && n <= 600 ? n * 1000 : 30000
+  },
+
+  // Path to a cookies file. Empty or non-string values are ignored.
+  sanitizeCookiesFile(file: unknown): string | undefined {
+    if (typeof file !== 'string') return undefined
+    const trimmed = file.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  },
 }
 
 export default Sanitizer

@@ -1187,7 +1187,7 @@ var require_command = __commonJS({
     var EventEmitter = require("node:events").EventEmitter;
     var childProcess = require("node:child_process");
     var path = require("node:path");
-    var fs4 = require("node:fs");
+    var fs5 = require("node:fs");
     var process2 = require("node:process");
     var { Argument: Argument2, humanReadableArgName } = require_argument();
     var { CommanderError: CommanderError2 } = require_error();
@@ -2182,7 +2182,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @param {string} subcommandName
        */
       _checkForMissingExecutable(executableFile, executableDir, subcommandName) {
-        if (fs4.existsSync(executableFile)) return;
+        if (fs5.existsSync(executableFile)) return;
         const executableDirMessage = executableDir ? `searched for local subcommand relative to directory '${executableDir}'` : "no directory for search for local subcommand, use .executableDir() to supply a custom directory";
         const executableMissing = `'${executableFile}' does not exist
  - if '${subcommandName}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
@@ -2201,10 +2201,10 @@ Expecting one of '${allowedValues.join("', '")}'`);
         const sourceExt = [".js", ".ts", ".tsx", ".mjs", ".cjs"];
         function findFile(baseDir, baseName) {
           const localBin = path.resolve(baseDir, baseName);
-          if (fs4.existsSync(localBin)) return localBin;
+          if (fs5.existsSync(localBin)) return localBin;
           if (sourceExt.includes(path.extname(baseName))) return void 0;
           const foundExt = sourceExt.find(
-            (ext) => fs4.existsSync(`${localBin}${ext}`)
+            (ext) => fs5.existsSync(`${localBin}${ext}`)
           );
           if (foundExt) return `${localBin}${foundExt}`;
           return void 0;
@@ -2216,7 +2216,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
         if (this._scriptPath) {
           let resolvedScriptPath;
           try {
-            resolvedScriptPath = fs4.realpathSync(this._scriptPath);
+            resolvedScriptPath = fs5.realpathSync(this._scriptPath);
           } catch {
             resolvedScriptPath = this._scriptPath;
           }
@@ -3452,7 +3452,7 @@ var require_commander = __commonJS({
 });
 
 // src/screenshot.ts
-var fs3 = __toESM(require("node:fs"));
+var fs4 = __toESM(require("node:fs"));
 
 // src/cli.ts
 var fs = __toESM(require("node:fs"));
@@ -3477,7 +3477,7 @@ var {
 // package.json
 var package_default = {
   name: "@helvio/web-screenshot",
-  version: "2.1.0",
+  version: "2.2.0",
   description: "CLI to take webpage screenshots with Puppeteer and optional Sharp crop",
   keywords: [
     "screenshot",
@@ -3599,6 +3599,23 @@ var Sanitizer = {
   sanitizeAuth(auth) {
     if (!auth) return void 0;
     return /^[^:]+:[^:]+$/.test(auth) ? auth : void 0;
+  },
+  // CSS selector to wait for. Empty or non-string values are ignored.
+  sanitizeWaitFor(selector) {
+    if (typeof selector !== "string") return void 0;
+    const trimmed = selector.trim();
+    return trimmed.length > 0 ? trimmed : void 0;
+  },
+  // Seconds to wait for --wait-for. Integer 1–600, otherwise 30s (30000 ms).
+  sanitizeWaitTimeout(timeout) {
+    const n = parseInteger(timeout);
+    return n !== void 0 && n >= 1 && n <= 600 ? n * 1e3 : 3e4;
+  },
+  // Path to a cookies file. Empty or non-string values are ignored.
+  sanitizeCookiesFile(file) {
+    if (typeof file !== "string") return void 0;
+    const trimmed = file.trim();
+    return trimmed.length > 0 ? trimmed : void 0;
   }
 };
 var Sanitizer_default = Sanitizer;
@@ -3652,13 +3669,22 @@ function createProgram() {
     new Option("-w, --width [width]", "Image width in pixels. 0 takes a full-page screenshot.").default(1920)
   ).addOption(
     new Option("-h, --height [height]", "Image height in pixels. 0 takes a full-page screenshot.").default(1080)
-  ).addOption(new Option("-o, --out [out]", "Absolute or relative path to save the screenshot.")).addOption(new Option("-c, --crop", "Auto crop same-color borders.")).addOption(new Option("-a, --auth [auth]", "NTLM credentials in username:password format.")).addHelpText(
+  ).addOption(new Option("-o, --out [out]", "Absolute or relative path to save the screenshot.")).addOption(new Option("-c, --crop", "Auto crop same-color borders.")).addOption(new Option("-a, --auth [auth]", "HTTP basic/NTLM credentials in username:password format.")).addOption(new Option("-s, --wait-for <selector>", "CSS selector to wait for before taking the screenshot.")).addOption(
+    new Option("--wait-timeout [s]", "Seconds to wait for --wait-for. Ignored without --wait-for.").default(30)
+  ).addOption(
+    new Option(
+      "--cookies <file>",
+      "Cookies file: JSON array, Playwright storageState, or Netscape format. Applied before navigation."
+    )
+  ).addHelpText(
     "after",
     `
 Examples:
   $ web-screenshot -u https://example.com
   $ web-screenshot -u github.com -w 0 -h 0 -o full.png
   $ web-screenshot -u https://google.com -x 700 -y 190 -w 700 -h 180 -o google_logo.png --crop
+  $ web-screenshot -u https://example.com --wait-for "#dashboard" --wait-timeout 30 -t 2 -o dashboard.png
+  $ web-screenshot -u https://example.com --cookies cookies.json -o dashboard.png
   $ web-screenshot -b jobs.txt
 `
   );
@@ -3682,7 +3708,10 @@ function optionsToScreenshot(options2) {
     tmp: tmpSanitized.path,
     ext: outSanitized.ext,
     auth: Sanitizer_default.sanitizeAuth(authValue),
-    crop: Boolean(options2.crop)
+    crop: Boolean(options2.crop),
+    waitFor: Sanitizer_default.sanitizeWaitFor(options2.waitFor),
+    waitTimeout: Sanitizer_default.sanitizeWaitTimeout(options2.waitTimeout),
+    cookiesFile: Sanitizer_default.sanitizeCookiesFile(options2.cookies)
   };
 }
 function parseBatchContent(content, debug2 = false) {
@@ -3727,7 +3756,7 @@ function jobsFromOptions(options2, io = fs, debug2 = false) {
 }
 
 // src/runScreenshots.ts
-var fs2 = __toESM(require("node:fs"));
+var fs3 = __toESM(require("node:fs"));
 
 // src/capture.ts
 function isFullPage(width, height) {
@@ -3738,9 +3767,134 @@ function planCapture(ss) {
   const screenshot = isFullPage(ss.width, ss.height) ? { path, fullPage: true } : { path, clip: { x: ss.x, y: ss.y, width: ss.width, height: ss.height } };
   return {
     goto: { url: ss.url, waitUntil: "networkidle2" },
+    waitFor: ss.waitFor ? { selector: ss.waitFor, timeout: ss.waitTimeout } : void 0,
     extraWaitMs: ss.time,
     screenshot
   };
+}
+
+// src/cookies.ts
+var fs2 = __toESM(require("node:fs"));
+var SAME_SITE = {
+  strict: "Strict",
+  lax: "Lax",
+  none: "None"
+};
+function isRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+function isCookieLike(value) {
+  return isRecord(value) && typeof value.name === "string" && typeof value.value === "string";
+}
+function sameSite(value) {
+  if (typeof value !== "string") return void 0;
+  return SAME_SITE[value.toLowerCase()];
+}
+function expires(value) {
+  if (typeof value === "number" && Number.isFinite(value) && value > 0) return value;
+  return void 0;
+}
+function ensureUrlOrDomain(cookie, pageUrl) {
+  if (cookie.url || cookie.domain) return cookie;
+  return { ...cookie, url: pageUrl };
+}
+function normalizeCookie(raw, pageUrl) {
+  const cookie = {
+    name: String(raw.name),
+    value: String(raw.value)
+  };
+  if (typeof raw.url === "string" && raw.url.length > 0) cookie.url = raw.url;
+  if (typeof raw.domain === "string" && raw.domain.length > 0) cookie.domain = raw.domain;
+  if (typeof raw.path === "string" && raw.path.length > 0) cookie.path = raw.path;
+  const exp = expires(raw.expires) ?? expires(raw.expirationDate);
+  if (exp !== void 0) cookie.expires = exp;
+  if (typeof raw.httpOnly === "boolean") cookie.httpOnly = raw.httpOnly;
+  if (typeof raw.secure === "boolean") cookie.secure = raw.secure;
+  const site = sameSite(raw.sameSite);
+  if (site) cookie.sameSite = site;
+  return ensureUrlOrDomain(cookie, pageUrl);
+}
+function parseJsonCookies(content, pageUrl) {
+  let data;
+  try {
+    data = JSON.parse(content);
+  } catch {
+    throw new Error("Cookies file contains invalid JSON.");
+  }
+  let raw;
+  if (Array.isArray(data)) {
+    raw = data;
+  } else if (isRecord(data) && Array.isArray(data.cookies)) {
+    raw = data.cookies;
+  } else if (isCookieLike(data)) {
+    raw = [data];
+  } else {
+    throw new Error(
+      "Cookies file must be a JSON array of cookies or a Playwright storageState object with a cookies array."
+    );
+  }
+  return raw.map((item, index) => {
+    if (!isCookieLike(item)) {
+      throw new Error(`Cookies file entry ${index} is missing name or value.`);
+    }
+    return normalizeCookie(item, pageUrl);
+  });
+}
+function parseNetscapeCookies(content, pageUrl) {
+  const cookies = [];
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line === "") continue;
+    let httpOnly = false;
+    let fieldsLine = line;
+    if (line.startsWith("#HttpOnly_")) {
+      httpOnly = true;
+      fieldsLine = line.slice("#HttpOnly_".length);
+    } else if (line.startsWith("#")) {
+      continue;
+    }
+    const fields = fieldsLine.split("	");
+    if (fields.length < 7) continue;
+    const [domain, , path, secure, expiry, name, ...valueParts] = fields;
+    if (!name) continue;
+    cookies.push(
+      ensureUrlOrDomain(
+        {
+          name,
+          value: valueParts.join("	"),
+          domain: domain || void 0,
+          path: path || "/",
+          secure: String(secure).toUpperCase() === "TRUE",
+          httpOnly,
+          expires: expires(Number(expiry))
+        },
+        pageUrl
+      )
+    );
+  }
+  return cookies;
+}
+function parseCookies(content, pageUrl) {
+  const trimmed = content.trim();
+  if (trimmed === "") {
+    throw new Error("Cookies file is empty.");
+  }
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    return parseJsonCookies(trimmed, pageUrl);
+  }
+  const cookies = parseNetscapeCookies(trimmed, pageUrl);
+  if (cookies.length === 0) {
+    throw new Error(
+      "Cookies file must be a JSON array of cookies, a Playwright storageState object, or a Netscape cookie file."
+    );
+  }
+  return cookies;
+}
+function loadCookiesFromFile(filePath, pageUrl, io = fs2) {
+  if (!io.existsSync(filePath)) {
+    throw new Error(`Cookies file "${filePath}" does not exist.`);
+  }
+  return parseCookies(io.readFileSync(filePath, "utf-8"), pageUrl);
 }
 
 // src/runScreenshots.ts
@@ -3751,7 +3905,7 @@ async function defaultTrimToFile(input, output) {
 }
 async function runScreenshots(jobs2, runtime) {
   const sleep = runtime.sleep ?? defaultSleep;
-  const fileOps = runtime.fs ?? fs2;
+  const fileOps = runtime.fs ?? fs3;
   const trimToFile = runtime.trimToFile ?? defaultTrimToFile;
   const launchOptions = {
     headless: runtime.debug ? false : "shell",
@@ -3772,9 +3926,20 @@ async function runScreenshots(jobs2, runtime) {
           await page.authenticate({ username, password: password ?? "" });
           console.log("Credentials Entered");
         }
+        if (ss.cookiesFile) {
+          const cookies = loadCookiesFromFile(ss.cookiesFile, ss.url);
+          if (cookies.length > 0) {
+            await page.setCookie(...cookies);
+            console.log(`Cookies loaded from ${ss.cookiesFile}`);
+          }
+        }
         const plan = planCapture(ss);
         await page.goto(plan.goto.url, { waitUntil: plan.goto.waitUntil });
         console.log(`Navigated to ${ss.url}`);
+        if (plan.waitFor) {
+          console.log(`Waiting for selector ${plan.waitFor.selector}`);
+          await page.waitForSelector(plan.waitFor.selector, { timeout: plan.waitFor.timeout });
+        }
         console.log(`Waiting for ${ss.time / 1e3} seconds`);
         await sleep(plan.extraWaitMs);
         console.log("Page Loaded");
@@ -3807,7 +3972,7 @@ var debug = Boolean(options.debug);
 var chromePath = typeof options.path === "string" ? options.path : void 0;
 var jobs = [];
 try {
-  jobs = jobsFromOptions(options, fs3, debug);
+  jobs = jobsFromOptions(options, fs4, debug);
 } catch (error) {
   console.error(error.message);
   process.exit(1);

@@ -1,5 +1,6 @@
 import * as fs from 'node:fs'
 import { planCapture } from './capture'
+import { type Cookie, loadCookiesFromFile } from './cookies'
 import type WebScreenshot from './types/WebScreenshot'
 
 export type LaunchOptions = {
@@ -10,8 +11,10 @@ export type LaunchOptions = {
 
 export type PageLike = {
   authenticate: (credentials: { username: string; password: string }) => Promise<void>
+  setCookie: (...cookies: Cookie[]) => Promise<void>
   setViewport: (viewport: { width: number; height: number }) => Promise<void>
   goto: (url: string, options?: { waitUntil: 'networkidle2' }) => Promise<unknown>
+  waitForSelector: (selector: string, options?: { timeout?: number }) => Promise<unknown>
   screenshot: (options: Record<string, unknown>) => Promise<unknown>
   close: () => Promise<void>
 }
@@ -69,9 +72,22 @@ export async function runScreenshots(jobs: WebScreenshot[], runtime: ScreenshotR
           console.log('Credentials Entered')
         }
 
+        if (ss.cookiesFile) {
+          const cookies = loadCookiesFromFile(ss.cookiesFile, ss.url)
+          if (cookies.length > 0) {
+            await page.setCookie(...cookies)
+            console.log(`Cookies loaded from ${ss.cookiesFile}`)
+          }
+        }
+
         const plan = planCapture(ss)
         await page.goto(plan.goto.url, { waitUntil: plan.goto.waitUntil })
         console.log(`Navigated to ${ss.url}`)
+
+        if (plan.waitFor) {
+          console.log(`Waiting for selector ${plan.waitFor.selector}`)
+          await page.waitForSelector(plan.waitFor.selector, { timeout: plan.waitFor.timeout })
+        }
 
         console.log(`Waiting for ${ss.time / 1000} seconds`)
         await sleep(plan.extraWaitMs)

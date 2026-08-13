@@ -29,7 +29,17 @@ export function createProgram(): Command {
     )
     .addOption(new Option('-o, --out [out]', 'Absolute or relative path to save the screenshot.'))
     .addOption(new Option('-c, --crop', 'Auto crop same-color borders.'))
-    .addOption(new Option('-a, --auth [auth]', 'NTLM credentials in username:password format.'))
+    .addOption(new Option('-a, --auth [auth]', 'HTTP basic/NTLM credentials in username:password format.'))
+    .addOption(new Option('-s, --wait-for <selector>', 'CSS selector to wait for before taking the screenshot.'))
+    .addOption(
+      new Option('--wait-timeout [s]', 'Seconds to wait for --wait-for. Ignored without --wait-for.').default(30),
+    )
+    .addOption(
+      new Option(
+        '--cookies <file>',
+        'Cookies file: JSON array, Playwright storageState, or Netscape format. Applied before navigation.',
+      ),
+    )
     .addHelpText(
       'after',
       `
@@ -37,6 +47,8 @@ Examples:
   $ web-screenshot -u https://example.com
   $ web-screenshot -u github.com -w 0 -h 0 -o full.png
   $ web-screenshot -u https://google.com -x 700 -y 190 -w 700 -h 180 -o google_logo.png --crop
+  $ web-screenshot -u https://example.com --wait-for "#dashboard" --wait-timeout 30 -t 2 -o dashboard.png
+  $ web-screenshot -u https://example.com --cookies cookies.json -o dashboard.png
   $ web-screenshot -b jobs.txt
 `,
     )
@@ -54,6 +66,9 @@ export function optionsToScreenshot(options: {
   out?: unknown
   auth?: unknown
   crop?: unknown
+  waitFor?: unknown
+  waitTimeout?: unknown
+  cookies?: unknown
 }): WebScreenshot | undefined {
   if (!options.url || typeof options.url !== 'string') return undefined
 
@@ -75,6 +90,9 @@ export function optionsToScreenshot(options: {
     ext: outSanitized.ext,
     auth: Sanitizer.sanitizeAuth(authValue),
     crop: Boolean(options.crop),
+    waitFor: Sanitizer.sanitizeWaitFor(options.waitFor),
+    waitTimeout: Sanitizer.sanitizeWaitTimeout(options.waitTimeout),
+    cookiesFile: Sanitizer.sanitizeCookiesFile(options.cookies),
   }
 }
 

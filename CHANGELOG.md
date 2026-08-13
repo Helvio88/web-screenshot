@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-08-13
+
+### Added
+- `-s` / `--wait-for <selector>` waits for a CSS selector (`page.waitForSelector`) after the page is idle and before the extra `-t` delay. Use this for slow or login-gated dashboards whose main content appears after JavaScript renders.
+- `--wait-timeout [s]` is the selector wait in seconds (default 30, clamped to 1–600). Ignored unless `--wait-for` is set.
+- `--cookies [file]` loads cookies before navigation. Accepts a JSON array of Puppeteer cookies, Playwright `storageState` JSON, or a Netscape cookie file. Cookies without `url` or `domain` use the screenshot URL.
+- Batch lines accept the new flags the same way as the CLI (including quoted selectors).
+
+### Changed
+- `-a` / `--auth` help text now says HTTP basic/NTLM (still `username:password` via `page.authenticate`).
+
 ## [2.1.0] - 2026-08-13
 
 ### Added

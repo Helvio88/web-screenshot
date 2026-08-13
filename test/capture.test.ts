@@ -15,6 +15,7 @@ function job(overrides: Partial<WebScreenshot> = {}): WebScreenshot {
     tmp: 'example.com_tmp',
     ext: 'png',
     crop: false,
+    waitTimeout: 30000,
     ...overrides,
   }
 }
@@ -24,6 +25,7 @@ describe('planCapture', () => {
     const plan = planCapture(job())
     assert.deepEqual(plan.goto, { url: 'https://example.com', waitUntil: 'networkidle2' })
     assert.equal(plan.extraWaitMs, 3000)
+    assert.equal(plan.waitFor, undefined)
     assert.deepEqual(plan.screenshot, {
       path: 'example.com_tmp.png',
       clip: { x: 0, y: 0, width: 1920, height: 1080 },
@@ -52,5 +54,22 @@ describe('planCapture', () => {
       path: 'example.com_tmp.png',
       clip: { x: 700, y: 190, width: 700, height: 180 },
     })
+  })
+
+  it('omits waitFor when no selector is set', () => {
+    assert.equal(planCapture(job()).waitFor, undefined)
+  })
+
+  it('plans waitForSelector after networkidle, before the extra -t wait', () => {
+    const plan = planCapture(
+      job({
+        waitFor: '#dashboard',
+        waitTimeout: 45000,
+        time: 2000,
+      }),
+    )
+    assert.deepEqual(plan.goto, { url: 'https://example.com', waitUntil: 'networkidle2' })
+    assert.deepEqual(plan.waitFor, { selector: '#dashboard', timeout: 45000 })
+    assert.equal(plan.extraWaitMs, 2000)
   })
 })

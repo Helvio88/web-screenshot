@@ -12,6 +12,8 @@ describe('built CLI', () => {
     assert.match(result.stdout, /Usage: web-screenshot \[options\]/)
     assert.match(result.stdout, /-u, --url <url>/)
     assert.match(result.stdout, /-p, --path \[path\]/)
+    assert.match(result.stdout, /-s, --wait-for <selector>/)
+    assert.match(result.stdout, /--cookies <file>/)
   })
 
   it('prints the package version', { skip: !existsSync('dist/screenshot.js') }, () => {
