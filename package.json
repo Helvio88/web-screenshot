@@ -1,37 +1,56 @@
 {
   "name": "@helvio/web-screenshot",
-  "version": "2.0.5",
-  "description": "Screenshots Pages to PNG",
+  "version": "2.1.0",
+  "description": "CLI to take webpage screenshots with Puppeteer and optional Sharp crop",
   "keywords": [
     "screenshot",
     "webpage",
     "png",
-    "image"
+    "image",
+    "cli",
+    "puppeteer"
   ],
   "main": "dist/screenshot.js",
   "bin": {
     "web-screenshot": "dist/screenshot.js"
   },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
-    "build": "npx esbuild --bundle --external:puppeteer src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js"
+    "build": "esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js",
+    "lint": "biome check src test",
+    "format": "biome check --write src test",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "license": "ISC",
   "preferGlobal": true,
-  "author": "Helvio Pedreschi",
+  "author": "Helvio Pedreschi (https://github.com/Helvio88)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Helvio88/web-screenshot.git"
+  },
   "bugs": "https://github.com/Helvio88/web-screenshot/issues",
   "homepage": "https://github.com/Helvio88/web-screenshot",
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "commander": "^14.0.0",
     "puppeteer": "^24.14.0",
-    "sharp": "^0.34.3",
-    "tslib": "^2.8.1"
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
-    "tsc": "^2.0.4",
+    "@types/node": "^22.16.5",
+    "esbuild": "^0.25.8",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }
