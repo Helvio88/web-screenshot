@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "ESNext",
-    "jsx": "react",
-    "importHelpers": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "target": "ES2022",
     "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

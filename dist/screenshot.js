@@ -1,29 +1,3833 @@
 #!/usr/bin/env node
-var Kn=Object.create;var er=Object.defineProperty;var Yn=Object.getOwnPropertyDescriptor;var Zn=Object.getOwnPropertyNames;var es=Object.getPrototypeOf,ts=Object.prototype.hasOwnProperty;var E=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports);var rs=(e,t,r,i)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of Zn(t))!ts.call(e,n)&&n!==r&&er(e,n,{get:()=>t[n],enumerable:!(i=Yn(t,n))||i.enumerable});return e};var Ce=(e,t,r)=>(r=e!=null?Kn(es(e)):{},rs(t||!e||!e.__esModule?er(r,"default",{value:e,enumerable:!0}):r,e));var pe=E(Ye=>{var $e=class extends Error{constructor(t,r,i){super(i),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name,this.code=r,this.exitCode=t,this.nestedError=void 0}},Ke=class extends $e{constructor(t){super(1,"commander.invalidArgument",t),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name}};Ye.CommanderError=$e;Ye.InvalidArgumentError=Ke});var Se=E(et=>{var{InvalidArgumentError:is}=pe(),Ze=class{constructor(t,r){switch(this.description=r||"",this.variadic=!1,this.parseArg=void 0,this.defaultValue=void 0,this.defaultValueDescription=void 0,this.argChoices=void 0,t[0]){case"<":this.required=!0,this._name=t.slice(1,-1);break;case"[":this.required=!1,this._name=t.slice(1,-1);break;default:this.required=!0,this._name=t;break}this._name.length>3&&this._name.slice(-3)==="..."&&(this.variadic=!0,this._name=this._name.slice(0,-3))}name(){return this._name}_concatValue(t,r){return r===this.defaultValue||!Array.isArray(r)?[t]:r.concat(t)}default(t,r){return this.defaultValue=t,this.defaultValueDescription=r,this}argParser(t){return this.parseArg=t,this}choices(t){return this.argChoices=t.slice(),this.parseArg=(r,i)=>{if(!this.argChoices.includes(r))throw new is(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(r,i):r},this}argRequired(){return this.required=!0,this}argOptional(){return this.required=!1,this}};function ns(e){let t=e.name()+(e.variadic===!0?"...":"");return e.required?"<"+t+">":"["+t+"]"}et.Argument=Ze;et.humanReadableArgName=ns});var it=E(rt=>{var{humanReadableArgName:ss}=Se(),tt=class{constructor(){this.helpWidth=void 0,this.minWidthToWrap=40,this.sortSubcommands=!1,this.sortOptions=!1,this.showGlobalOptions=!1}prepareContext(t){this.helpWidth=this.helpWidth??t.helpWidth??80}visibleCommands(t){let r=t.commands.filter(n=>!n._hidden),i=t._getHelpCommand();return i&&!i._hidden&&r.push(i),this.sortSubcommands&&r.sort((n,s)=>n.name().localeCompare(s.name())),r}compareOptions(t,r){let i=n=>n.short?n.short.replace(/^-/,""):n.long.replace(/^--/,"");return i(t).localeCompare(i(r))}visibleOptions(t){let r=t.options.filter(n=>!n.hidden),i=t._getHelpOption();if(i&&!i.hidden){let n=i.short&&t._findOption(i.short),s=i.long&&t._findOption(i.long);!n&&!s?r.push(i):i.long&&!s?r.push(t.createOption(i.long,i.description)):i.short&&!n&&r.push(t.createOption(i.short,i.description))}return this.sortOptions&&r.sort(this.compareOptions),r}visibleGlobalOptions(t){if(!this.showGlobalOptions)return[];let r=[];for(let i=t.parent;i;i=i.parent){let n=i.options.filter(s=>!s.hidden);r.push(...n)}return this.sortOptions&&r.sort(this.compareOptions),r}visibleArguments(t){return t._argsDescription&&t.registeredArguments.forEach(r=>{r.description=r.description||t._argsDescription[r.name()]||""}),t.registeredArguments.find(r=>r.description)?t.registeredArguments:[]}subcommandTerm(t){let r=t.registeredArguments.map(i=>ss(i)).join(" ");return t._name+(t._aliases[0]?"|"+t._aliases[0]:"")+(t.options.length?" [options]":"")+(r?" "+r:"")}optionTerm(t){return t.flags}argumentTerm(t){return t.name()}longestSubcommandTermLength(t,r){return r.visibleCommands(t).reduce((i,n)=>Math.max(i,this.displayWidth(r.styleSubcommandTerm(r.subcommandTerm(n)))),0)}longestOptionTermLength(t,r){return r.visibleOptions(t).reduce((i,n)=>Math.max(i,this.displayWidth(r.styleOptionTerm(r.optionTerm(n)))),0)}longestGlobalOptionTermLength(t,r){return r.visibleGlobalOptions(t).reduce((i,n)=>Math.max(i,this.displayWidth(r.styleOptionTerm(r.optionTerm(n)))),0)}longestArgumentTermLength(t,r){return r.visibleArguments(t).reduce((i,n)=>Math.max(i,this.displayWidth(r.styleArgumentTerm(r.argumentTerm(n)))),0)}commandUsage(t){let r=t._name;t._aliases[0]&&(r=r+"|"+t._aliases[0]);let i="";for(let n=t.parent;n;n=n.parent)i=n.name()+" "+i;return i+r+" "+t.usage()}commandDescription(t){return t.description()}subcommandDescription(t){return t.summary()||t.description()}optionDescription(t){let r=[];if(t.argChoices&&r.push(`choices: ${t.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),t.defaultValue!==void 0&&(t.required||t.optional||t.isBoolean()&&typeof t.defaultValue=="boolean")&&r.push(`default: ${t.defaultValueDescription||JSON.stringify(t.defaultValue)}`),t.presetArg!==void 0&&t.optional&&r.push(`preset: ${JSON.stringify(t.presetArg)}`),t.envVar!==void 0&&r.push(`env: ${t.envVar}`),r.length>0){let i=`(${r.join(", ")})`;return t.description?`${t.description} ${i}`:i}return t.description}argumentDescription(t){let r=[];if(t.argChoices&&r.push(`choices: ${t.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),t.defaultValue!==void 0&&r.push(`default: ${t.defaultValueDescription||JSON.stringify(t.defaultValue)}`),r.length>0){let i=`(${r.join(", ")})`;return t.description?`${t.description} ${i}`:i}return t.description}formatItemList(t,r,i){return r.length===0?[]:[i.styleTitle(t),...r,""]}groupItems(t,r,i){let n=new Map;return t.forEach(s=>{let a=i(s);n.has(a)||n.set(a,[])}),r.forEach(s=>{let a=i(s);n.has(a)||n.set(a,[]),n.get(a).push(s)}),n}formatHelp(t,r){let i=r.padWidth(t,r),n=r.helpWidth??80;function s(d,x){return r.formatItem(d,i,x,r)}let a=[`${r.styleTitle("Usage:")} ${r.styleUsage(r.commandUsage(t))}`,""],l=r.commandDescription(t);l.length>0&&(a=a.concat([r.boxWrap(r.styleCommandDescription(l),n),""]));let c=r.visibleArguments(t).map(d=>s(r.styleArgumentTerm(r.argumentTerm(d)),r.styleArgumentDescription(r.argumentDescription(d))));if(a=a.concat(this.formatItemList("Arguments:",c,r)),this.groupItems(t.options,r.visibleOptions(t),d=>d.helpGroupHeading??"Options:").forEach((d,x)=>{let U=d.map(H=>s(r.styleOptionTerm(r.optionTerm(H)),r.styleOptionDescription(r.optionDescription(H))));a=a.concat(this.formatItemList(x,U,r))}),r.showGlobalOptions){let d=r.visibleGlobalOptions(t).map(x=>s(r.styleOptionTerm(r.optionTerm(x)),r.styleOptionDescription(r.optionDescription(x))));a=a.concat(this.formatItemList("Global Options:",d,r))}return this.groupItems(t.commands,r.visibleCommands(t),d=>d.helpGroup()||"Commands:").forEach((d,x)=>{let U=d.map(H=>s(r.styleSubcommandTerm(r.subcommandTerm(H)),r.styleSubcommandDescription(r.subcommandDescription(H))));a=a.concat(this.formatItemList(x,U,r))}),a.join(`
-`)}displayWidth(t){return tr(t).length}styleTitle(t){return t}styleUsage(t){return t.split(" ").map(r=>r==="[options]"?this.styleOptionText(r):r==="[command]"?this.styleSubcommandText(r):r[0]==="["||r[0]==="<"?this.styleArgumentText(r):this.styleCommandText(r)).join(" ")}styleCommandDescription(t){return this.styleDescriptionText(t)}styleOptionDescription(t){return this.styleDescriptionText(t)}styleSubcommandDescription(t){return this.styleDescriptionText(t)}styleArgumentDescription(t){return this.styleDescriptionText(t)}styleDescriptionText(t){return t}styleOptionTerm(t){return this.styleOptionText(t)}styleSubcommandTerm(t){return t.split(" ").map(r=>r==="[options]"?this.styleOptionText(r):r[0]==="["||r[0]==="<"?this.styleArgumentText(r):this.styleSubcommandText(r)).join(" ")}styleArgumentTerm(t){return this.styleArgumentText(t)}styleOptionText(t){return t}styleArgumentText(t){return t}styleSubcommandText(t){return t}styleCommandText(t){return t}padWidth(t,r){return Math.max(r.longestOptionTermLength(t,r),r.longestGlobalOptionTermLength(t,r),r.longestSubcommandTermLength(t,r),r.longestArgumentTermLength(t,r))}preformatted(t){return/\n[^\S\r\n]/.test(t)}formatItem(t,r,i,n){let a=" ".repeat(2);if(!i)return a+t;let l=t.padEnd(r+t.length-n.displayWidth(t)),c=2,m=(this.helpWidth??80)-r-c-2,d;return m<this.minWidthToWrap||n.preformatted(i)?d=i:d=n.boxWrap(i,m).replace(/\n/g,`
-`+" ".repeat(r+c)),a+l+" ".repeat(c)+d.replace(/\n/g,`
-${a}`)}boxWrap(t,r){if(r<this.minWidthToWrap)return t;let i=t.split(/\r\n|\n/),n=/[\s]*[^\s]+/g,s=[];return i.forEach(a=>{let l=a.match(n);if(l===null){s.push("");return}let c=[l.shift()],f=this.displayWidth(c[0]);l.forEach(m=>{let d=this.displayWidth(m);if(f+d<=r){c.push(m),f+=d;return}s.push(c.join(""));let x=m.trimStart();c=[x],f=this.displayWidth(x)}),s.push(c.join(""))}),s.join(`
-`)}};function tr(e){let t=/\x1b\[\d*(;\d*)*m/g;return e.replace(t,"")}rt.Help=tt;rt.stripColor=tr});var ot=E(at=>{var{InvalidArgumentError:as}=pe(),nt=class{constructor(t,r){this.flags=t,this.description=r||"",this.required=t.includes("<"),this.optional=t.includes("["),this.variadic=/\w\.\.\.[>\]]$/.test(t),this.mandatory=!1;let i=os(t);this.short=i.shortFlag,this.long=i.longFlag,this.negate=!1,this.long&&(this.negate=this.long.startsWith("--no-")),this.defaultValue=void 0,this.defaultValueDescription=void 0,this.presetArg=void 0,this.envVar=void 0,this.parseArg=void 0,this.hidden=!1,this.argChoices=void 0,this.conflictsWith=[],this.implied=void 0,this.helpGroupHeading=void 0}default(t,r){return this.defaultValue=t,this.defaultValueDescription=r,this}preset(t){return this.presetArg=t,this}conflicts(t){return this.conflictsWith=this.conflictsWith.concat(t),this}implies(t){let r=t;return typeof t=="string"&&(r={[t]:!0}),this.implied=Object.assign(this.implied||{},r),this}env(t){return this.envVar=t,this}argParser(t){return this.parseArg=t,this}makeOptionMandatory(t=!0){return this.mandatory=!!t,this}hideHelp(t=!0){return this.hidden=!!t,this}_concatValue(t,r){return r===this.defaultValue||!Array.isArray(r)?[t]:r.concat(t)}choices(t){return this.argChoices=t.slice(),this.parseArg=(r,i)=>{if(!this.argChoices.includes(r))throw new as(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(r,i):r},this}name(){return this.long?this.long.replace(/^--/,""):this.short.replace(/^-/,"")}attributeName(){return this.negate?rr(this.name().replace(/^no-/,"")):rr(this.name())}helpGroup(t){return this.helpGroupHeading=t,this}is(t){return this.short===t||this.long===t}isBoolean(){return!this.required&&!this.optional&&!this.negate}},st=class{constructor(t){this.positiveOptions=new Map,this.negativeOptions=new Map,this.dualOptions=new Set,t.forEach(r=>{r.negate?this.negativeOptions.set(r.attributeName(),r):this.positiveOptions.set(r.attributeName(),r)}),this.negativeOptions.forEach((r,i)=>{this.positiveOptions.has(i)&&this.dualOptions.add(i)})}valueFromOption(t,r){let i=r.attributeName();if(!this.dualOptions.has(i))return!0;let n=this.negativeOptions.get(i).presetArg,s=n!==void 0?n:!1;return r.negate===(s===t)}};function rr(e){return e.split("-").reduce((t,r)=>t+r[0].toUpperCase()+r.slice(1))}function os(e){let t,r,i=/^-[^-]$/,n=/^--[^-]/,s=e.split(/[ |,]+/).concat("guard");if(i.test(s[0])&&(t=s.shift()),n.test(s[0])&&(r=s.shift()),!t&&i.test(s[0])&&(t=s.shift()),!t&&n.test(s[0])&&(t=r,r=s.shift()),s[0].startsWith("-")){let a=s[0],l=`option creation failed due to '${a}' in option flags '${e}'`;throw/^-[^-][^-]/.test(a)?new Error(`${l}
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// node_modules/commander/lib/error.js
+var require_error = __commonJS({
+  "node_modules/commander/lib/error.js"(exports2) {
+    var CommanderError2 = class extends Error {
+      /**
+       * Constructs the CommanderError class
+       * @param {number} exitCode suggested exit code which could be used with process.exit
+       * @param {string} code an id string representing the error
+       * @param {string} message human-readable description of the error
+       */
+      constructor(exitCode, code, message) {
+        super(message);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
+        this.code = code;
+        this.exitCode = exitCode;
+        this.nestedError = void 0;
+      }
+    };
+    var InvalidArgumentError2 = class extends CommanderError2 {
+      /**
+       * Constructs the InvalidArgumentError class
+       * @param {string} [message] explanation of why argument is invalid
+       */
+      constructor(message) {
+        super(1, "commander.invalidArgument", message);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
+      }
+    };
+    exports2.CommanderError = CommanderError2;
+    exports2.InvalidArgumentError = InvalidArgumentError2;
+  }
+});
+
+// node_modules/commander/lib/argument.js
+var require_argument = __commonJS({
+  "node_modules/commander/lib/argument.js"(exports2) {
+    var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var Argument2 = class {
+      /**
+       * Initialize a new command argument with the given name and description.
+       * The default is that the argument is required, and you can explicitly
+       * indicate this with <> around the name. Put [] around the name for an optional argument.
+       *
+       * @param {string} name
+       * @param {string} [description]
+       */
+      constructor(name, description) {
+        this.description = description || "";
+        this.variadic = false;
+        this.parseArg = void 0;
+        this.defaultValue = void 0;
+        this.defaultValueDescription = void 0;
+        this.argChoices = void 0;
+        switch (name[0]) {
+          case "<":
+            this.required = true;
+            this._name = name.slice(1, -1);
+            break;
+          case "[":
+            this.required = false;
+            this._name = name.slice(1, -1);
+            break;
+          default:
+            this.required = true;
+            this._name = name;
+            break;
+        }
+        if (this._name.length > 3 && this._name.slice(-3) === "...") {
+          this.variadic = true;
+          this._name = this._name.slice(0, -3);
+        }
+      }
+      /**
+       * Return argument name.
+       *
+       * @return {string}
+       */
+      name() {
+        return this._name;
+      }
+      /**
+       * @package
+       */
+      _concatValue(value, previous) {
+        if (previous === this.defaultValue || !Array.isArray(previous)) {
+          return [value];
+        }
+        return previous.concat(value);
+      }
+      /**
+       * Set the default value, and optionally supply the description to be displayed in the help.
+       *
+       * @param {*} value
+       * @param {string} [description]
+       * @return {Argument}
+       */
+      default(value, description) {
+        this.defaultValue = value;
+        this.defaultValueDescription = description;
+        return this;
+      }
+      /**
+       * Set the custom handler for processing CLI command arguments into argument values.
+       *
+       * @param {Function} [fn]
+       * @return {Argument}
+       */
+      argParser(fn) {
+        this.parseArg = fn;
+        return this;
+      }
+      /**
+       * Only allow argument value to be one of choices.
+       *
+       * @param {string[]} values
+       * @return {Argument}
+       */
+      choices(values) {
+        this.argChoices = values.slice();
+        this.parseArg = (arg, previous) => {
+          if (!this.argChoices.includes(arg)) {
+            throw new InvalidArgumentError2(
+              `Allowed choices are ${this.argChoices.join(", ")}.`
+            );
+          }
+          if (this.variadic) {
+            return this._concatValue(arg, previous);
+          }
+          return arg;
+        };
+        return this;
+      }
+      /**
+       * Make argument required.
+       *
+       * @returns {Argument}
+       */
+      argRequired() {
+        this.required = true;
+        return this;
+      }
+      /**
+       * Make argument optional.
+       *
+       * @returns {Argument}
+       */
+      argOptional() {
+        this.required = false;
+        return this;
+      }
+    };
+    function humanReadableArgName(arg) {
+      const nameOutput = arg.name() + (arg.variadic === true ? "..." : "");
+      return arg.required ? "<" + nameOutput + ">" : "[" + nameOutput + "]";
+    }
+    exports2.Argument = Argument2;
+    exports2.humanReadableArgName = humanReadableArgName;
+  }
+});
+
+// node_modules/commander/lib/help.js
+var require_help = __commonJS({
+  "node_modules/commander/lib/help.js"(exports2) {
+    var { humanReadableArgName } = require_argument();
+    var Help2 = class {
+      constructor() {
+        this.helpWidth = void 0;
+        this.minWidthToWrap = 40;
+        this.sortSubcommands = false;
+        this.sortOptions = false;
+        this.showGlobalOptions = false;
+      }
+      /**
+       * prepareContext is called by Commander after applying overrides from `Command.configureHelp()`
+       * and just before calling `formatHelp()`.
+       *
+       * Commander just uses the helpWidth and the rest is provided for optional use by more complex subclasses.
+       *
+       * @param {{ error?: boolean, helpWidth?: number, outputHasColors?: boolean }} contextOptions
+       */
+      prepareContext(contextOptions) {
+        this.helpWidth = this.helpWidth ?? contextOptions.helpWidth ?? 80;
+      }
+      /**
+       * Get an array of the visible subcommands. Includes a placeholder for the implicit help command, if there is one.
+       *
+       * @param {Command} cmd
+       * @returns {Command[]}
+       */
+      visibleCommands(cmd) {
+        const visibleCommands = cmd.commands.filter((cmd2) => !cmd2._hidden);
+        const helpCommand = cmd._getHelpCommand();
+        if (helpCommand && !helpCommand._hidden) {
+          visibleCommands.push(helpCommand);
+        }
+        if (this.sortSubcommands) {
+          visibleCommands.sort((a, b) => {
+            return a.name().localeCompare(b.name());
+          });
+        }
+        return visibleCommands;
+      }
+      /**
+       * Compare options for sort.
+       *
+       * @param {Option} a
+       * @param {Option} b
+       * @returns {number}
+       */
+      compareOptions(a, b) {
+        const getSortKey = (option) => {
+          return option.short ? option.short.replace(/^-/, "") : option.long.replace(/^--/, "");
+        };
+        return getSortKey(a).localeCompare(getSortKey(b));
+      }
+      /**
+       * Get an array of the visible options. Includes a placeholder for the implicit help option, if there is one.
+       *
+       * @param {Command} cmd
+       * @returns {Option[]}
+       */
+      visibleOptions(cmd) {
+        const visibleOptions = cmd.options.filter((option) => !option.hidden);
+        const helpOption = cmd._getHelpOption();
+        if (helpOption && !helpOption.hidden) {
+          const removeShort = helpOption.short && cmd._findOption(helpOption.short);
+          const removeLong = helpOption.long && cmd._findOption(helpOption.long);
+          if (!removeShort && !removeLong) {
+            visibleOptions.push(helpOption);
+          } else if (helpOption.long && !removeLong) {
+            visibleOptions.push(
+              cmd.createOption(helpOption.long, helpOption.description)
+            );
+          } else if (helpOption.short && !removeShort) {
+            visibleOptions.push(
+              cmd.createOption(helpOption.short, helpOption.description)
+            );
+          }
+        }
+        if (this.sortOptions) {
+          visibleOptions.sort(this.compareOptions);
+        }
+        return visibleOptions;
+      }
+      /**
+       * Get an array of the visible global options. (Not including help.)
+       *
+       * @param {Command} cmd
+       * @returns {Option[]}
+       */
+      visibleGlobalOptions(cmd) {
+        if (!this.showGlobalOptions) return [];
+        const globalOptions = [];
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          const visibleOptions = ancestorCmd.options.filter(
+            (option) => !option.hidden
+          );
+          globalOptions.push(...visibleOptions);
+        }
+        if (this.sortOptions) {
+          globalOptions.sort(this.compareOptions);
+        }
+        return globalOptions;
+      }
+      /**
+       * Get an array of the arguments if any have a description.
+       *
+       * @param {Command} cmd
+       * @returns {Argument[]}
+       */
+      visibleArguments(cmd) {
+        if (cmd._argsDescription) {
+          cmd.registeredArguments.forEach((argument) => {
+            argument.description = argument.description || cmd._argsDescription[argument.name()] || "";
+          });
+        }
+        if (cmd.registeredArguments.find((argument) => argument.description)) {
+          return cmd.registeredArguments;
+        }
+        return [];
+      }
+      /**
+       * Get the command term to show in the list of subcommands.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      subcommandTerm(cmd) {
+        const args = cmd.registeredArguments.map((arg) => humanReadableArgName(arg)).join(" ");
+        return cmd._name + (cmd._aliases[0] ? "|" + cmd._aliases[0] : "") + (cmd.options.length ? " [options]" : "") + // simplistic check for non-help option
+        (args ? " " + args : "");
+      }
+      /**
+       * Get the option term to show in the list of options.
+       *
+       * @param {Option} option
+       * @returns {string}
+       */
+      optionTerm(option) {
+        return option.flags;
+      }
+      /**
+       * Get the argument term to show in the list of arguments.
+       *
+       * @param {Argument} argument
+       * @returns {string}
+       */
+      argumentTerm(argument) {
+        return argument.name();
+      }
+      /**
+       * Get the longest command term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestSubcommandTermLength(cmd, helper) {
+        return helper.visibleCommands(cmd).reduce((max, command) => {
+          return Math.max(
+            max,
+            this.displayWidth(
+              helper.styleSubcommandTerm(helper.subcommandTerm(command))
+            )
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest option term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestOptionTermLength(cmd, helper) {
+        return helper.visibleOptions(cmd).reduce((max, option) => {
+          return Math.max(
+            max,
+            this.displayWidth(helper.styleOptionTerm(helper.optionTerm(option)))
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest global option term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestGlobalOptionTermLength(cmd, helper) {
+        return helper.visibleGlobalOptions(cmd).reduce((max, option) => {
+          return Math.max(
+            max,
+            this.displayWidth(helper.styleOptionTerm(helper.optionTerm(option)))
+          );
+        }, 0);
+      }
+      /**
+       * Get the longest argument term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      longestArgumentTermLength(cmd, helper) {
+        return helper.visibleArguments(cmd).reduce((max, argument) => {
+          return Math.max(
+            max,
+            this.displayWidth(
+              helper.styleArgumentTerm(helper.argumentTerm(argument))
+            )
+          );
+        }, 0);
+      }
+      /**
+       * Get the command usage to be displayed at the top of the built-in help.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      commandUsage(cmd) {
+        let cmdName = cmd._name;
+        if (cmd._aliases[0]) {
+          cmdName = cmdName + "|" + cmd._aliases[0];
+        }
+        let ancestorCmdNames = "";
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          ancestorCmdNames = ancestorCmd.name() + " " + ancestorCmdNames;
+        }
+        return ancestorCmdNames + cmdName + " " + cmd.usage();
+      }
+      /**
+       * Get the description for the command.
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      commandDescription(cmd) {
+        return cmd.description();
+      }
+      /**
+       * Get the subcommand summary to show in the list of subcommands.
+       * (Fallback to description for backwards compatibility.)
+       *
+       * @param {Command} cmd
+       * @returns {string}
+       */
+      subcommandDescription(cmd) {
+        return cmd.summary() || cmd.description();
+      }
+      /**
+       * Get the option description to show in the list of options.
+       *
+       * @param {Option} option
+       * @return {string}
+       */
+      optionDescription(option) {
+        const extraInfo = [];
+        if (option.argChoices) {
+          extraInfo.push(
+            // use stringify to match the display of the default value
+            `choices: ${option.argChoices.map((choice) => JSON.stringify(choice)).join(", ")}`
+          );
+        }
+        if (option.defaultValue !== void 0) {
+          const showDefault = option.required || option.optional || option.isBoolean() && typeof option.defaultValue === "boolean";
+          if (showDefault) {
+            extraInfo.push(
+              `default: ${option.defaultValueDescription || JSON.stringify(option.defaultValue)}`
+            );
+          }
+        }
+        if (option.presetArg !== void 0 && option.optional) {
+          extraInfo.push(`preset: ${JSON.stringify(option.presetArg)}`);
+        }
+        if (option.envVar !== void 0) {
+          extraInfo.push(`env: ${option.envVar}`);
+        }
+        if (extraInfo.length > 0) {
+          const extraDescription = `(${extraInfo.join(", ")})`;
+          if (option.description) {
+            return `${option.description} ${extraDescription}`;
+          }
+          return extraDescription;
+        }
+        return option.description;
+      }
+      /**
+       * Get the argument description to show in the list of arguments.
+       *
+       * @param {Argument} argument
+       * @return {string}
+       */
+      argumentDescription(argument) {
+        const extraInfo = [];
+        if (argument.argChoices) {
+          extraInfo.push(
+            // use stringify to match the display of the default value
+            `choices: ${argument.argChoices.map((choice) => JSON.stringify(choice)).join(", ")}`
+          );
+        }
+        if (argument.defaultValue !== void 0) {
+          extraInfo.push(
+            `default: ${argument.defaultValueDescription || JSON.stringify(argument.defaultValue)}`
+          );
+        }
+        if (extraInfo.length > 0) {
+          const extraDescription = `(${extraInfo.join(", ")})`;
+          if (argument.description) {
+            return `${argument.description} ${extraDescription}`;
+          }
+          return extraDescription;
+        }
+        return argument.description;
+      }
+      /**
+       * Format a list of items, given a heading and an array of formatted items.
+       *
+       * @param {string} heading
+       * @param {string[]} items
+       * @param {Help} helper
+       * @returns string[]
+       */
+      formatItemList(heading, items, helper) {
+        if (items.length === 0) return [];
+        return [helper.styleTitle(heading), ...items, ""];
+      }
+      /**
+       * Group items by their help group heading.
+       *
+       * @param {Command[] | Option[]} unsortedItems
+       * @param {Command[] | Option[]} visibleItems
+       * @param {Function} getGroup
+       * @returns {Map<string, Command[] | Option[]>}
+       */
+      groupItems(unsortedItems, visibleItems, getGroup) {
+        const result = /* @__PURE__ */ new Map();
+        unsortedItems.forEach((item) => {
+          const group = getGroup(item);
+          if (!result.has(group)) result.set(group, []);
+        });
+        visibleItems.forEach((item) => {
+          const group = getGroup(item);
+          if (!result.has(group)) {
+            result.set(group, []);
+          }
+          result.get(group).push(item);
+        });
+        return result;
+      }
+      /**
+       * Generate the built-in help text.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {string}
+       */
+      formatHelp(cmd, helper) {
+        const termWidth = helper.padWidth(cmd, helper);
+        const helpWidth = helper.helpWidth ?? 80;
+        function callFormatItem(term, description) {
+          return helper.formatItem(term, termWidth, description, helper);
+        }
+        let output = [
+          `${helper.styleTitle("Usage:")} ${helper.styleUsage(helper.commandUsage(cmd))}`,
+          ""
+        ];
+        const commandDescription = helper.commandDescription(cmd);
+        if (commandDescription.length > 0) {
+          output = output.concat([
+            helper.boxWrap(
+              helper.styleCommandDescription(commandDescription),
+              helpWidth
+            ),
+            ""
+          ]);
+        }
+        const argumentList = helper.visibleArguments(cmd).map((argument) => {
+          return callFormatItem(
+            helper.styleArgumentTerm(helper.argumentTerm(argument)),
+            helper.styleArgumentDescription(helper.argumentDescription(argument))
+          );
+        });
+        output = output.concat(
+          this.formatItemList("Arguments:", argumentList, helper)
+        );
+        const optionGroups = this.groupItems(
+          cmd.options,
+          helper.visibleOptions(cmd),
+          (option) => option.helpGroupHeading ?? "Options:"
+        );
+        optionGroups.forEach((options2, group) => {
+          const optionList = options2.map((option) => {
+            return callFormatItem(
+              helper.styleOptionTerm(helper.optionTerm(option)),
+              helper.styleOptionDescription(helper.optionDescription(option))
+            );
+          });
+          output = output.concat(this.formatItemList(group, optionList, helper));
+        });
+        if (helper.showGlobalOptions) {
+          const globalOptionList = helper.visibleGlobalOptions(cmd).map((option) => {
+            return callFormatItem(
+              helper.styleOptionTerm(helper.optionTerm(option)),
+              helper.styleOptionDescription(helper.optionDescription(option))
+            );
+          });
+          output = output.concat(
+            this.formatItemList("Global Options:", globalOptionList, helper)
+          );
+        }
+        const commandGroups = this.groupItems(
+          cmd.commands,
+          helper.visibleCommands(cmd),
+          (sub) => sub.helpGroup() || "Commands:"
+        );
+        commandGroups.forEach((commands, group) => {
+          const commandList = commands.map((sub) => {
+            return callFormatItem(
+              helper.styleSubcommandTerm(helper.subcommandTerm(sub)),
+              helper.styleSubcommandDescription(helper.subcommandDescription(sub))
+            );
+          });
+          output = output.concat(this.formatItemList(group, commandList, helper));
+        });
+        return output.join("\n");
+      }
+      /**
+       * Return display width of string, ignoring ANSI escape sequences. Used in padding and wrapping calculations.
+       *
+       * @param {string} str
+       * @returns {number}
+       */
+      displayWidth(str) {
+        return stripColor(str).length;
+      }
+      /**
+       * Style the title for displaying in the help. Called with 'Usage:', 'Options:', etc.
+       *
+       * @param {string} str
+       * @returns {string}
+       */
+      styleTitle(str) {
+        return str;
+      }
+      styleUsage(str) {
+        return str.split(" ").map((word) => {
+          if (word === "[options]") return this.styleOptionText(word);
+          if (word === "[command]") return this.styleSubcommandText(word);
+          if (word[0] === "[" || word[0] === "<")
+            return this.styleArgumentText(word);
+          return this.styleCommandText(word);
+        }).join(" ");
+      }
+      styleCommandDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleOptionDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleSubcommandDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleArgumentDescription(str) {
+        return this.styleDescriptionText(str);
+      }
+      styleDescriptionText(str) {
+        return str;
+      }
+      styleOptionTerm(str) {
+        return this.styleOptionText(str);
+      }
+      styleSubcommandTerm(str) {
+        return str.split(" ").map((word) => {
+          if (word === "[options]") return this.styleOptionText(word);
+          if (word[0] === "[" || word[0] === "<")
+            return this.styleArgumentText(word);
+          return this.styleSubcommandText(word);
+        }).join(" ");
+      }
+      styleArgumentTerm(str) {
+        return this.styleArgumentText(str);
+      }
+      styleOptionText(str) {
+        return str;
+      }
+      styleArgumentText(str) {
+        return str;
+      }
+      styleSubcommandText(str) {
+        return str;
+      }
+      styleCommandText(str) {
+        return str;
+      }
+      /**
+       * Calculate the pad width from the maximum term length.
+       *
+       * @param {Command} cmd
+       * @param {Help} helper
+       * @returns {number}
+       */
+      padWidth(cmd, helper) {
+        return Math.max(
+          helper.longestOptionTermLength(cmd, helper),
+          helper.longestGlobalOptionTermLength(cmd, helper),
+          helper.longestSubcommandTermLength(cmd, helper),
+          helper.longestArgumentTermLength(cmd, helper)
+        );
+      }
+      /**
+       * Detect manually wrapped and indented strings by checking for line break followed by whitespace.
+       *
+       * @param {string} str
+       * @returns {boolean}
+       */
+      preformatted(str) {
+        return /\n[^\S\r\n]/.test(str);
+      }
+      /**
+       * Format the "item", which consists of a term and description. Pad the term and wrap the description, indenting the following lines.
+       *
+       * So "TTT", 5, "DDD DDDD DD DDD" might be formatted for this.helpWidth=17 like so:
+       *   TTT  DDD DDDD
+       *        DD DDD
+       *
+       * @param {string} term
+       * @param {number} termWidth
+       * @param {string} description
+       * @param {Help} helper
+       * @returns {string}
+       */
+      formatItem(term, termWidth, description, helper) {
+        const itemIndent = 2;
+        const itemIndentStr = " ".repeat(itemIndent);
+        if (!description) return itemIndentStr + term;
+        const paddedTerm = term.padEnd(
+          termWidth + term.length - helper.displayWidth(term)
+        );
+        const spacerWidth = 2;
+        const helpWidth = this.helpWidth ?? 80;
+        const remainingWidth = helpWidth - termWidth - spacerWidth - itemIndent;
+        let formattedDescription;
+        if (remainingWidth < this.minWidthToWrap || helper.preformatted(description)) {
+          formattedDescription = description;
+        } else {
+          const wrappedDescription = helper.boxWrap(description, remainingWidth);
+          formattedDescription = wrappedDescription.replace(
+            /\n/g,
+            "\n" + " ".repeat(termWidth + spacerWidth)
+          );
+        }
+        return itemIndentStr + paddedTerm + " ".repeat(spacerWidth) + formattedDescription.replace(/\n/g, `
+${itemIndentStr}`);
+      }
+      /**
+       * Wrap a string at whitespace, preserving existing line breaks.
+       * Wrapping is skipped if the width is less than `minWidthToWrap`.
+       *
+       * @param {string} str
+       * @param {number} width
+       * @returns {string}
+       */
+      boxWrap(str, width) {
+        if (width < this.minWidthToWrap) return str;
+        const rawLines = str.split(/\r\n|\n/);
+        const chunkPattern = /[\s]*[^\s]+/g;
+        const wrappedLines = [];
+        rawLines.forEach((line) => {
+          const chunks = line.match(chunkPattern);
+          if (chunks === null) {
+            wrappedLines.push("");
+            return;
+          }
+          let sumChunks = [chunks.shift()];
+          let sumWidth = this.displayWidth(sumChunks[0]);
+          chunks.forEach((chunk) => {
+            const visibleWidth = this.displayWidth(chunk);
+            if (sumWidth + visibleWidth <= width) {
+              sumChunks.push(chunk);
+              sumWidth += visibleWidth;
+              return;
+            }
+            wrappedLines.push(sumChunks.join(""));
+            const nextChunk = chunk.trimStart();
+            sumChunks = [nextChunk];
+            sumWidth = this.displayWidth(nextChunk);
+          });
+          wrappedLines.push(sumChunks.join(""));
+        });
+        return wrappedLines.join("\n");
+      }
+    };
+    function stripColor(str) {
+      const sgrPattern = /\x1b\[\d*(;\d*)*m/g;
+      return str.replace(sgrPattern, "");
+    }
+    exports2.Help = Help2;
+    exports2.stripColor = stripColor;
+  }
+});
+
+// node_modules/commander/lib/option.js
+var require_option = __commonJS({
+  "node_modules/commander/lib/option.js"(exports2) {
+    var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var Option2 = class {
+      /**
+       * Initialize a new `Option` with the given `flags` and `description`.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       */
+      constructor(flags, description) {
+        this.flags = flags;
+        this.description = description || "";
+        this.required = flags.includes("<");
+        this.optional = flags.includes("[");
+        this.variadic = /\w\.\.\.[>\]]$/.test(flags);
+        this.mandatory = false;
+        const optionFlags = splitOptionFlags(flags);
+        this.short = optionFlags.shortFlag;
+        this.long = optionFlags.longFlag;
+        this.negate = false;
+        if (this.long) {
+          this.negate = this.long.startsWith("--no-");
+        }
+        this.defaultValue = void 0;
+        this.defaultValueDescription = void 0;
+        this.presetArg = void 0;
+        this.envVar = void 0;
+        this.parseArg = void 0;
+        this.hidden = false;
+        this.argChoices = void 0;
+        this.conflictsWith = [];
+        this.implied = void 0;
+        this.helpGroupHeading = void 0;
+      }
+      /**
+       * Set the default value, and optionally supply the description to be displayed in the help.
+       *
+       * @param {*} value
+       * @param {string} [description]
+       * @return {Option}
+       */
+      default(value, description) {
+        this.defaultValue = value;
+        this.defaultValueDescription = description;
+        return this;
+      }
+      /**
+       * Preset to use when option used without option-argument, especially optional but also boolean and negated.
+       * The custom processing (parseArg) is called.
+       *
+       * @example
+       * new Option('--color').default('GREYSCALE').preset('RGB');
+       * new Option('--donate [amount]').preset('20').argParser(parseFloat);
+       *
+       * @param {*} arg
+       * @return {Option}
+       */
+      preset(arg) {
+        this.presetArg = arg;
+        return this;
+      }
+      /**
+       * Add option name(s) that conflict with this option.
+       * An error will be displayed if conflicting options are found during parsing.
+       *
+       * @example
+       * new Option('--rgb').conflicts('cmyk');
+       * new Option('--js').conflicts(['ts', 'jsx']);
+       *
+       * @param {(string | string[])} names
+       * @return {Option}
+       */
+      conflicts(names) {
+        this.conflictsWith = this.conflictsWith.concat(names);
+        return this;
+      }
+      /**
+       * Specify implied option values for when this option is set and the implied options are not.
+       *
+       * The custom processing (parseArg) is not called on the implied values.
+       *
+       * @example
+       * program
+       *   .addOption(new Option('--log', 'write logging information to file'))
+       *   .addOption(new Option('--trace', 'log extra details').implies({ log: 'trace.txt' }));
+       *
+       * @param {object} impliedOptionValues
+       * @return {Option}
+       */
+      implies(impliedOptionValues) {
+        let newImplied = impliedOptionValues;
+        if (typeof impliedOptionValues === "string") {
+          newImplied = { [impliedOptionValues]: true };
+        }
+        this.implied = Object.assign(this.implied || {}, newImplied);
+        return this;
+      }
+      /**
+       * Set environment variable to check for option value.
+       *
+       * An environment variable is only used if when processed the current option value is
+       * undefined, or the source of the current value is 'default' or 'config' or 'env'.
+       *
+       * @param {string} name
+       * @return {Option}
+       */
+      env(name) {
+        this.envVar = name;
+        return this;
+      }
+      /**
+       * Set the custom handler for processing CLI option arguments into option values.
+       *
+       * @param {Function} [fn]
+       * @return {Option}
+       */
+      argParser(fn) {
+        this.parseArg = fn;
+        return this;
+      }
+      /**
+       * Whether the option is mandatory and must have a value after parsing.
+       *
+       * @param {boolean} [mandatory=true]
+       * @return {Option}
+       */
+      makeOptionMandatory(mandatory = true) {
+        this.mandatory = !!mandatory;
+        return this;
+      }
+      /**
+       * Hide option in help.
+       *
+       * @param {boolean} [hide=true]
+       * @return {Option}
+       */
+      hideHelp(hide = true) {
+        this.hidden = !!hide;
+        return this;
+      }
+      /**
+       * @package
+       */
+      _concatValue(value, previous) {
+        if (previous === this.defaultValue || !Array.isArray(previous)) {
+          return [value];
+        }
+        return previous.concat(value);
+      }
+      /**
+       * Only allow option value to be one of choices.
+       *
+       * @param {string[]} values
+       * @return {Option}
+       */
+      choices(values) {
+        this.argChoices = values.slice();
+        this.parseArg = (arg, previous) => {
+          if (!this.argChoices.includes(arg)) {
+            throw new InvalidArgumentError2(
+              `Allowed choices are ${this.argChoices.join(", ")}.`
+            );
+          }
+          if (this.variadic) {
+            return this._concatValue(arg, previous);
+          }
+          return arg;
+        };
+        return this;
+      }
+      /**
+       * Return option name.
+       *
+       * @return {string}
+       */
+      name() {
+        if (this.long) {
+          return this.long.replace(/^--/, "");
+        }
+        return this.short.replace(/^-/, "");
+      }
+      /**
+       * Return option name, in a camelcase format that can be used
+       * as an object attribute key.
+       *
+       * @return {string}
+       */
+      attributeName() {
+        if (this.negate) {
+          return camelcase(this.name().replace(/^no-/, ""));
+        }
+        return camelcase(this.name());
+      }
+      /**
+       * Set the help group heading.
+       *
+       * @param {string} heading
+       * @return {Option}
+       */
+      helpGroup(heading) {
+        this.helpGroupHeading = heading;
+        return this;
+      }
+      /**
+       * Check if `arg` matches the short or long flag.
+       *
+       * @param {string} arg
+       * @return {boolean}
+       * @package
+       */
+      is(arg) {
+        return this.short === arg || this.long === arg;
+      }
+      /**
+       * Return whether a boolean option.
+       *
+       * Options are one of boolean, negated, required argument, or optional argument.
+       *
+       * @return {boolean}
+       * @package
+       */
+      isBoolean() {
+        return !this.required && !this.optional && !this.negate;
+      }
+    };
+    var DualOptions = class {
+      /**
+       * @param {Option[]} options
+       */
+      constructor(options2) {
+        this.positiveOptions = /* @__PURE__ */ new Map();
+        this.negativeOptions = /* @__PURE__ */ new Map();
+        this.dualOptions = /* @__PURE__ */ new Set();
+        options2.forEach((option) => {
+          if (option.negate) {
+            this.negativeOptions.set(option.attributeName(), option);
+          } else {
+            this.positiveOptions.set(option.attributeName(), option);
+          }
+        });
+        this.negativeOptions.forEach((value, key) => {
+          if (this.positiveOptions.has(key)) {
+            this.dualOptions.add(key);
+          }
+        });
+      }
+      /**
+       * Did the value come from the option, and not from possible matching dual option?
+       *
+       * @param {*} value
+       * @param {Option} option
+       * @returns {boolean}
+       */
+      valueFromOption(value, option) {
+        const optionKey = option.attributeName();
+        if (!this.dualOptions.has(optionKey)) return true;
+        const preset = this.negativeOptions.get(optionKey).presetArg;
+        const negativeValue = preset !== void 0 ? preset : false;
+        return option.negate === (negativeValue === value);
+      }
+    };
+    function camelcase(str) {
+      return str.split("-").reduce((str2, word) => {
+        return str2 + word[0].toUpperCase() + word.slice(1);
+      });
+    }
+    function splitOptionFlags(flags) {
+      let shortFlag;
+      let longFlag;
+      const shortFlagExp = /^-[^-]$/;
+      const longFlagExp = /^--[^-]/;
+      const flagParts = flags.split(/[ |,]+/).concat("guard");
+      if (shortFlagExp.test(flagParts[0])) shortFlag = flagParts.shift();
+      if (longFlagExp.test(flagParts[0])) longFlag = flagParts.shift();
+      if (!shortFlag && shortFlagExp.test(flagParts[0]))
+        shortFlag = flagParts.shift();
+      if (!shortFlag && longFlagExp.test(flagParts[0])) {
+        shortFlag = longFlag;
+        longFlag = flagParts.shift();
+      }
+      if (flagParts[0].startsWith("-")) {
+        const unsupportedFlag = flagParts[0];
+        const baseError = `option creation failed due to '${unsupportedFlag}' in option flags '${flags}'`;
+        if (/^-[^-][^-]/.test(unsupportedFlag))
+          throw new Error(
+            `${baseError}
 - a short flag is a single dash and a single character
   - either use a single dash and a single character (for a short flag)
-  - or use a double dash for a long option (and can have two, like '--ws, --workspace')`):i.test(a)?new Error(`${l}
-- too many short flags`):n.test(a)?new Error(`${l}
-- too many long flags`):new Error(`${l}
-- unrecognised flag format`)}if(t===void 0&&r===void 0)throw new Error(`option creation failed due to no flags found in '${e}'.`);return{shortFlag:t,longFlag:r}}at.Option=nt;at.DualOptions=st});var nr=E(ir=>{function ls(e,t){if(Math.abs(e.length-t.length)>3)return Math.max(e.length,t.length);let r=[];for(let i=0;i<=e.length;i++)r[i]=[i];for(let i=0;i<=t.length;i++)r[0][i]=i;for(let i=1;i<=t.length;i++)for(let n=1;n<=e.length;n++){let s=1;e[n-1]===t[i-1]?s=0:s=1,r[n][i]=Math.min(r[n-1][i]+1,r[n][i-1]+1,r[n-1][i-1]+s),n>1&&i>1&&e[n-1]===t[i-2]&&e[n-2]===t[i-1]&&(r[n][i]=Math.min(r[n][i],r[n-2][i-2]+1))}return r[e.length][t.length]}function hs(e,t){if(!t||t.length===0)return"";t=Array.from(new Set(t));let r=e.startsWith("--");r&&(e=e.slice(2),t=t.map(a=>a.slice(2)));let i=[],n=3,s=.4;return t.forEach(a=>{if(a.length<=1)return;let l=ls(e,a),c=Math.max(e.length,a.length);(c-l)/c>s&&(l<n?(n=l,i=[a]):l===n&&i.push(a))}),i.sort((a,l)=>a.localeCompare(l)),r&&(i=i.map(a=>`--${a}`)),i.length>1?`
-(Did you mean one of ${i.join(", ")}?)`:i.length===1?`
-(Did you mean ${i[0]}?)`:""}ir.suggestSimilar=hs});var lr=E(ft=>{var cs=require("node:events").EventEmitter,lt=require("node:child_process"),X=require("node:path"),Ie=require("node:fs"),y=require("node:process"),{Argument:us,humanReadableArgName:fs}=Se(),{CommanderError:ht}=pe(),{Help:ds,stripColor:ms}=it(),{Option:sr,DualOptions:gs}=ot(),{suggestSimilar:ar}=nr(),ct=class e extends cs{constructor(t){super(),this.commands=[],this.options=[],this.parent=null,this._allowUnknownOption=!1,this._allowExcessArguments=!1,this.registeredArguments=[],this._args=this.registeredArguments,this.args=[],this.rawArgs=[],this.processedArgs=[],this._scriptPath=null,this._name=t||"",this._optionValues={},this._optionValueSources={},this._storeOptionsAsProperties=!1,this._actionHandler=null,this._executableHandler=!1,this._executableFile=null,this._executableDir=null,this._defaultCommandName=null,this._exitCallback=null,this._aliases=[],this._combineFlagAndOptionalValue=!0,this._description="",this._summary="",this._argsDescription=void 0,this._enablePositionalOptions=!1,this._passThroughOptions=!1,this._lifeCycleHooks={},this._showHelpAfterError=!1,this._showSuggestionAfterError=!0,this._savedState=null,this._outputConfiguration={writeOut:r=>y.stdout.write(r),writeErr:r=>y.stderr.write(r),outputError:(r,i)=>i(r),getOutHelpWidth:()=>y.stdout.isTTY?y.stdout.columns:void 0,getErrHelpWidth:()=>y.stderr.isTTY?y.stderr.columns:void 0,getOutHasColors:()=>ut()??(y.stdout.isTTY&&y.stdout.hasColors?.()),getErrHasColors:()=>ut()??(y.stderr.isTTY&&y.stderr.hasColors?.()),stripColor:r=>ms(r)},this._hidden=!1,this._helpOption=void 0,this._addImplicitHelpCommand=void 0,this._helpCommand=void 0,this._helpConfiguration={},this._helpGroupHeading=void 0,this._defaultCommandGroup=void 0,this._defaultOptionGroup=void 0}copyInheritedSettings(t){return this._outputConfiguration=t._outputConfiguration,this._helpOption=t._helpOption,this._helpCommand=t._helpCommand,this._helpConfiguration=t._helpConfiguration,this._exitCallback=t._exitCallback,this._storeOptionsAsProperties=t._storeOptionsAsProperties,this._combineFlagAndOptionalValue=t._combineFlagAndOptionalValue,this._allowExcessArguments=t._allowExcessArguments,this._enablePositionalOptions=t._enablePositionalOptions,this._showHelpAfterError=t._showHelpAfterError,this._showSuggestionAfterError=t._showSuggestionAfterError,this}_getCommandAndAncestors(){let t=[];for(let r=this;r;r=r.parent)t.push(r);return t}command(t,r,i){let n=r,s=i;typeof n=="object"&&n!==null&&(s=n,n=null),s=s||{};let[,a,l]=t.match(/([^ ]+) *(.*)/),c=this.createCommand(a);return n&&(c.description(n),c._executableHandler=!0),s.isDefault&&(this._defaultCommandName=c._name),c._hidden=!!(s.noHelp||s.hidden),c._executableFile=s.executableFile||null,l&&c.arguments(l),this._registerCommand(c),c.parent=this,c.copyInheritedSettings(this),n?this:c}createCommand(t){return new e(t)}createHelp(){return Object.assign(new ds,this.configureHelp())}configureHelp(t){return t===void 0?this._helpConfiguration:(this._helpConfiguration=t,this)}configureOutput(t){return t===void 0?this._outputConfiguration:(this._outputConfiguration=Object.assign({},this._outputConfiguration,t),this)}showHelpAfterError(t=!0){return typeof t!="string"&&(t=!!t),this._showHelpAfterError=t,this}showSuggestionAfterError(t=!0){return this._showSuggestionAfterError=!!t,this}addCommand(t,r){if(!t._name)throw new Error(`Command passed to .addCommand() must have a name
-- specify the name in Command constructor or using .name()`);return r=r||{},r.isDefault&&(this._defaultCommandName=t._name),(r.noHelp||r.hidden)&&(t._hidden=!0),this._registerCommand(t),t.parent=this,t._checkForBrokenPassThrough(),this}createArgument(t,r){return new us(t,r)}argument(t,r,i,n){let s=this.createArgument(t,r);return typeof i=="function"?s.default(n).argParser(i):s.default(i),this.addArgument(s),this}arguments(t){return t.trim().split(/ +/).forEach(r=>{this.argument(r)}),this}addArgument(t){let r=this.registeredArguments.slice(-1)[0];if(r&&r.variadic)throw new Error(`only the last argument can be variadic '${r.name()}'`);if(t.required&&t.defaultValue!==void 0&&t.parseArg===void 0)throw new Error(`a default value for a required argument is never used: '${t.name()}'`);return this.registeredArguments.push(t),this}helpCommand(t,r){if(typeof t=="boolean")return this._addImplicitHelpCommand=t,t&&this._defaultCommandGroup&&this._initCommandGroup(this._getHelpCommand()),this;let i=t??"help [command]",[,n,s]=i.match(/([^ ]+) *(.*)/),a=r??"display help for command",l=this.createCommand(n);return l.helpOption(!1),s&&l.arguments(s),a&&l.description(a),this._addImplicitHelpCommand=!0,this._helpCommand=l,(t||r)&&this._initCommandGroup(l),this}addHelpCommand(t,r){return typeof t!="object"?(this.helpCommand(t,r),this):(this._addImplicitHelpCommand=!0,this._helpCommand=t,this._initCommandGroup(t),this)}_getHelpCommand(){return this._addImplicitHelpCommand??(this.commands.length&&!this._actionHandler&&!this._findCommand("help"))?(this._helpCommand===void 0&&this.helpCommand(void 0,void 0),this._helpCommand):null}hook(t,r){let i=["preSubcommand","preAction","postAction"];if(!i.includes(t))throw new Error(`Unexpected value for event passed to hook : '${t}'.
-Expecting one of '${i.join("', '")}'`);return this._lifeCycleHooks[t]?this._lifeCycleHooks[t].push(r):this._lifeCycleHooks[t]=[r],this}exitOverride(t){return t?this._exitCallback=t:this._exitCallback=r=>{if(r.code!=="commander.executeSubCommandAsync")throw r},this}_exit(t,r,i){this._exitCallback&&this._exitCallback(new ht(t,r,i)),y.exit(t)}action(t){let r=i=>{let n=this.registeredArguments.length,s=i.slice(0,n);return this._storeOptionsAsProperties?s[n]=this:s[n]=this.opts(),s.push(this),t.apply(this,s)};return this._actionHandler=r,this}createOption(t,r){return new sr(t,r)}_callParseArg(t,r,i,n){try{return t.parseArg(r,i)}catch(s){if(s.code==="commander.invalidArgument"){let a=`${n} ${s.message}`;this.error(a,{exitCode:s.exitCode,code:s.code})}throw s}}_registerOption(t){let r=t.short&&this._findOption(t.short)||t.long&&this._findOption(t.long);if(r){let i=t.long&&this._findOption(t.long)?t.long:t.short;throw new Error(`Cannot add option '${t.flags}'${this._name&&` to command '${this._name}'`} due to conflicting flag '${i}'
--  already used by option '${r.flags}'`)}this._initOptionGroup(t),this.options.push(t)}_registerCommand(t){let r=n=>[n.name()].concat(n.aliases()),i=r(t).find(n=>this._findCommand(n));if(i){let n=r(this._findCommand(i)).join("|"),s=r(t).join("|");throw new Error(`cannot add command '${s}' as already have command '${n}'`)}this._initCommandGroup(t),this.commands.push(t)}addOption(t){this._registerOption(t);let r=t.name(),i=t.attributeName();if(t.negate){let s=t.long.replace(/^--no-/,"--");this._findOption(s)||this.setOptionValueWithSource(i,t.defaultValue===void 0?!0:t.defaultValue,"default")}else t.defaultValue!==void 0&&this.setOptionValueWithSource(i,t.defaultValue,"default");let n=(s,a,l)=>{s==null&&t.presetArg!==void 0&&(s=t.presetArg);let c=this.getOptionValue(i);s!==null&&t.parseArg?s=this._callParseArg(t,s,c,a):s!==null&&t.variadic&&(s=t._concatValue(s,c)),s==null&&(t.negate?s=!1:t.isBoolean()||t.optional?s=!0:s=""),this.setOptionValueWithSource(i,s,l)};return this.on("option:"+r,s=>{let a=`error: option '${t.flags}' argument '${s}' is invalid.`;n(s,a,"cli")}),t.envVar&&this.on("optionEnv:"+r,s=>{let a=`error: option '${t.flags}' value '${s}' from env '${t.envVar}' is invalid.`;n(s,a,"env")}),this}_optionEx(t,r,i,n,s){if(typeof r=="object"&&r instanceof sr)throw new Error("To add an Option object use addOption() instead of option() or requiredOption()");let a=this.createOption(r,i);if(a.makeOptionMandatory(!!t.mandatory),typeof n=="function")a.default(s).argParser(n);else if(n instanceof RegExp){let l=n;n=(c,f)=>{let m=l.exec(c);return m?m[0]:f},a.default(s).argParser(n)}else a.default(n);return this.addOption(a)}option(t,r,i,n){return this._optionEx({},t,r,i,n)}requiredOption(t,r,i,n){return this._optionEx({mandatory:!0},t,r,i,n)}combineFlagAndOptionalValue(t=!0){return this._combineFlagAndOptionalValue=!!t,this}allowUnknownOption(t=!0){return this._allowUnknownOption=!!t,this}allowExcessArguments(t=!0){return this._allowExcessArguments=!!t,this}enablePositionalOptions(t=!0){return this._enablePositionalOptions=!!t,this}passThroughOptions(t=!0){return this._passThroughOptions=!!t,this._checkForBrokenPassThrough(),this}_checkForBrokenPassThrough(){if(this.parent&&this._passThroughOptions&&!this.parent._enablePositionalOptions)throw new Error(`passThroughOptions cannot be used for '${this._name}' without turning on enablePositionalOptions for parent command(s)`)}storeOptionsAsProperties(t=!0){if(this.options.length)throw new Error("call .storeOptionsAsProperties() before adding options");if(Object.keys(this._optionValues).length)throw new Error("call .storeOptionsAsProperties() before setting option values");return this._storeOptionsAsProperties=!!t,this}getOptionValue(t){return this._storeOptionsAsProperties?this[t]:this._optionValues[t]}setOptionValue(t,r){return this.setOptionValueWithSource(t,r,void 0)}setOptionValueWithSource(t,r,i){return this._storeOptionsAsProperties?this[t]=r:this._optionValues[t]=r,this._optionValueSources[t]=i,this}getOptionValueSource(t){return this._optionValueSources[t]}getOptionValueSourceWithGlobals(t){let r;return this._getCommandAndAncestors().forEach(i=>{i.getOptionValueSource(t)!==void 0&&(r=i.getOptionValueSource(t))}),r}_prepareUserArgs(t,r){if(t!==void 0&&!Array.isArray(t))throw new Error("first parameter to parse must be array or undefined");if(r=r||{},t===void 0&&r.from===void 0){y.versions?.electron&&(r.from="electron");let n=y.execArgv??[];(n.includes("-e")||n.includes("--eval")||n.includes("-p")||n.includes("--print"))&&(r.from="eval")}t===void 0&&(t=y.argv),this.rawArgs=t.slice();let i;switch(r.from){case void 0:case"node":this._scriptPath=t[1],i=t.slice(2);break;case"electron":y.defaultApp?(this._scriptPath=t[1],i=t.slice(2)):i=t.slice(1);break;case"user":i=t.slice(0);break;case"eval":i=t.slice(1);break;default:throw new Error(`unexpected parse option { from: '${r.from}' }`)}return!this._name&&this._scriptPath&&this.nameFromFilename(this._scriptPath),this._name=this._name||"program",i}parse(t,r){this._prepareForParse();let i=this._prepareUserArgs(t,r);return this._parseCommand([],i),this}async parseAsync(t,r){this._prepareForParse();let i=this._prepareUserArgs(t,r);return await this._parseCommand([],i),this}_prepareForParse(){this._savedState===null?this.saveStateBeforeParse():this.restoreStateBeforeParse()}saveStateBeforeParse(){this._savedState={_name:this._name,_optionValues:{...this._optionValues},_optionValueSources:{...this._optionValueSources}}}restoreStateBeforeParse(){if(this._storeOptionsAsProperties)throw new Error(`Can not call parse again when storeOptionsAsProperties is true.
-- either make a new Command for each call to parse, or stop storing options as properties`);this._name=this._savedState._name,this._scriptPath=null,this.rawArgs=[],this._optionValues={...this._savedState._optionValues},this._optionValueSources={...this._savedState._optionValueSources},this.args=[],this.processedArgs=[]}_checkForMissingExecutable(t,r,i){if(Ie.existsSync(t))return;let n=r?`searched for local subcommand relative to directory '${r}'`:"no directory for search for local subcommand, use .executableDir() to supply a custom directory",s=`'${t}' does not exist
- - if '${i}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
+  - or use a double dash for a long option (and can have two, like '--ws, --workspace')`
+          );
+        if (shortFlagExp.test(unsupportedFlag))
+          throw new Error(`${baseError}
+- too many short flags`);
+        if (longFlagExp.test(unsupportedFlag))
+          throw new Error(`${baseError}
+- too many long flags`);
+        throw new Error(`${baseError}
+- unrecognised flag format`);
+      }
+      if (shortFlag === void 0 && longFlag === void 0)
+        throw new Error(
+          `option creation failed due to no flags found in '${flags}'.`
+        );
+      return { shortFlag, longFlag };
+    }
+    exports2.Option = Option2;
+    exports2.DualOptions = DualOptions;
+  }
+});
+
+// node_modules/commander/lib/suggestSimilar.js
+var require_suggestSimilar = __commonJS({
+  "node_modules/commander/lib/suggestSimilar.js"(exports2) {
+    var maxDistance = 3;
+    function editDistance(a, b) {
+      if (Math.abs(a.length - b.length) > maxDistance)
+        return Math.max(a.length, b.length);
+      const d = [];
+      for (let i = 0; i <= a.length; i++) {
+        d[i] = [i];
+      }
+      for (let j = 0; j <= b.length; j++) {
+        d[0][j] = j;
+      }
+      for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+          let cost = 1;
+          if (a[i - 1] === b[j - 1]) {
+            cost = 0;
+          } else {
+            cost = 1;
+          }
+          d[i][j] = Math.min(
+            d[i - 1][j] + 1,
+            // deletion
+            d[i][j - 1] + 1,
+            // insertion
+            d[i - 1][j - 1] + cost
+            // substitution
+          );
+          if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+            d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+          }
+        }
+      }
+      return d[a.length][b.length];
+    }
+    function suggestSimilar(word, candidates) {
+      if (!candidates || candidates.length === 0) return "";
+      candidates = Array.from(new Set(candidates));
+      const searchingOptions = word.startsWith("--");
+      if (searchingOptions) {
+        word = word.slice(2);
+        candidates = candidates.map((candidate) => candidate.slice(2));
+      }
+      let similar = [];
+      let bestDistance = maxDistance;
+      const minSimilarity = 0.4;
+      candidates.forEach((candidate) => {
+        if (candidate.length <= 1) return;
+        const distance = editDistance(word, candidate);
+        const length = Math.max(word.length, candidate.length);
+        const similarity = (length - distance) / length;
+        if (similarity > minSimilarity) {
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            similar = [candidate];
+          } else if (distance === bestDistance) {
+            similar.push(candidate);
+          }
+        }
+      });
+      similar.sort((a, b) => a.localeCompare(b));
+      if (searchingOptions) {
+        similar = similar.map((candidate) => `--${candidate}`);
+      }
+      if (similar.length > 1) {
+        return `
+(Did you mean one of ${similar.join(", ")}?)`;
+      }
+      if (similar.length === 1) {
+        return `
+(Did you mean ${similar[0]}?)`;
+      }
+      return "";
+    }
+    exports2.suggestSimilar = suggestSimilar;
+  }
+});
+
+// node_modules/commander/lib/command.js
+var require_command = __commonJS({
+  "node_modules/commander/lib/command.js"(exports2) {
+    var EventEmitter = require("node:events").EventEmitter;
+    var childProcess = require("node:child_process");
+    var path = require("node:path");
+    var fs4 = require("node:fs");
+    var process2 = require("node:process");
+    var { Argument: Argument2, humanReadableArgName } = require_argument();
+    var { CommanderError: CommanderError2 } = require_error();
+    var { Help: Help2, stripColor } = require_help();
+    var { Option: Option2, DualOptions } = require_option();
+    var { suggestSimilar } = require_suggestSimilar();
+    var Command2 = class _Command extends EventEmitter {
+      /**
+       * Initialize a new `Command`.
+       *
+       * @param {string} [name]
+       */
+      constructor(name) {
+        super();
+        this.commands = [];
+        this.options = [];
+        this.parent = null;
+        this._allowUnknownOption = false;
+        this._allowExcessArguments = false;
+        this.registeredArguments = [];
+        this._args = this.registeredArguments;
+        this.args = [];
+        this.rawArgs = [];
+        this.processedArgs = [];
+        this._scriptPath = null;
+        this._name = name || "";
+        this._optionValues = {};
+        this._optionValueSources = {};
+        this._storeOptionsAsProperties = false;
+        this._actionHandler = null;
+        this._executableHandler = false;
+        this._executableFile = null;
+        this._executableDir = null;
+        this._defaultCommandName = null;
+        this._exitCallback = null;
+        this._aliases = [];
+        this._combineFlagAndOptionalValue = true;
+        this._description = "";
+        this._summary = "";
+        this._argsDescription = void 0;
+        this._enablePositionalOptions = false;
+        this._passThroughOptions = false;
+        this._lifeCycleHooks = {};
+        this._showHelpAfterError = false;
+        this._showSuggestionAfterError = true;
+        this._savedState = null;
+        this._outputConfiguration = {
+          writeOut: (str) => process2.stdout.write(str),
+          writeErr: (str) => process2.stderr.write(str),
+          outputError: (str, write) => write(str),
+          getOutHelpWidth: () => process2.stdout.isTTY ? process2.stdout.columns : void 0,
+          getErrHelpWidth: () => process2.stderr.isTTY ? process2.stderr.columns : void 0,
+          getOutHasColors: () => useColor() ?? (process2.stdout.isTTY && process2.stdout.hasColors?.()),
+          getErrHasColors: () => useColor() ?? (process2.stderr.isTTY && process2.stderr.hasColors?.()),
+          stripColor: (str) => stripColor(str)
+        };
+        this._hidden = false;
+        this._helpOption = void 0;
+        this._addImplicitHelpCommand = void 0;
+        this._helpCommand = void 0;
+        this._helpConfiguration = {};
+        this._helpGroupHeading = void 0;
+        this._defaultCommandGroup = void 0;
+        this._defaultOptionGroup = void 0;
+      }
+      /**
+       * Copy settings that are useful to have in common across root command and subcommands.
+       *
+       * (Used internally when adding a command using `.command()` so subcommands inherit parent settings.)
+       *
+       * @param {Command} sourceCommand
+       * @return {Command} `this` command for chaining
+       */
+      copyInheritedSettings(sourceCommand) {
+        this._outputConfiguration = sourceCommand._outputConfiguration;
+        this._helpOption = sourceCommand._helpOption;
+        this._helpCommand = sourceCommand._helpCommand;
+        this._helpConfiguration = sourceCommand._helpConfiguration;
+        this._exitCallback = sourceCommand._exitCallback;
+        this._storeOptionsAsProperties = sourceCommand._storeOptionsAsProperties;
+        this._combineFlagAndOptionalValue = sourceCommand._combineFlagAndOptionalValue;
+        this._allowExcessArguments = sourceCommand._allowExcessArguments;
+        this._enablePositionalOptions = sourceCommand._enablePositionalOptions;
+        this._showHelpAfterError = sourceCommand._showHelpAfterError;
+        this._showSuggestionAfterError = sourceCommand._showSuggestionAfterError;
+        return this;
+      }
+      /**
+       * @returns {Command[]}
+       * @private
+       */
+      _getCommandAndAncestors() {
+        const result = [];
+        for (let command = this; command; command = command.parent) {
+          result.push(command);
+        }
+        return result;
+      }
+      /**
+       * Define a command.
+       *
+       * There are two styles of command: pay attention to where to put the description.
+       *
+       * @example
+       * // Command implemented using action handler (description is supplied separately to `.command`)
+       * program
+       *   .command('clone <source> [destination]')
+       *   .description('clone a repository into a newly created directory')
+       *   .action((source, destination) => {
+       *     console.log('clone command called');
+       *   });
+       *
+       * // Command implemented using separate executable file (description is second parameter to `.command`)
+       * program
+       *   .command('start <service>', 'start named service')
+       *   .command('stop [service]', 'stop named service, or all if no name supplied');
+       *
+       * @param {string} nameAndArgs - command name and arguments, args are `<required>` or `[optional]` and last may also be `variadic...`
+       * @param {(object | string)} [actionOptsOrExecDesc] - configuration options (for action), or description (for executable)
+       * @param {object} [execOpts] - configuration options (for executable)
+       * @return {Command} returns new command for action handler, or `this` for executable command
+       */
+      command(nameAndArgs, actionOptsOrExecDesc, execOpts) {
+        let desc = actionOptsOrExecDesc;
+        let opts = execOpts;
+        if (typeof desc === "object" && desc !== null) {
+          opts = desc;
+          desc = null;
+        }
+        opts = opts || {};
+        const [, name, args] = nameAndArgs.match(/([^ ]+) *(.*)/);
+        const cmd = this.createCommand(name);
+        if (desc) {
+          cmd.description(desc);
+          cmd._executableHandler = true;
+        }
+        if (opts.isDefault) this._defaultCommandName = cmd._name;
+        cmd._hidden = !!(opts.noHelp || opts.hidden);
+        cmd._executableFile = opts.executableFile || null;
+        if (args) cmd.arguments(args);
+        this._registerCommand(cmd);
+        cmd.parent = this;
+        cmd.copyInheritedSettings(this);
+        if (desc) return this;
+        return cmd;
+      }
+      /**
+       * Factory routine to create a new unattached command.
+       *
+       * See .command() for creating an attached subcommand, which uses this routine to
+       * create the command. You can override createCommand to customise subcommands.
+       *
+       * @param {string} [name]
+       * @return {Command} new command
+       */
+      createCommand(name) {
+        return new _Command(name);
+      }
+      /**
+       * You can customise the help with a subclass of Help by overriding createHelp,
+       * or by overriding Help properties using configureHelp().
+       *
+       * @return {Help}
+       */
+      createHelp() {
+        return Object.assign(new Help2(), this.configureHelp());
+      }
+      /**
+       * You can customise the help by overriding Help properties using configureHelp(),
+       * or with a subclass of Help by overriding createHelp().
+       *
+       * @param {object} [configuration] - configuration options
+       * @return {(Command | object)} `this` command for chaining, or stored configuration
+       */
+      configureHelp(configuration) {
+        if (configuration === void 0) return this._helpConfiguration;
+        this._helpConfiguration = configuration;
+        return this;
+      }
+      /**
+       * The default output goes to stdout and stderr. You can customise this for special
+       * applications. You can also customise the display of errors by overriding outputError.
+       *
+       * The configuration properties are all functions:
+       *
+       *     // change how output being written, defaults to stdout and stderr
+       *     writeOut(str)
+       *     writeErr(str)
+       *     // change how output being written for errors, defaults to writeErr
+       *     outputError(str, write) // used for displaying errors and not used for displaying help
+       *     // specify width for wrapping help
+       *     getOutHelpWidth()
+       *     getErrHelpWidth()
+       *     // color support, currently only used with Help
+       *     getOutHasColors()
+       *     getErrHasColors()
+       *     stripColor() // used to remove ANSI escape codes if output does not have colors
+       *
+       * @param {object} [configuration] - configuration options
+       * @return {(Command | object)} `this` command for chaining, or stored configuration
+       */
+      configureOutput(configuration) {
+        if (configuration === void 0) return this._outputConfiguration;
+        this._outputConfiguration = Object.assign(
+          {},
+          this._outputConfiguration,
+          configuration
+        );
+        return this;
+      }
+      /**
+       * Display the help or a custom message after an error occurs.
+       *
+       * @param {(boolean|string)} [displayHelp]
+       * @return {Command} `this` command for chaining
+       */
+      showHelpAfterError(displayHelp = true) {
+        if (typeof displayHelp !== "string") displayHelp = !!displayHelp;
+        this._showHelpAfterError = displayHelp;
+        return this;
+      }
+      /**
+       * Display suggestion of similar commands for unknown commands, or options for unknown options.
+       *
+       * @param {boolean} [displaySuggestion]
+       * @return {Command} `this` command for chaining
+       */
+      showSuggestionAfterError(displaySuggestion = true) {
+        this._showSuggestionAfterError = !!displaySuggestion;
+        return this;
+      }
+      /**
+       * Add a prepared subcommand.
+       *
+       * See .command() for creating an attached subcommand which inherits settings from its parent.
+       *
+       * @param {Command} cmd - new subcommand
+       * @param {object} [opts] - configuration options
+       * @return {Command} `this` command for chaining
+       */
+      addCommand(cmd, opts) {
+        if (!cmd._name) {
+          throw new Error(`Command passed to .addCommand() must have a name
+- specify the name in Command constructor or using .name()`);
+        }
+        opts = opts || {};
+        if (opts.isDefault) this._defaultCommandName = cmd._name;
+        if (opts.noHelp || opts.hidden) cmd._hidden = true;
+        this._registerCommand(cmd);
+        cmd.parent = this;
+        cmd._checkForBrokenPassThrough();
+        return this;
+      }
+      /**
+       * Factory routine to create a new unattached argument.
+       *
+       * See .argument() for creating an attached argument, which uses this routine to
+       * create the argument. You can override createArgument to return a custom argument.
+       *
+       * @param {string} name
+       * @param {string} [description]
+       * @return {Argument} new argument
+       */
+      createArgument(name, description) {
+        return new Argument2(name, description);
+      }
+      /**
+       * Define argument syntax for command.
+       *
+       * The default is that the argument is required, and you can explicitly
+       * indicate this with <> around the name. Put [] around the name for an optional argument.
+       *
+       * @example
+       * program.argument('<input-file>');
+       * program.argument('[output-file]');
+       *
+       * @param {string} name
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom argument processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      argument(name, description, parseArg, defaultValue) {
+        const argument = this.createArgument(name, description);
+        if (typeof parseArg === "function") {
+          argument.default(defaultValue).argParser(parseArg);
+        } else {
+          argument.default(parseArg);
+        }
+        this.addArgument(argument);
+        return this;
+      }
+      /**
+       * Define argument syntax for command, adding multiple at once (without descriptions).
+       *
+       * See also .argument().
+       *
+       * @example
+       * program.arguments('<cmd> [env]');
+       *
+       * @param {string} names
+       * @return {Command} `this` command for chaining
+       */
+      arguments(names) {
+        names.trim().split(/ +/).forEach((detail) => {
+          this.argument(detail);
+        });
+        return this;
+      }
+      /**
+       * Define argument syntax for command, adding a prepared argument.
+       *
+       * @param {Argument} argument
+       * @return {Command} `this` command for chaining
+       */
+      addArgument(argument) {
+        const previousArgument = this.registeredArguments.slice(-1)[0];
+        if (previousArgument && previousArgument.variadic) {
+          throw new Error(
+            `only the last argument can be variadic '${previousArgument.name()}'`
+          );
+        }
+        if (argument.required && argument.defaultValue !== void 0 && argument.parseArg === void 0) {
+          throw new Error(
+            `a default value for a required argument is never used: '${argument.name()}'`
+          );
+        }
+        this.registeredArguments.push(argument);
+        return this;
+      }
+      /**
+       * Customise or override default help command. By default a help command is automatically added if your command has subcommands.
+       *
+       * @example
+       *    program.helpCommand('help [cmd]');
+       *    program.helpCommand('help [cmd]', 'show help');
+       *    program.helpCommand(false); // suppress default help command
+       *    program.helpCommand(true); // add help command even if no subcommands
+       *
+       * @param {string|boolean} enableOrNameAndArgs - enable with custom name and/or arguments, or boolean to override whether added
+       * @param {string} [description] - custom description
+       * @return {Command} `this` command for chaining
+       */
+      helpCommand(enableOrNameAndArgs, description) {
+        if (typeof enableOrNameAndArgs === "boolean") {
+          this._addImplicitHelpCommand = enableOrNameAndArgs;
+          if (enableOrNameAndArgs && this._defaultCommandGroup) {
+            this._initCommandGroup(this._getHelpCommand());
+          }
+          return this;
+        }
+        const nameAndArgs = enableOrNameAndArgs ?? "help [command]";
+        const [, helpName, helpArgs] = nameAndArgs.match(/([^ ]+) *(.*)/);
+        const helpDescription = description ?? "display help for command";
+        const helpCommand = this.createCommand(helpName);
+        helpCommand.helpOption(false);
+        if (helpArgs) helpCommand.arguments(helpArgs);
+        if (helpDescription) helpCommand.description(helpDescription);
+        this._addImplicitHelpCommand = true;
+        this._helpCommand = helpCommand;
+        if (enableOrNameAndArgs || description) this._initCommandGroup(helpCommand);
+        return this;
+      }
+      /**
+       * Add prepared custom help command.
+       *
+       * @param {(Command|string|boolean)} helpCommand - custom help command, or deprecated enableOrNameAndArgs as for `.helpCommand()`
+       * @param {string} [deprecatedDescription] - deprecated custom description used with custom name only
+       * @return {Command} `this` command for chaining
+       */
+      addHelpCommand(helpCommand, deprecatedDescription) {
+        if (typeof helpCommand !== "object") {
+          this.helpCommand(helpCommand, deprecatedDescription);
+          return this;
+        }
+        this._addImplicitHelpCommand = true;
+        this._helpCommand = helpCommand;
+        this._initCommandGroup(helpCommand);
+        return this;
+      }
+      /**
+       * Lazy create help command.
+       *
+       * @return {(Command|null)}
+       * @package
+       */
+      _getHelpCommand() {
+        const hasImplicitHelpCommand = this._addImplicitHelpCommand ?? (this.commands.length && !this._actionHandler && !this._findCommand("help"));
+        if (hasImplicitHelpCommand) {
+          if (this._helpCommand === void 0) {
+            this.helpCommand(void 0, void 0);
+          }
+          return this._helpCommand;
+        }
+        return null;
+      }
+      /**
+       * Add hook for life cycle event.
+       *
+       * @param {string} event
+       * @param {Function} listener
+       * @return {Command} `this` command for chaining
+       */
+      hook(event, listener) {
+        const allowedValues = ["preSubcommand", "preAction", "postAction"];
+        if (!allowedValues.includes(event)) {
+          throw new Error(`Unexpected value for event passed to hook : '${event}'.
+Expecting one of '${allowedValues.join("', '")}'`);
+        }
+        if (this._lifeCycleHooks[event]) {
+          this._lifeCycleHooks[event].push(listener);
+        } else {
+          this._lifeCycleHooks[event] = [listener];
+        }
+        return this;
+      }
+      /**
+       * Register callback to use as replacement for calling process.exit.
+       *
+       * @param {Function} [fn] optional callback which will be passed a CommanderError, defaults to throwing
+       * @return {Command} `this` command for chaining
+       */
+      exitOverride(fn) {
+        if (fn) {
+          this._exitCallback = fn;
+        } else {
+          this._exitCallback = (err) => {
+            if (err.code !== "commander.executeSubCommandAsync") {
+              throw err;
+            } else {
+            }
+          };
+        }
+        return this;
+      }
+      /**
+       * Call process.exit, and _exitCallback if defined.
+       *
+       * @param {number} exitCode exit code for using with process.exit
+       * @param {string} code an id string representing the error
+       * @param {string} message human-readable description of the error
+       * @return never
+       * @private
+       */
+      _exit(exitCode, code, message) {
+        if (this._exitCallback) {
+          this._exitCallback(new CommanderError2(exitCode, code, message));
+        }
+        process2.exit(exitCode);
+      }
+      /**
+       * Register callback `fn` for the command.
+       *
+       * @example
+       * program
+       *   .command('serve')
+       *   .description('start service')
+       *   .action(function() {
+       *      // do work here
+       *   });
+       *
+       * @param {Function} fn
+       * @return {Command} `this` command for chaining
+       */
+      action(fn) {
+        const listener = (args) => {
+          const expectedArgsCount = this.registeredArguments.length;
+          const actionArgs = args.slice(0, expectedArgsCount);
+          if (this._storeOptionsAsProperties) {
+            actionArgs[expectedArgsCount] = this;
+          } else {
+            actionArgs[expectedArgsCount] = this.opts();
+          }
+          actionArgs.push(this);
+          return fn.apply(this, actionArgs);
+        };
+        this._actionHandler = listener;
+        return this;
+      }
+      /**
+       * Factory routine to create a new unattached option.
+       *
+       * See .option() for creating an attached option, which uses this routine to
+       * create the option. You can override createOption to return a custom option.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @return {Option} new option
+       */
+      createOption(flags, description) {
+        return new Option2(flags, description);
+      }
+      /**
+       * Wrap parseArgs to catch 'commander.invalidArgument'.
+       *
+       * @param {(Option | Argument)} target
+       * @param {string} value
+       * @param {*} previous
+       * @param {string} invalidArgumentMessage
+       * @private
+       */
+      _callParseArg(target, value, previous, invalidArgumentMessage) {
+        try {
+          return target.parseArg(value, previous);
+        } catch (err) {
+          if (err.code === "commander.invalidArgument") {
+            const message = `${invalidArgumentMessage} ${err.message}`;
+            this.error(message, { exitCode: err.exitCode, code: err.code });
+          }
+          throw err;
+        }
+      }
+      /**
+       * Check for option flag conflicts.
+       * Register option if no conflicts found, or throw on conflict.
+       *
+       * @param {Option} option
+       * @private
+       */
+      _registerOption(option) {
+        const matchingOption = option.short && this._findOption(option.short) || option.long && this._findOption(option.long);
+        if (matchingOption) {
+          const matchingFlag = option.long && this._findOption(option.long) ? option.long : option.short;
+          throw new Error(`Cannot add option '${option.flags}'${this._name && ` to command '${this._name}'`} due to conflicting flag '${matchingFlag}'
+-  already used by option '${matchingOption.flags}'`);
+        }
+        this._initOptionGroup(option);
+        this.options.push(option);
+      }
+      /**
+       * Check for command name and alias conflicts with existing commands.
+       * Register command if no conflicts found, or throw on conflict.
+       *
+       * @param {Command} command
+       * @private
+       */
+      _registerCommand(command) {
+        const knownBy = (cmd) => {
+          return [cmd.name()].concat(cmd.aliases());
+        };
+        const alreadyUsed = knownBy(command).find(
+          (name) => this._findCommand(name)
+        );
+        if (alreadyUsed) {
+          const existingCmd = knownBy(this._findCommand(alreadyUsed)).join("|");
+          const newCmd = knownBy(command).join("|");
+          throw new Error(
+            `cannot add command '${newCmd}' as already have command '${existingCmd}'`
+          );
+        }
+        this._initCommandGroup(command);
+        this.commands.push(command);
+      }
+      /**
+       * Add an option.
+       *
+       * @param {Option} option
+       * @return {Command} `this` command for chaining
+       */
+      addOption(option) {
+        this._registerOption(option);
+        const oname = option.name();
+        const name = option.attributeName();
+        if (option.negate) {
+          const positiveLongFlag = option.long.replace(/^--no-/, "--");
+          if (!this._findOption(positiveLongFlag)) {
+            this.setOptionValueWithSource(
+              name,
+              option.defaultValue === void 0 ? true : option.defaultValue,
+              "default"
+            );
+          }
+        } else if (option.defaultValue !== void 0) {
+          this.setOptionValueWithSource(name, option.defaultValue, "default");
+        }
+        const handleOptionValue = (val, invalidValueMessage, valueSource) => {
+          if (val == null && option.presetArg !== void 0) {
+            val = option.presetArg;
+          }
+          const oldValue = this.getOptionValue(name);
+          if (val !== null && option.parseArg) {
+            val = this._callParseArg(option, val, oldValue, invalidValueMessage);
+          } else if (val !== null && option.variadic) {
+            val = option._concatValue(val, oldValue);
+          }
+          if (val == null) {
+            if (option.negate) {
+              val = false;
+            } else if (option.isBoolean() || option.optional) {
+              val = true;
+            } else {
+              val = "";
+            }
+          }
+          this.setOptionValueWithSource(name, val, valueSource);
+        };
+        this.on("option:" + oname, (val) => {
+          const invalidValueMessage = `error: option '${option.flags}' argument '${val}' is invalid.`;
+          handleOptionValue(val, invalidValueMessage, "cli");
+        });
+        if (option.envVar) {
+          this.on("optionEnv:" + oname, (val) => {
+            const invalidValueMessage = `error: option '${option.flags}' value '${val}' from env '${option.envVar}' is invalid.`;
+            handleOptionValue(val, invalidValueMessage, "env");
+          });
+        }
+        return this;
+      }
+      /**
+       * Internal implementation shared by .option() and .requiredOption()
+       *
+       * @return {Command} `this` command for chaining
+       * @private
+       */
+      _optionEx(config, flags, description, fn, defaultValue) {
+        if (typeof flags === "object" && flags instanceof Option2) {
+          throw new Error(
+            "To add an Option object use addOption() instead of option() or requiredOption()"
+          );
+        }
+        const option = this.createOption(flags, description);
+        option.makeOptionMandatory(!!config.mandatory);
+        if (typeof fn === "function") {
+          option.default(defaultValue).argParser(fn);
+        } else if (fn instanceof RegExp) {
+          const regex = fn;
+          fn = (val, def) => {
+            const m = regex.exec(val);
+            return m ? m[0] : def;
+          };
+          option.default(defaultValue).argParser(fn);
+        } else {
+          option.default(fn);
+        }
+        return this.addOption(option);
+      }
+      /**
+       * Define option with `flags`, `description`, and optional argument parsing function or `defaultValue` or both.
+       *
+       * The `flags` string contains the short and/or long flags, separated by comma, a pipe or space. A required
+       * option-argument is indicated by `<>` and an optional option-argument by `[]`.
+       *
+       * See the README for more details, and see also addOption() and requiredOption().
+       *
+       * @example
+       * program
+       *     .option('-p, --pepper', 'add pepper')
+       *     .option('--pt, --pizza-type <TYPE>', 'type of pizza') // required option-argument
+       *     .option('-c, --cheese [CHEESE]', 'add extra cheese', 'mozzarella') // optional option-argument with default
+       *     .option('-t, --tip <VALUE>', 'add tip to purchase cost', parseFloat) // custom parse function
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom option processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      option(flags, description, parseArg, defaultValue) {
+        return this._optionEx({}, flags, description, parseArg, defaultValue);
+      }
+      /**
+       * Add a required option which must have a value after parsing. This usually means
+       * the option must be specified on the command line. (Otherwise the same as .option().)
+       *
+       * The `flags` string contains the short and/or long flags, separated by comma, a pipe or space.
+       *
+       * @param {string} flags
+       * @param {string} [description]
+       * @param {(Function|*)} [parseArg] - custom option processing function or default value
+       * @param {*} [defaultValue]
+       * @return {Command} `this` command for chaining
+       */
+      requiredOption(flags, description, parseArg, defaultValue) {
+        return this._optionEx(
+          { mandatory: true },
+          flags,
+          description,
+          parseArg,
+          defaultValue
+        );
+      }
+      /**
+       * Alter parsing of short flags with optional values.
+       *
+       * @example
+       * // for `.option('-f,--flag [value]'):
+       * program.combineFlagAndOptionalValue(true);  // `-f80` is treated like `--flag=80`, this is the default behaviour
+       * program.combineFlagAndOptionalValue(false) // `-fb` is treated like `-f -b`
+       *
+       * @param {boolean} [combine] - if `true` or omitted, an optional value can be specified directly after the flag.
+       * @return {Command} `this` command for chaining
+       */
+      combineFlagAndOptionalValue(combine = true) {
+        this._combineFlagAndOptionalValue = !!combine;
+        return this;
+      }
+      /**
+       * Allow unknown options on the command line.
+       *
+       * @param {boolean} [allowUnknown] - if `true` or omitted, no error will be thrown for unknown options.
+       * @return {Command} `this` command for chaining
+       */
+      allowUnknownOption(allowUnknown = true) {
+        this._allowUnknownOption = !!allowUnknown;
+        return this;
+      }
+      /**
+       * Allow excess command-arguments on the command line. Pass false to make excess arguments an error.
+       *
+       * @param {boolean} [allowExcess] - if `true` or omitted, no error will be thrown for excess arguments.
+       * @return {Command} `this` command for chaining
+       */
+      allowExcessArguments(allowExcess = true) {
+        this._allowExcessArguments = !!allowExcess;
+        return this;
+      }
+      /**
+       * Enable positional options. Positional means global options are specified before subcommands which lets
+       * subcommands reuse the same option names, and also enables subcommands to turn on passThroughOptions.
+       * The default behaviour is non-positional and global options may appear anywhere on the command line.
+       *
+       * @param {boolean} [positional]
+       * @return {Command} `this` command for chaining
+       */
+      enablePositionalOptions(positional = true) {
+        this._enablePositionalOptions = !!positional;
+        return this;
+      }
+      /**
+       * Pass through options that come after command-arguments rather than treat them as command-options,
+       * so actual command-options come before command-arguments. Turning this on for a subcommand requires
+       * positional options to have been enabled on the program (parent commands).
+       * The default behaviour is non-positional and options may appear before or after command-arguments.
+       *
+       * @param {boolean} [passThrough] for unknown options.
+       * @return {Command} `this` command for chaining
+       */
+      passThroughOptions(passThrough = true) {
+        this._passThroughOptions = !!passThrough;
+        this._checkForBrokenPassThrough();
+        return this;
+      }
+      /**
+       * @private
+       */
+      _checkForBrokenPassThrough() {
+        if (this.parent && this._passThroughOptions && !this.parent._enablePositionalOptions) {
+          throw new Error(
+            `passThroughOptions cannot be used for '${this._name}' without turning on enablePositionalOptions for parent command(s)`
+          );
+        }
+      }
+      /**
+       * Whether to store option values as properties on command object,
+       * or store separately (specify false). In both cases the option values can be accessed using .opts().
+       *
+       * @param {boolean} [storeAsProperties=true]
+       * @return {Command} `this` command for chaining
+       */
+      storeOptionsAsProperties(storeAsProperties = true) {
+        if (this.options.length) {
+          throw new Error("call .storeOptionsAsProperties() before adding options");
+        }
+        if (Object.keys(this._optionValues).length) {
+          throw new Error(
+            "call .storeOptionsAsProperties() before setting option values"
+          );
+        }
+        this._storeOptionsAsProperties = !!storeAsProperties;
+        return this;
+      }
+      /**
+       * Retrieve option value.
+       *
+       * @param {string} key
+       * @return {object} value
+       */
+      getOptionValue(key) {
+        if (this._storeOptionsAsProperties) {
+          return this[key];
+        }
+        return this._optionValues[key];
+      }
+      /**
+       * Store option value.
+       *
+       * @param {string} key
+       * @param {object} value
+       * @return {Command} `this` command for chaining
+       */
+      setOptionValue(key, value) {
+        return this.setOptionValueWithSource(key, value, void 0);
+      }
+      /**
+       * Store option value and where the value came from.
+       *
+       * @param {string} key
+       * @param {object} value
+       * @param {string} source - expected values are default/config/env/cli/implied
+       * @return {Command} `this` command for chaining
+       */
+      setOptionValueWithSource(key, value, source) {
+        if (this._storeOptionsAsProperties) {
+          this[key] = value;
+        } else {
+          this._optionValues[key] = value;
+        }
+        this._optionValueSources[key] = source;
+        return this;
+      }
+      /**
+       * Get source of option value.
+       * Expected values are default | config | env | cli | implied
+       *
+       * @param {string} key
+       * @return {string}
+       */
+      getOptionValueSource(key) {
+        return this._optionValueSources[key];
+      }
+      /**
+       * Get source of option value. See also .optsWithGlobals().
+       * Expected values are default | config | env | cli | implied
+       *
+       * @param {string} key
+       * @return {string}
+       */
+      getOptionValueSourceWithGlobals(key) {
+        let source;
+        this._getCommandAndAncestors().forEach((cmd) => {
+          if (cmd.getOptionValueSource(key) !== void 0) {
+            source = cmd.getOptionValueSource(key);
+          }
+        });
+        return source;
+      }
+      /**
+       * Get user arguments from implied or explicit arguments.
+       * Side-effects: set _scriptPath if args included script. Used for default program name, and subcommand searches.
+       *
+       * @private
+       */
+      _prepareUserArgs(argv, parseOptions) {
+        if (argv !== void 0 && !Array.isArray(argv)) {
+          throw new Error("first parameter to parse must be array or undefined");
+        }
+        parseOptions = parseOptions || {};
+        if (argv === void 0 && parseOptions.from === void 0) {
+          if (process2.versions?.electron) {
+            parseOptions.from = "electron";
+          }
+          const execArgv = process2.execArgv ?? [];
+          if (execArgv.includes("-e") || execArgv.includes("--eval") || execArgv.includes("-p") || execArgv.includes("--print")) {
+            parseOptions.from = "eval";
+          }
+        }
+        if (argv === void 0) {
+          argv = process2.argv;
+        }
+        this.rawArgs = argv.slice();
+        let userArgs;
+        switch (parseOptions.from) {
+          case void 0:
+          case "node":
+            this._scriptPath = argv[1];
+            userArgs = argv.slice(2);
+            break;
+          case "electron":
+            if (process2.defaultApp) {
+              this._scriptPath = argv[1];
+              userArgs = argv.slice(2);
+            } else {
+              userArgs = argv.slice(1);
+            }
+            break;
+          case "user":
+            userArgs = argv.slice(0);
+            break;
+          case "eval":
+            userArgs = argv.slice(1);
+            break;
+          default:
+            throw new Error(
+              `unexpected parse option { from: '${parseOptions.from}' }`
+            );
+        }
+        if (!this._name && this._scriptPath)
+          this.nameFromFilename(this._scriptPath);
+        this._name = this._name || "program";
+        return userArgs;
+      }
+      /**
+       * Parse `argv`, setting options and invoking commands when defined.
+       *
+       * Use parseAsync instead of parse if any of your action handlers are async.
+       *
+       * Call with no parameters to parse `process.argv`. Detects Electron and special node options like `node --eval`. Easy mode!
+       *
+       * Or call with an array of strings to parse, and optionally where the user arguments start by specifying where the arguments are `from`:
+       * - `'node'`: default, `argv[0]` is the application and `argv[1]` is the script being run, with user arguments after that
+       * - `'electron'`: `argv[0]` is the application and `argv[1]` varies depending on whether the electron application is packaged
+       * - `'user'`: just user arguments
+       *
+       * @example
+       * program.parse(); // parse process.argv and auto-detect electron and special node flags
+       * program.parse(process.argv); // assume argv[0] is app and argv[1] is script
+       * program.parse(my-args, { from: 'user' }); // just user supplied arguments, nothing special about argv[0]
+       *
+       * @param {string[]} [argv] - optional, defaults to process.argv
+       * @param {object} [parseOptions] - optionally specify style of options with from: node/user/electron
+       * @param {string} [parseOptions.from] - where the args are from: 'node', 'user', 'electron'
+       * @return {Command} `this` command for chaining
+       */
+      parse(argv, parseOptions) {
+        this._prepareForParse();
+        const userArgs = this._prepareUserArgs(argv, parseOptions);
+        this._parseCommand([], userArgs);
+        return this;
+      }
+      /**
+       * Parse `argv`, setting options and invoking commands when defined.
+       *
+       * Call with no parameters to parse `process.argv`. Detects Electron and special node options like `node --eval`. Easy mode!
+       *
+       * Or call with an array of strings to parse, and optionally where the user arguments start by specifying where the arguments are `from`:
+       * - `'node'`: default, `argv[0]` is the application and `argv[1]` is the script being run, with user arguments after that
+       * - `'electron'`: `argv[0]` is the application and `argv[1]` varies depending on whether the electron application is packaged
+       * - `'user'`: just user arguments
+       *
+       * @example
+       * await program.parseAsync(); // parse process.argv and auto-detect electron and special node flags
+       * await program.parseAsync(process.argv); // assume argv[0] is app and argv[1] is script
+       * await program.parseAsync(my-args, { from: 'user' }); // just user supplied arguments, nothing special about argv[0]
+       *
+       * @param {string[]} [argv]
+       * @param {object} [parseOptions]
+       * @param {string} parseOptions.from - where the args are from: 'node', 'user', 'electron'
+       * @return {Promise}
+       */
+      async parseAsync(argv, parseOptions) {
+        this._prepareForParse();
+        const userArgs = this._prepareUserArgs(argv, parseOptions);
+        await this._parseCommand([], userArgs);
+        return this;
+      }
+      _prepareForParse() {
+        if (this._savedState === null) {
+          this.saveStateBeforeParse();
+        } else {
+          this.restoreStateBeforeParse();
+        }
+      }
+      /**
+       * Called the first time parse is called to save state and allow a restore before subsequent calls to parse.
+       * Not usually called directly, but available for subclasses to save their custom state.
+       *
+       * This is called in a lazy way. Only commands used in parsing chain will have state saved.
+       */
+      saveStateBeforeParse() {
+        this._savedState = {
+          // name is stable if supplied by author, but may be unspecified for root command and deduced during parsing
+          _name: this._name,
+          // option values before parse have default values (including false for negated options)
+          // shallow clones
+          _optionValues: { ...this._optionValues },
+          _optionValueSources: { ...this._optionValueSources }
+        };
+      }
+      /**
+       * Restore state before parse for calls after the first.
+       * Not usually called directly, but available for subclasses to save their custom state.
+       *
+       * This is called in a lazy way. Only commands used in parsing chain will have state restored.
+       */
+      restoreStateBeforeParse() {
+        if (this._storeOptionsAsProperties)
+          throw new Error(`Can not call parse again when storeOptionsAsProperties is true.
+- either make a new Command for each call to parse, or stop storing options as properties`);
+        this._name = this._savedState._name;
+        this._scriptPath = null;
+        this.rawArgs = [];
+        this._optionValues = { ...this._savedState._optionValues };
+        this._optionValueSources = { ...this._savedState._optionValueSources };
+        this.args = [];
+        this.processedArgs = [];
+      }
+      /**
+       * Throw if expected executable is missing. Add lots of help for author.
+       *
+       * @param {string} executableFile
+       * @param {string} executableDir
+       * @param {string} subcommandName
+       */
+      _checkForMissingExecutable(executableFile, executableDir, subcommandName) {
+        if (fs4.existsSync(executableFile)) return;
+        const executableDirMessage = executableDir ? `searched for local subcommand relative to directory '${executableDir}'` : "no directory for search for local subcommand, use .executableDir() to supply a custom directory";
+        const executableMissing = `'${executableFile}' does not exist
+ - if '${subcommandName}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
  - if the default executable name is not suitable, use the executableFile option to supply a custom name or path
- - ${n}`;throw new Error(s)}_executeSubCommand(t,r){r=r.slice();let i=!1,n=[".js",".ts",".tsx",".mjs",".cjs"];function s(m,d){let x=X.resolve(m,d);if(Ie.existsSync(x))return x;if(n.includes(X.extname(d)))return;let U=n.find(H=>Ie.existsSync(`${x}${H}`));if(U)return`${x}${U}`}this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let a=t._executableFile||`${this._name}-${t._name}`,l=this._executableDir||"";if(this._scriptPath){let m;try{m=Ie.realpathSync(this._scriptPath)}catch{m=this._scriptPath}l=X.resolve(X.dirname(m),l)}if(l){let m=s(l,a);if(!m&&!t._executableFile&&this._scriptPath){let d=X.basename(this._scriptPath,X.extname(this._scriptPath));d!==this._name&&(m=s(l,`${d}-${t._name}`))}a=m||a}i=n.includes(X.extname(a));let c;y.platform!=="win32"?i?(r.unshift(a),r=or(y.execArgv).concat(r),c=lt.spawn(y.argv[0],r,{stdio:"inherit"})):c=lt.spawn(a,r,{stdio:"inherit"}):(this._checkForMissingExecutable(a,l,t._name),r.unshift(a),r=or(y.execArgv).concat(r),c=lt.spawn(y.execPath,r,{stdio:"inherit"})),c.killed||["SIGUSR1","SIGUSR2","SIGTERM","SIGINT","SIGHUP"].forEach(d=>{y.on(d,()=>{c.killed===!1&&c.exitCode===null&&c.kill(d)})});let f=this._exitCallback;c.on("close",m=>{m=m??1,f?f(new ht(m,"commander.executeSubCommandAsync","(close)")):y.exit(m)}),c.on("error",m=>{if(m.code==="ENOENT")this._checkForMissingExecutable(a,l,t._name);else if(m.code==="EACCES")throw new Error(`'${a}' not executable`);if(!f)y.exit(1);else{let d=new ht(1,"commander.executeSubCommandAsync","(error)");d.nestedError=m,f(d)}}),this.runningCommand=c}_dispatchSubcommand(t,r,i){let n=this._findCommand(t);n||this.help({error:!0}),n._prepareForParse();let s;return s=this._chainOrCallSubCommandHook(s,n,"preSubcommand"),s=this._chainOrCall(s,()=>{if(n._executableHandler)this._executeSubCommand(n,r.concat(i));else return n._parseCommand(r,i)}),s}_dispatchHelpCommand(t){t||this.help();let r=this._findCommand(t);return r&&!r._executableHandler&&r.help(),this._dispatchSubcommand(t,[],[this._getHelpOption()?.long??this._getHelpOption()?.short??"--help"])}_checkNumberOfArguments(){this.registeredArguments.forEach((t,r)=>{t.required&&this.args[r]==null&&this.missingArgument(t.name())}),!(this.registeredArguments.length>0&&this.registeredArguments[this.registeredArguments.length-1].variadic)&&this.args.length>this.registeredArguments.length&&this._excessArguments(this.args)}_processArguments(){let t=(i,n,s)=>{let a=n;if(n!==null&&i.parseArg){let l=`error: command-argument value '${n}' is invalid for argument '${i.name()}'.`;a=this._callParseArg(i,n,s,l)}return a};this._checkNumberOfArguments();let r=[];this.registeredArguments.forEach((i,n)=>{let s=i.defaultValue;i.variadic?n<this.args.length?(s=this.args.slice(n),i.parseArg&&(s=s.reduce((a,l)=>t(i,l,a),i.defaultValue))):s===void 0&&(s=[]):n<this.args.length&&(s=this.args[n],i.parseArg&&(s=t(i,s,i.defaultValue))),r[n]=s}),this.processedArgs=r}_chainOrCall(t,r){return t&&t.then&&typeof t.then=="function"?t.then(()=>r()):r()}_chainOrCallHooks(t,r){let i=t,n=[];return this._getCommandAndAncestors().reverse().filter(s=>s._lifeCycleHooks[r]!==void 0).forEach(s=>{s._lifeCycleHooks[r].forEach(a=>{n.push({hookedCommand:s,callback:a})})}),r==="postAction"&&n.reverse(),n.forEach(s=>{i=this._chainOrCall(i,()=>s.callback(s.hookedCommand,this))}),i}_chainOrCallSubCommandHook(t,r,i){let n=t;return this._lifeCycleHooks[i]!==void 0&&this._lifeCycleHooks[i].forEach(s=>{n=this._chainOrCall(n,()=>s(this,r))}),n}_parseCommand(t,r){let i=this.parseOptions(r);if(this._parseOptionsEnv(),this._parseOptionsImplied(),t=t.concat(i.operands),r=i.unknown,this.args=t.concat(r),t&&this._findCommand(t[0]))return this._dispatchSubcommand(t[0],t.slice(1),r);if(this._getHelpCommand()&&t[0]===this._getHelpCommand().name())return this._dispatchHelpCommand(t[1]);if(this._defaultCommandName)return this._outputHelpIfRequested(r),this._dispatchSubcommand(this._defaultCommandName,t,r);this.commands.length&&this.args.length===0&&!this._actionHandler&&!this._defaultCommandName&&this.help({error:!0}),this._outputHelpIfRequested(i.unknown),this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let n=()=>{i.unknown.length>0&&this.unknownOption(i.unknown[0])},s=`command:${this.name()}`;if(this._actionHandler){n(),this._processArguments();let a;return a=this._chainOrCallHooks(a,"preAction"),a=this._chainOrCall(a,()=>this._actionHandler(this.processedArgs)),this.parent&&(a=this._chainOrCall(a,()=>{this.parent.emit(s,t,r)})),a=this._chainOrCallHooks(a,"postAction"),a}if(this.parent&&this.parent.listenerCount(s))n(),this._processArguments(),this.parent.emit(s,t,r);else if(t.length){if(this._findCommand("*"))return this._dispatchSubcommand("*",t,r);this.listenerCount("command:*")?this.emit("command:*",t,r):this.commands.length?this.unknownCommand():(n(),this._processArguments())}else this.commands.length?(n(),this.help({error:!0})):(n(),this._processArguments())}_findCommand(t){if(t)return this.commands.find(r=>r._name===t||r._aliases.includes(t))}_findOption(t){return this.options.find(r=>r.is(t))}_checkForMissingMandatoryOptions(){this._getCommandAndAncestors().forEach(t=>{t.options.forEach(r=>{r.mandatory&&t.getOptionValue(r.attributeName())===void 0&&t.missingMandatoryOptionValue(r)})})}_checkForConflictingLocalOptions(){let t=this.options.filter(i=>{let n=i.attributeName();return this.getOptionValue(n)===void 0?!1:this.getOptionValueSource(n)!=="default"});t.filter(i=>i.conflictsWith.length>0).forEach(i=>{let n=t.find(s=>i.conflictsWith.includes(s.attributeName()));n&&this._conflictingOption(i,n)})}_checkForConflictingOptions(){this._getCommandAndAncestors().forEach(t=>{t._checkForConflictingLocalOptions()})}parseOptions(t){let r=[],i=[],n=r,s=t.slice();function a(f){return f.length>1&&f[0]==="-"}let l=f=>/^-\d*\.?\d+(e[+-]?\d+)?$/.test(f)?!this._getCommandAndAncestors().some(m=>m.options.map(d=>d.short).some(d=>/^-\d$/.test(d))):!1,c=null;for(;s.length;){let f=s.shift();if(f==="--"){n===i&&n.push(f),n.push(...s);break}if(c&&(!a(f)||l(f))){this.emit(`option:${c.name()}`,f);continue}if(c=null,a(f)){let m=this._findOption(f);if(m){if(m.required){let d=s.shift();d===void 0&&this.optionMissingArgument(m),this.emit(`option:${m.name()}`,d)}else if(m.optional){let d=null;s.length>0&&(!a(s[0])||l(s[0]))&&(d=s.shift()),this.emit(`option:${m.name()}`,d)}else this.emit(`option:${m.name()}`);c=m.variadic?m:null;continue}}if(f.length>2&&f[0]==="-"&&f[1]!=="-"){let m=this._findOption(`-${f[1]}`);if(m){m.required||m.optional&&this._combineFlagAndOptionalValue?this.emit(`option:${m.name()}`,f.slice(2)):(this.emit(`option:${m.name()}`),s.unshift(`-${f.slice(2)}`));continue}}if(/^--[^=]+=/.test(f)){let m=f.indexOf("="),d=this._findOption(f.slice(0,m));if(d&&(d.required||d.optional)){this.emit(`option:${d.name()}`,f.slice(m+1));continue}}if(n===r&&a(f)&&!(this.commands.length===0&&l(f))&&(n=i),(this._enablePositionalOptions||this._passThroughOptions)&&r.length===0&&i.length===0){if(this._findCommand(f)){r.push(f),s.length>0&&i.push(...s);break}else if(this._getHelpCommand()&&f===this._getHelpCommand().name()){r.push(f),s.length>0&&r.push(...s);break}else if(this._defaultCommandName){i.push(f),s.length>0&&i.push(...s);break}}if(this._passThroughOptions){n.push(f),s.length>0&&n.push(...s);break}n.push(f)}return{operands:r,unknown:i}}opts(){if(this._storeOptionsAsProperties){let t={},r=this.options.length;for(let i=0;i<r;i++){let n=this.options[i].attributeName();t[n]=n===this._versionOptionName?this._version:this[n]}return t}return this._optionValues}optsWithGlobals(){return this._getCommandAndAncestors().reduce((t,r)=>Object.assign(t,r.opts()),{})}error(t,r){this._outputConfiguration.outputError(`${t}
-`,this._outputConfiguration.writeErr),typeof this._showHelpAfterError=="string"?this._outputConfiguration.writeErr(`${this._showHelpAfterError}
-`):this._showHelpAfterError&&(this._outputConfiguration.writeErr(`
-`),this.outputHelp({error:!0}));let i=r||{},n=i.exitCode||1,s=i.code||"commander.error";this._exit(n,s,t)}_parseOptionsEnv(){this.options.forEach(t=>{if(t.envVar&&t.envVar in y.env){let r=t.attributeName();(this.getOptionValue(r)===void 0||["default","config","env"].includes(this.getOptionValueSource(r)))&&(t.required||t.optional?this.emit(`optionEnv:${t.name()}`,y.env[t.envVar]):this.emit(`optionEnv:${t.name()}`))}})}_parseOptionsImplied(){let t=new gs(this.options),r=i=>this.getOptionValue(i)!==void 0&&!["default","implied"].includes(this.getOptionValueSource(i));this.options.filter(i=>i.implied!==void 0&&r(i.attributeName())&&t.valueFromOption(this.getOptionValue(i.attributeName()),i)).forEach(i=>{Object.keys(i.implied).filter(n=>!r(n)).forEach(n=>{this.setOptionValueWithSource(n,i.implied[n],"implied")})})}missingArgument(t){let r=`error: missing required argument '${t}'`;this.error(r,{code:"commander.missingArgument"})}optionMissingArgument(t){let r=`error: option '${t.flags}' argument missing`;this.error(r,{code:"commander.optionMissingArgument"})}missingMandatoryOptionValue(t){let r=`error: required option '${t.flags}' not specified`;this.error(r,{code:"commander.missingMandatoryOptionValue"})}_conflictingOption(t,r){let i=a=>{let l=a.attributeName(),c=this.getOptionValue(l),f=this.options.find(d=>d.negate&&l===d.attributeName()),m=this.options.find(d=>!d.negate&&l===d.attributeName());return f&&(f.presetArg===void 0&&c===!1||f.presetArg!==void 0&&c===f.presetArg)?f:m||a},n=a=>{let l=i(a),c=l.attributeName();return this.getOptionValueSource(c)==="env"?`environment variable '${l.envVar}'`:`option '${l.flags}'`},s=`error: ${n(t)} cannot be used with ${n(r)}`;this.error(s,{code:"commander.conflictingOption"})}unknownOption(t){if(this._allowUnknownOption)return;let r="";if(t.startsWith("--")&&this._showSuggestionAfterError){let n=[],s=this;do{let a=s.createHelp().visibleOptions(s).filter(l=>l.long).map(l=>l.long);n=n.concat(a),s=s.parent}while(s&&!s._enablePositionalOptions);r=ar(t,n)}let i=`error: unknown option '${t}'${r}`;this.error(i,{code:"commander.unknownOption"})}_excessArguments(t){if(this._allowExcessArguments)return;let r=this.registeredArguments.length,i=r===1?"":"s",s=`error: too many arguments${this.parent?` for '${this.name()}'`:""}. Expected ${r} argument${i} but got ${t.length}.`;this.error(s,{code:"commander.excessArguments"})}unknownCommand(){let t=this.args[0],r="";if(this._showSuggestionAfterError){let n=[];this.createHelp().visibleCommands(this).forEach(s=>{n.push(s.name()),s.alias()&&n.push(s.alias())}),r=ar(t,n)}let i=`error: unknown command '${t}'${r}`;this.error(i,{code:"commander.unknownCommand"})}version(t,r,i){if(t===void 0)return this._version;this._version=t,r=r||"-V, --version",i=i||"output the version number";let n=this.createOption(r,i);return this._versionOptionName=n.attributeName(),this._registerOption(n),this.on("option:"+n.name(),()=>{this._outputConfiguration.writeOut(`${t}
-`),this._exit(0,"commander.version",t)}),this}description(t,r){return t===void 0&&r===void 0?this._description:(this._description=t,r&&(this._argsDescription=r),this)}summary(t){return t===void 0?this._summary:(this._summary=t,this)}alias(t){if(t===void 0)return this._aliases[0];let r=this;if(this.commands.length!==0&&this.commands[this.commands.length-1]._executableHandler&&(r=this.commands[this.commands.length-1]),t===r._name)throw new Error("Command alias can't be the same as its name");let i=this.parent?._findCommand(t);if(i){let n=[i.name()].concat(i.aliases()).join("|");throw new Error(`cannot add alias '${t}' to command '${this.name()}' as already have command '${n}'`)}return r._aliases.push(t),this}aliases(t){return t===void 0?this._aliases:(t.forEach(r=>this.alias(r)),this)}usage(t){if(t===void 0){if(this._usage)return this._usage;let r=this.registeredArguments.map(i=>fs(i));return[].concat(this.options.length||this._helpOption!==null?"[options]":[],this.commands.length?"[command]":[],this.registeredArguments.length?r:[]).join(" ")}return this._usage=t,this}name(t){return t===void 0?this._name:(this._name=t,this)}helpGroup(t){return t===void 0?this._helpGroupHeading??"":(this._helpGroupHeading=t,this)}commandsGroup(t){return t===void 0?this._defaultCommandGroup??"":(this._defaultCommandGroup=t,this)}optionsGroup(t){return t===void 0?this._defaultOptionGroup??"":(this._defaultOptionGroup=t,this)}_initOptionGroup(t){this._defaultOptionGroup&&!t.helpGroupHeading&&t.helpGroup(this._defaultOptionGroup)}_initCommandGroup(t){this._defaultCommandGroup&&!t.helpGroup()&&t.helpGroup(this._defaultCommandGroup)}nameFromFilename(t){return this._name=X.basename(t,X.extname(t)),this}executableDir(t){return t===void 0?this._executableDir:(this._executableDir=t,this)}helpInformation(t){let r=this.createHelp(),i=this._getOutputContext(t);r.prepareContext({error:i.error,helpWidth:i.helpWidth,outputHasColors:i.hasColors});let n=r.formatHelp(this,r);return i.hasColors?n:this._outputConfiguration.stripColor(n)}_getOutputContext(t){t=t||{};let r=!!t.error,i,n,s;return r?(i=l=>this._outputConfiguration.writeErr(l),n=this._outputConfiguration.getErrHasColors(),s=this._outputConfiguration.getErrHelpWidth()):(i=l=>this._outputConfiguration.writeOut(l),n=this._outputConfiguration.getOutHasColors(),s=this._outputConfiguration.getOutHelpWidth()),{error:r,write:l=>(n||(l=this._outputConfiguration.stripColor(l)),i(l)),hasColors:n,helpWidth:s}}outputHelp(t){let r;typeof t=="function"&&(r=t,t=void 0);let i=this._getOutputContext(t),n={error:i.error,write:i.write,command:this};this._getCommandAndAncestors().reverse().forEach(a=>a.emit("beforeAllHelp",n)),this.emit("beforeHelp",n);let s=this.helpInformation({error:i.error});if(r&&(s=r(s),typeof s!="string"&&!Buffer.isBuffer(s)))throw new Error("outputHelp callback must return a string or a Buffer");i.write(s),this._getHelpOption()?.long&&this.emit(this._getHelpOption().long),this.emit("afterHelp",n),this._getCommandAndAncestors().forEach(a=>a.emit("afterAllHelp",n))}helpOption(t,r){return typeof t=="boolean"?(t?(this._helpOption===null&&(this._helpOption=void 0),this._defaultOptionGroup&&this._initOptionGroup(this._getHelpOption())):this._helpOption=null,this):(this._helpOption=this.createOption(t??"-h, --help",r??"display help for command"),(t||r)&&this._initOptionGroup(this._helpOption),this)}_getHelpOption(){return this._helpOption===void 0&&this.helpOption(void 0,void 0),this._helpOption}addHelpOption(t){return this._helpOption=t,this._initOptionGroup(t),this}help(t){this.outputHelp(t);let r=Number(y.exitCode??0);r===0&&t&&typeof t!="function"&&t.error&&(r=1),this._exit(r,"commander.help","(outputHelp)")}addHelpText(t,r){let i=["beforeAll","before","after","afterAll"];if(!i.includes(t))throw new Error(`Unexpected value for position to addHelpText.
-Expecting one of '${i.join("', '")}'`);let n=`${t}Help`;return this.on(n,s=>{let a;typeof r=="function"?a=r({error:s.error,command:s.command}):a=r,a&&s.write(`${a}
-`)}),this}_outputHelpIfRequested(t){let r=this._getHelpOption();r&&t.find(n=>r.is(n))&&(this.outputHelp(),this._exit(0,"commander.helpDisplayed","(outputHelp)"))}};function or(e){return e.map(t=>{if(!t.startsWith("--inspect"))return t;let r,i="127.0.0.1",n="9229",s;return(s=t.match(/^(--inspect(-brk)?)$/))!==null?r=s[1]:(s=t.match(/^(--inspect(-brk|-port)?)=([^:]+)$/))!==null?(r=s[1],/^\d+$/.test(s[3])?n=s[3]:i=s[3]):(s=t.match(/^(--inspect(-brk|-port)?)=([^:]+):(\d+)$/))!==null&&(r=s[1],i=s[3],n=s[4]),r&&n!=="0"?`${r}=${i}:${parseInt(n)+1}`:t})}function ut(){if(y.env.NO_COLOR||y.env.FORCE_COLOR==="0"||y.env.FORCE_COLOR==="false")return!1;if(y.env.FORCE_COLOR||y.env.CLICOLOR_FORCE!==void 0)return!0}ft.Command=ct;ft.useColor=ut});var fr=E(q=>{var{Argument:hr}=Se(),{Command:dt}=lr(),{CommanderError:ps,InvalidArgumentError:cr}=pe(),{Help:bs}=it(),{Option:ur}=ot();q.program=new dt;q.createCommand=e=>new dt(e);q.createOption=(e,t)=>new ur(e,t);q.createArgument=(e,t)=>new hr(e,t);q.Command=dt;q.Option=ur;q.Argument=hr;q.Help=bs;q.CommanderError=ps;q.InvalidArgumentError=cr;q.InvalidOptionArgumentError=cr});var B=E((Kh,pr)=>{"use strict";var gr=function(e){return typeof e<"u"&&e!==null},ws=function(e){return typeof e=="object"},Es=function(e){return Object.prototype.toString.call(e)==="[object Object]"},vs=function(e){return typeof e=="function"},ys=function(e){return typeof e=="boolean"},xs=function(e){return e instanceof Buffer},_s=function(e){if(gr(e))switch(e.constructor){case Uint8Array:case Uint8ClampedArray:case Int8Array:case Uint16Array:case Int16Array:case Uint32Array:case Int32Array:case Float32Array:case Float64Array:return!0}return!1},As=function(e){return e instanceof ArrayBuffer},Ps=function(e){return typeof e=="string"&&e.length>0},Cs=function(e){return typeof e=="number"&&!Number.isNaN(e)},$s=function(e){return Number.isInteger(e)},Ss=function(e,t,r){return e>=t&&e<=r},Is=function(e,t){return t.includes(e)},Os=function(e,t,r){return new Error(`Expected ${t} for ${e} but received ${r} of type ${typeof r}`)},Rs=function(e,t){return t.message=e.message,t};pr.exports={defined:gr,object:ws,plainObject:Es,fn:vs,bool:ys,buffer:xs,typedArray:_s,arrayBuffer:As,string:Ps,number:Cs,integer:$s,inRange:Ss,inArray:Is,invalidParameterError:Os,nativeError:Rs}});var Er=E((Yh,wr)=>{"use strict";var br=()=>process.platform==="linux",Oe=null,ks=()=>{if(!Oe)if(br()&&process.report){let e=process.report.excludeNetwork;process.report.excludeNetwork=!0,Oe=process.report.getReport(),process.report.excludeNetwork=e}else Oe={};return Oe};wr.exports={isLinux:br,getReport:ks}});var xr=E((Zh,yr)=>{"use strict";var vr=require("fs"),js="/usr/bin/ldd",Ls=e=>vr.readFileSync(e,"utf-8"),Ns=e=>new Promise((t,r)=>{vr.readFile(e,"utf-8",(i,n)=>{i?r(i):t(n)})});yr.exports={LDD_PATH:js,readFileSync:Ls,readFile:Ns}});var ke=E((ec,Dr)=>{"use strict";var Ar=require("child_process"),{isLinux:oe,getReport:Pr}=Er(),{LDD_PATH:Re,readFile:Cr,readFileSync:$r}=xr(),W,G,Sr="getconf GNU_LIBC_VERSION 2>&1 || true; ldd --version 2>&1 || true",K="",Ir=()=>K||new Promise(e=>{Ar.exec(Sr,(t,r)=>{K=t?" ":r,e(K)})}),Or=()=>{if(!K)try{K=Ar.execSync(Sr,{encoding:"utf8"})}catch{K=" "}return K},Y="glibc",Rr=/LIBC[a-z0-9 \-).]*?(\d+\.\d+)/i,ae="musl",Ts=e=>e.includes("libc.musl-")||e.includes("ld-musl-"),kr=()=>{let e=Pr();return e.header&&e.header.glibcVersionRuntime?Y:Array.isArray(e.sharedObjects)&&e.sharedObjects.some(Ts)?ae:null},jr=e=>{let[t,r]=e.split(/[\r\n]+/);return t&&t.includes(Y)?Y:r&&r.includes(ae)?ae:null},Lr=e=>e.includes("musl")?ae:e.includes("GNU C Library")?Y:null,Fs=async()=>{if(W!==void 0)return W;W=null;try{let e=await Cr(Re);W=Lr(e)}catch{}return W},qs=()=>{if(W!==void 0)return W;W=null;try{let e=$r(Re);W=Lr(e)}catch{}return W},Nr=async()=>{let e=null;if(oe()&&(e=await Fs(),e||(e=kr()),!e)){let t=await Ir();e=jr(t)}return e},Tr=()=>{let e=null;if(oe()&&(e=qs(),e||(e=kr()),!e)){let t=Or();e=jr(t)}return e},Ds=async()=>oe()&&await Nr()!==Y,Ms=()=>oe()&&Tr()!==Y,Hs=async()=>{if(G!==void 0)return G;G=null;try{let t=(await Cr(Re)).match(Rr);t&&(G=t[1])}catch{}return G},Bs=()=>{if(G!==void 0)return G;G=null;try{let t=$r(Re).match(Rr);t&&(G=t[1])}catch{}return G},Fr=()=>{let e=Pr();return e.header&&e.header.glibcVersionRuntime?e.header.glibcVersionRuntime:null},_r=e=>e.trim().split(/\s+/)[1],qr=e=>{let[t,r,i]=e.split(/[\r\n]+/);return t&&t.includes(Y)?_r(t):r&&i&&r.includes(ae)?_r(i):null},Ws=async()=>{let e=null;if(oe()&&(e=await Hs(),e||(e=Fr()),!e)){let t=await Ir();e=qr(t)}return e},Gs=()=>{let e=null;if(oe()&&(e=Bs(),e||(e=Fr()),!e)){let t=Or();e=qr(t)}return e};Dr.exports={GLIBC:Y,MUSL:ae,family:Nr,familySync:Tr,isNonGlibcLinux:Ds,isNonGlibcLinuxSync:Ms,version:Ws,versionSync:Gs}});var be=E((tc,Mr)=>{"use strict";var Vs=typeof process=="object"&&process.env&&process.env.NODE_DEBUG&&/\bsemver\b/i.test(process.env.NODE_DEBUG)?(...e)=>console.error("SEMVER",...e):()=>{};Mr.exports=Vs});var je=E((rc,Hr)=>{"use strict";var zs="2.0.0",Us=Number.MAX_SAFE_INTEGER||9007199254740991,Xs=16,Qs=250,Js=["major","premajor","minor","preminor","patch","prepatch","prerelease"];Hr.exports={MAX_LENGTH:256,MAX_SAFE_COMPONENT_LENGTH:Xs,MAX_SAFE_BUILD_LENGTH:Qs,MAX_SAFE_INTEGER:Us,RELEASE_TYPES:Js,SEMVER_SPEC_VERSION:zs,FLAG_INCLUDE_PRERELEASE:1,FLAG_LOOSE:2}});var we=E((V,Br)=>{"use strict";var{MAX_SAFE_COMPONENT_LENGTH:mt,MAX_SAFE_BUILD_LENGTH:Ks,MAX_LENGTH:Ys}=je(),Zs=be();V=Br.exports={};var ea=V.re=[],ta=V.safeRe=[],g=V.src=[],ra=V.safeSrc=[],p=V.t={},ia=0,gt="[a-zA-Z0-9-]",na=[["\\s",1],["\\d",Ys],[gt,Ks]],sa=e=>{for(let[t,r]of na)e=e.split(`${t}*`).join(`${t}{0,${r}}`).split(`${t}+`).join(`${t}{1,${r}}`);return e},v=(e,t,r)=>{let i=sa(t),n=ia++;Zs(e,n,t),p[e]=n,g[n]=t,ra[n]=i,ea[n]=new RegExp(t,r?"g":void 0),ta[n]=new RegExp(i,r?"g":void 0)};v("NUMERICIDENTIFIER","0|[1-9]\\d*");v("NUMERICIDENTIFIERLOOSE","\\d+");v("NONNUMERICIDENTIFIER",`\\d*[a-zA-Z-]${gt}*`);v("MAINVERSION",`(${g[p.NUMERICIDENTIFIER]})\\.(${g[p.NUMERICIDENTIFIER]})\\.(${g[p.NUMERICIDENTIFIER]})`);v("MAINVERSIONLOOSE",`(${g[p.NUMERICIDENTIFIERLOOSE]})\\.(${g[p.NUMERICIDENTIFIERLOOSE]})\\.(${g[p.NUMERICIDENTIFIERLOOSE]})`);v("PRERELEASEIDENTIFIER",`(?:${g[p.NONNUMERICIDENTIFIER]}|${g[p.NUMERICIDENTIFIER]})`);v("PRERELEASEIDENTIFIERLOOSE",`(?:${g[p.NONNUMERICIDENTIFIER]}|${g[p.NUMERICIDENTIFIERLOOSE]})`);v("PRERELEASE",`(?:-(${g[p.PRERELEASEIDENTIFIER]}(?:\\.${g[p.PRERELEASEIDENTIFIER]})*))`);v("PRERELEASELOOSE",`(?:-?(${g[p.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${g[p.PRERELEASEIDENTIFIERLOOSE]})*))`);v("BUILDIDENTIFIER",`${gt}+`);v("BUILD",`(?:\\+(${g[p.BUILDIDENTIFIER]}(?:\\.${g[p.BUILDIDENTIFIER]})*))`);v("FULLPLAIN",`v?${g[p.MAINVERSION]}${g[p.PRERELEASE]}?${g[p.BUILD]}?`);v("FULL",`^${g[p.FULLPLAIN]}$`);v("LOOSEPLAIN",`[v=\\s]*${g[p.MAINVERSIONLOOSE]}${g[p.PRERELEASELOOSE]}?${g[p.BUILD]}?`);v("LOOSE",`^${g[p.LOOSEPLAIN]}$`);v("GTLT","((?:<|>)?=?)");v("XRANGEIDENTIFIERLOOSE",`${g[p.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);v("XRANGEIDENTIFIER",`${g[p.NUMERICIDENTIFIER]}|x|X|\\*`);v("XRANGEPLAIN",`[v=\\s]*(${g[p.XRANGEIDENTIFIER]})(?:\\.(${g[p.XRANGEIDENTIFIER]})(?:\\.(${g[p.XRANGEIDENTIFIER]})(?:${g[p.PRERELEASE]})?${g[p.BUILD]}?)?)?`);v("XRANGEPLAINLOOSE",`[v=\\s]*(${g[p.XRANGEIDENTIFIERLOOSE]})(?:\\.(${g[p.XRANGEIDENTIFIERLOOSE]})(?:\\.(${g[p.XRANGEIDENTIFIERLOOSE]})(?:${g[p.PRERELEASELOOSE]})?${g[p.BUILD]}?)?)?`);v("XRANGE",`^${g[p.GTLT]}\\s*${g[p.XRANGEPLAIN]}$`);v("XRANGELOOSE",`^${g[p.GTLT]}\\s*${g[p.XRANGEPLAINLOOSE]}$`);v("COERCEPLAIN",`(^|[^\\d])(\\d{1,${mt}})(?:\\.(\\d{1,${mt}}))?(?:\\.(\\d{1,${mt}}))?`);v("COERCE",`${g[p.COERCEPLAIN]}(?:$|[^\\d])`);v("COERCEFULL",g[p.COERCEPLAIN]+`(?:${g[p.PRERELEASE]})?(?:${g[p.BUILD]})?(?:$|[^\\d])`);v("COERCERTL",g[p.COERCE],!0);v("COERCERTLFULL",g[p.COERCEFULL],!0);v("LONETILDE","(?:~>?)");v("TILDETRIM",`(\\s*)${g[p.LONETILDE]}\\s+`,!0);V.tildeTrimReplace="$1~";v("TILDE",`^${g[p.LONETILDE]}${g[p.XRANGEPLAIN]}$`);v("TILDELOOSE",`^${g[p.LONETILDE]}${g[p.XRANGEPLAINLOOSE]}$`);v("LONECARET","(?:\\^)");v("CARETTRIM",`(\\s*)${g[p.LONECARET]}\\s+`,!0);V.caretTrimReplace="$1^";v("CARET",`^${g[p.LONECARET]}${g[p.XRANGEPLAIN]}$`);v("CARETLOOSE",`^${g[p.LONECARET]}${g[p.XRANGEPLAINLOOSE]}$`);v("COMPARATORLOOSE",`^${g[p.GTLT]}\\s*(${g[p.LOOSEPLAIN]})$|^$`);v("COMPARATOR",`^${g[p.GTLT]}\\s*(${g[p.FULLPLAIN]})$|^$`);v("COMPARATORTRIM",`(\\s*)${g[p.GTLT]}\\s*(${g[p.LOOSEPLAIN]}|${g[p.XRANGEPLAIN]})`,!0);V.comparatorTrimReplace="$1$2$3";v("HYPHENRANGE",`^\\s*(${g[p.XRANGEPLAIN]})\\s+-\\s+(${g[p.XRANGEPLAIN]})\\s*$`);v("HYPHENRANGELOOSE",`^\\s*(${g[p.XRANGEPLAINLOOSE]})\\s+-\\s+(${g[p.XRANGEPLAINLOOSE]})\\s*$`);v("STAR","(<|>)?=?\\s*\\*");v("GTE0","^\\s*>=\\s*0\\.0\\.0\\s*$");v("GTE0PRE","^\\s*>=\\s*0\\.0\\.0-0\\s*$")});var Le=E((ic,Wr)=>{"use strict";var aa=Object.freeze({loose:!0}),oa=Object.freeze({}),la=e=>e?typeof e!="object"?aa:e:oa;Wr.exports=la});var Ur=E((nc,zr)=>{"use strict";var Gr=/^[0-9]+$/,Vr=(e,t)=>{let r=Gr.test(e),i=Gr.test(t);return r&&i&&(e=+e,t=+t),e===t?0:r&&!i?-1:i&&!r?1:e<t?-1:1},ha=(e,t)=>Vr(t,e);zr.exports={compareIdentifiers:Vr,rcompareIdentifiers:ha}});var he=E((sc,Qr)=>{"use strict";var Ne=be(),{MAX_LENGTH:Xr,MAX_SAFE_INTEGER:Te}=je(),{safeRe:Fe,t:qe}=we(),ca=Le(),{compareIdentifiers:le}=Ur(),pt=class e{constructor(t,r){if(r=ca(r),t instanceof e){if(t.loose===!!r.loose&&t.includePrerelease===!!r.includePrerelease)return t;t=t.version}else if(typeof t!="string")throw new TypeError(`Invalid version. Must be a string. Got type "${typeof t}".`);if(t.length>Xr)throw new TypeError(`version is longer than ${Xr} characters`);Ne("SemVer",t,r),this.options=r,this.loose=!!r.loose,this.includePrerelease=!!r.includePrerelease;let i=t.trim().match(r.loose?Fe[qe.LOOSE]:Fe[qe.FULL]);if(!i)throw new TypeError(`Invalid Version: ${t}`);if(this.raw=t,this.major=+i[1],this.minor=+i[2],this.patch=+i[3],this.major>Te||this.major<0)throw new TypeError("Invalid major version");if(this.minor>Te||this.minor<0)throw new TypeError("Invalid minor version");if(this.patch>Te||this.patch<0)throw new TypeError("Invalid patch version");i[4]?this.prerelease=i[4].split(".").map(n=>{if(/^[0-9]+$/.test(n)){let s=+n;if(s>=0&&s<Te)return s}return n}):this.prerelease=[],this.build=i[5]?i[5].split("."):[],this.format()}format(){return this.version=`${this.major}.${this.minor}.${this.patch}`,this.prerelease.length&&(this.version+=`-${this.prerelease.join(".")}`),this.version}toString(){return this.version}compare(t){if(Ne("SemVer.compare",this.version,this.options,t),!(t instanceof e)){if(typeof t=="string"&&t===this.version)return 0;t=new e(t,this.options)}return t.version===this.version?0:this.compareMain(t)||this.comparePre(t)}compareMain(t){return t instanceof e||(t=new e(t,this.options)),le(this.major,t.major)||le(this.minor,t.minor)||le(this.patch,t.patch)}comparePre(t){if(t instanceof e||(t=new e(t,this.options)),this.prerelease.length&&!t.prerelease.length)return-1;if(!this.prerelease.length&&t.prerelease.length)return 1;if(!this.prerelease.length&&!t.prerelease.length)return 0;let r=0;do{let i=this.prerelease[r],n=t.prerelease[r];if(Ne("prerelease compare",r,i,n),i===void 0&&n===void 0)return 0;if(n===void 0)return 1;if(i===void 0)return-1;if(i===n)continue;return le(i,n)}while(++r)}compareBuild(t){t instanceof e||(t=new e(t,this.options));let r=0;do{let i=this.build[r],n=t.build[r];if(Ne("build compare",r,i,n),i===void 0&&n===void 0)return 0;if(n===void 0)return 1;if(i===void 0)return-1;if(i===n)continue;return le(i,n)}while(++r)}inc(t,r,i){if(t.startsWith("pre")){if(!r&&i===!1)throw new Error("invalid increment argument: identifier is empty");if(r){let n=`-${r}`.match(this.options.loose?Fe[qe.PRERELEASELOOSE]:Fe[qe.PRERELEASE]);if(!n||n[1]!==r)throw new Error(`invalid identifier: ${r}`)}}switch(t){case"premajor":this.prerelease.length=0,this.patch=0,this.minor=0,this.major++,this.inc("pre",r,i);break;case"preminor":this.prerelease.length=0,this.patch=0,this.minor++,this.inc("pre",r,i);break;case"prepatch":this.prerelease.length=0,this.inc("patch",r,i),this.inc("pre",r,i);break;case"prerelease":this.prerelease.length===0&&this.inc("patch",r,i),this.inc("pre",r,i);break;case"release":if(this.prerelease.length===0)throw new Error(`version ${this.raw} is not a prerelease`);this.prerelease.length=0;break;case"major":(this.minor!==0||this.patch!==0||this.prerelease.length===0)&&this.major++,this.minor=0,this.patch=0,this.prerelease=[];break;case"minor":(this.patch!==0||this.prerelease.length===0)&&this.minor++,this.patch=0,this.prerelease=[];break;case"patch":this.prerelease.length===0&&this.patch++,this.prerelease=[];break;case"pre":{let n=Number(i)?1:0;if(this.prerelease.length===0)this.prerelease=[n];else{let s=this.prerelease.length;for(;--s>=0;)typeof this.prerelease[s]=="number"&&(this.prerelease[s]++,s=-2);if(s===-1){if(r===this.prerelease.join(".")&&i===!1)throw new Error("invalid increment argument: identifier already exists");this.prerelease.push(n)}}if(r){let s=[r,n];i===!1&&(s=[r]),le(this.prerelease[0],r)===0?isNaN(this.prerelease[1])&&(this.prerelease=s):this.prerelease=s}break}default:throw new Error(`invalid increment argument: ${t}`)}return this.raw=this.format(),this.build.length&&(this.raw+=`+${this.build.join(".")}`),this}};Qr.exports=pt});var Yr=E((ac,Kr)=>{"use strict";var Jr=he(),ua=(e,t,r=!1)=>{if(e instanceof Jr)return e;try{return new Jr(e,t)}catch(i){if(!r)return null;throw i}};Kr.exports=ua});var ei=E((oc,Zr)=>{"use strict";var fa=he(),da=Yr(),{safeRe:De,t:Me}=we(),ma=(e,t)=>{if(e instanceof fa)return e;if(typeof e=="number"&&(e=String(e)),typeof e!="string")return null;t=t||{};let r=null;if(!t.rtl)r=e.match(t.includePrerelease?De[Me.COERCEFULL]:De[Me.COERCE]);else{let c=t.includePrerelease?De[Me.COERCERTLFULL]:De[Me.COERCERTL],f;for(;(f=c.exec(e))&&(!r||r.index+r[0].length!==e.length);)(!r||f.index+f[0].length!==r.index+r[0].length)&&(r=f),c.lastIndex=f.index+f[1].length+f[2].length;c.lastIndex=-1}if(r===null)return null;let i=r[2],n=r[3]||"0",s=r[4]||"0",a=t.includePrerelease&&r[5]?`-${r[5]}`:"",l=t.includePrerelease&&r[6]?`+${r[6]}`:"";return da(`${i}.${n}.${s}${a}${l}`,t)};Zr.exports=ma});var ie=E((lc,ri)=>{"use strict";var ti=he(),ga=(e,t,r)=>new ti(e,r).compare(new ti(t,r));ri.exports=ga});var bt=E((hc,ii)=>{"use strict";var pa=ie(),ba=(e,t,r)=>pa(e,t,r)>=0;ii.exports=ba});var si=E((cc,ni)=>{"use strict";var wt=class{constructor(){this.max=1e3,this.map=new Map}get(t){let r=this.map.get(t);if(r!==void 0)return this.map.delete(t),this.map.set(t,r),r}delete(t){return this.map.delete(t)}set(t,r){if(!this.delete(t)&&r!==void 0){if(this.map.size>=this.max){let n=this.map.keys().next().value;this.delete(n)}this.map.set(t,r)}return this}};ni.exports=wt});var oi=E((uc,ai)=>{"use strict";var wa=ie(),Ea=(e,t,r)=>wa(e,t,r)===0;ai.exports=Ea});var hi=E((fc,li)=>{"use strict";var va=ie(),ya=(e,t,r)=>va(e,t,r)!==0;li.exports=ya});var ui=E((dc,ci)=>{"use strict";var xa=ie(),_a=(e,t,r)=>xa(e,t,r)>0;ci.exports=_a});var di=E((mc,fi)=>{"use strict";var Aa=ie(),Pa=(e,t,r)=>Aa(e,t,r)<0;fi.exports=Pa});var gi=E((gc,mi)=>{"use strict";var Ca=ie(),$a=(e,t,r)=>Ca(e,t,r)<=0;mi.exports=$a});var bi=E((pc,pi)=>{"use strict";var Sa=oi(),Ia=hi(),Oa=ui(),Ra=bt(),ka=di(),ja=gi(),La=(e,t,r,i)=>{switch(t){case"===":return typeof e=="object"&&(e=e.version),typeof r=="object"&&(r=r.version),e===r;case"!==":return typeof e=="object"&&(e=e.version),typeof r=="object"&&(r=r.version),e!==r;case"":case"=":case"==":return Sa(e,r,i);case"!=":return Ia(e,r,i);case">":return Oa(e,r,i);case">=":return Ra(e,r,i);case"<":return ka(e,r,i);case"<=":return ja(e,r,i);default:throw new TypeError(`Invalid operator: ${t}`)}};pi.exports=La});var Ai=E((bc,_i)=>{"use strict";var Ee=Symbol("SemVer ANY"),yt=class e{static get ANY(){return Ee}constructor(t,r){if(r=wi(r),t instanceof e){if(t.loose===!!r.loose)return t;t=t.value}t=t.trim().split(/\s+/).join(" "),vt("comparator",t,r),this.options=r,this.loose=!!r.loose,this.parse(t),this.semver===Ee?this.value="":this.value=this.operator+this.semver.version,vt("comp",this)}parse(t){let r=this.options.loose?Ei[vi.COMPARATORLOOSE]:Ei[vi.COMPARATOR],i=t.match(r);if(!i)throw new TypeError(`Invalid comparator: ${t}`);this.operator=i[1]!==void 0?i[1]:"",this.operator==="="&&(this.operator=""),i[2]?this.semver=new yi(i[2],this.options.loose):this.semver=Ee}toString(){return this.value}test(t){if(vt("Comparator.test",t,this.options.loose),this.semver===Ee||t===Ee)return!0;if(typeof t=="string")try{t=new yi(t,this.options)}catch{return!1}return Et(t,this.operator,this.semver,this.options)}intersects(t,r){if(!(t instanceof e))throw new TypeError("a Comparator is required");return this.operator===""?this.value===""?!0:new xi(t.value,r).test(this.value):t.operator===""?t.value===""?!0:new xi(this.value,r).test(t.semver):(r=wi(r),r.includePrerelease&&(this.value==="<0.0.0-0"||t.value==="<0.0.0-0")||!r.includePrerelease&&(this.value.startsWith("<0.0.0")||t.value.startsWith("<0.0.0"))?!1:!!(this.operator.startsWith(">")&&t.operator.startsWith(">")||this.operator.startsWith("<")&&t.operator.startsWith("<")||this.semver.version===t.semver.version&&this.operator.includes("=")&&t.operator.includes("=")||Et(this.semver,"<",t.semver,r)&&this.operator.startsWith(">")&&t.operator.startsWith("<")||Et(this.semver,">",t.semver,r)&&this.operator.startsWith("<")&&t.operator.startsWith(">")))}};_i.exports=yt;var wi=Le(),{safeRe:Ei,t:vi}=we(),Et=bi(),vt=be(),yi=he(),xi=xt()});var xt=E((wc,Si)=>{"use strict";var Na=/\s+/g,_t=class e{constructor(t,r){if(r=Fa(r),t instanceof e)return t.loose===!!r.loose&&t.includePrerelease===!!r.includePrerelease?t:new e(t.raw,r);if(t instanceof At)return this.raw=t.value,this.set=[[t]],this.formatted=void 0,this;if(this.options=r,this.loose=!!r.loose,this.includePrerelease=!!r.includePrerelease,this.raw=t.trim().replace(Na," "),this.set=this.raw.split("||").map(i=>this.parseRange(i.trim())).filter(i=>i.length),!this.set.length)throw new TypeError(`Invalid SemVer Range: ${this.raw}`);if(this.set.length>1){let i=this.set[0];if(this.set=this.set.filter(n=>!Ci(n[0])),this.set.length===0)this.set=[i];else if(this.set.length>1){for(let n of this.set)if(n.length===1&&Ga(n[0])){this.set=[n];break}}}this.formatted=void 0}get range(){if(this.formatted===void 0){this.formatted="";for(let t=0;t<this.set.length;t++){t>0&&(this.formatted+="||");let r=this.set[t];for(let i=0;i<r.length;i++)i>0&&(this.formatted+=" "),this.formatted+=r[i].toString().trim()}}return this.formatted}format(){return this.range}toString(){return this.range}parseRange(t){let i=((this.options.includePrerelease&&Ba)|(this.options.loose&&Wa))+":"+t,n=Pi.get(i);if(n)return n;let s=this.options.loose,a=s?L[R.HYPHENRANGELOOSE]:L[R.HYPHENRANGE];t=t.replace(a,eo(this.options.includePrerelease)),P("hyphen replace",t),t=t.replace(L[R.COMPARATORTRIM],Da),P("comparator trim",t),t=t.replace(L[R.TILDETRIM],Ma),P("tilde trim",t),t=t.replace(L[R.CARETTRIM],Ha),P("caret trim",t);let l=t.split(" ").map(d=>Va(d,this.options)).join(" ").split(/\s+/).map(d=>Za(d,this.options));s&&(l=l.filter(d=>(P("loose invalid filter",d,this.options),!!d.match(L[R.COMPARATORLOOSE])))),P("range list",l);let c=new Map,f=l.map(d=>new At(d,this.options));for(let d of f){if(Ci(d))return[d];c.set(d.value,d)}c.size>1&&c.has("")&&c.delete("");let m=[...c.values()];return Pi.set(i,m),m}intersects(t,r){if(!(t instanceof e))throw new TypeError("a Range is required");return this.set.some(i=>$i(i,r)&&t.set.some(n=>$i(n,r)&&i.every(s=>n.every(a=>s.intersects(a,r)))))}test(t){if(!t)return!1;if(typeof t=="string")try{t=new qa(t,this.options)}catch{return!1}for(let r=0;r<this.set.length;r++)if(to(this.set[r],t,this.options))return!0;return!1}};Si.exports=_t;var Ta=si(),Pi=new Ta,Fa=Le(),At=Ai(),P=be(),qa=he(),{safeRe:L,t:R,comparatorTrimReplace:Da,tildeTrimReplace:Ma,caretTrimReplace:Ha}=we(),{FLAG_INCLUDE_PRERELEASE:Ba,FLAG_LOOSE:Wa}=je(),Ci=e=>e.value==="<0.0.0-0",Ga=e=>e.value==="",$i=(e,t)=>{let r=!0,i=e.slice(),n=i.pop();for(;r&&i.length;)r=i.every(s=>n.intersects(s,t)),n=i.pop();return r},Va=(e,t)=>(P("comp",e,t),e=Xa(e,t),P("caret",e),e=za(e,t),P("tildes",e),e=Ja(e,t),P("xrange",e),e=Ya(e,t),P("stars",e),e),k=e=>!e||e.toLowerCase()==="x"||e==="*",za=(e,t)=>e.trim().split(/\s+/).map(r=>Ua(r,t)).join(" "),Ua=(e,t)=>{let r=t.loose?L[R.TILDELOOSE]:L[R.TILDE];return e.replace(r,(i,n,s,a,l)=>{P("tilde",e,i,n,s,a,l);let c;return k(n)?c="":k(s)?c=`>=${n}.0.0 <${+n+1}.0.0-0`:k(a)?c=`>=${n}.${s}.0 <${n}.${+s+1}.0-0`:l?(P("replaceTilde pr",l),c=`>=${n}.${s}.${a}-${l} <${n}.${+s+1}.0-0`):c=`>=${n}.${s}.${a} <${n}.${+s+1}.0-0`,P("tilde return",c),c})},Xa=(e,t)=>e.trim().split(/\s+/).map(r=>Qa(r,t)).join(" "),Qa=(e,t)=>{P("caret",e,t);let r=t.loose?L[R.CARETLOOSE]:L[R.CARET],i=t.includePrerelease?"-0":"";return e.replace(r,(n,s,a,l,c)=>{P("caret",e,n,s,a,l,c);let f;return k(s)?f="":k(a)?f=`>=${s}.0.0${i} <${+s+1}.0.0-0`:k(l)?s==="0"?f=`>=${s}.${a}.0${i} <${s}.${+a+1}.0-0`:f=`>=${s}.${a}.0${i} <${+s+1}.0.0-0`:c?(P("replaceCaret pr",c),s==="0"?a==="0"?f=`>=${s}.${a}.${l}-${c} <${s}.${a}.${+l+1}-0`:f=`>=${s}.${a}.${l}-${c} <${s}.${+a+1}.0-0`:f=`>=${s}.${a}.${l}-${c} <${+s+1}.0.0-0`):(P("no pr"),s==="0"?a==="0"?f=`>=${s}.${a}.${l}${i} <${s}.${a}.${+l+1}-0`:f=`>=${s}.${a}.${l}${i} <${s}.${+a+1}.0-0`:f=`>=${s}.${a}.${l} <${+s+1}.0.0-0`),P("caret return",f),f})},Ja=(e,t)=>(P("replaceXRanges",e,t),e.split(/\s+/).map(r=>Ka(r,t)).join(" ")),Ka=(e,t)=>{e=e.trim();let r=t.loose?L[R.XRANGELOOSE]:L[R.XRANGE];return e.replace(r,(i,n,s,a,l,c)=>{P("xRange",e,i,n,s,a,l,c);let f=k(s),m=f||k(a),d=m||k(l),x=d;return n==="="&&x&&(n=""),c=t.includePrerelease?"-0":"",f?n===">"||n==="<"?i="<0.0.0-0":i="*":n&&x?(m&&(a=0),l=0,n===">"?(n=">=",m?(s=+s+1,a=0,l=0):(a=+a+1,l=0)):n==="<="&&(n="<",m?s=+s+1:a=+a+1),n==="<"&&(c="-0"),i=`${n+s}.${a}.${l}${c}`):m?i=`>=${s}.0.0${c} <${+s+1}.0.0-0`:d&&(i=`>=${s}.${a}.0${c} <${s}.${+a+1}.0-0`),P("xRange return",i),i})},Ya=(e,t)=>(P("replaceStars",e,t),e.trim().replace(L[R.STAR],"")),Za=(e,t)=>(P("replaceGTE0",e,t),e.trim().replace(L[t.includePrerelease?R.GTE0PRE:R.GTE0],"")),eo=e=>(t,r,i,n,s,a,l,c,f,m,d,x)=>(k(i)?r="":k(n)?r=`>=${i}.0.0${e?"-0":""}`:k(s)?r=`>=${i}.${n}.0${e?"-0":""}`:a?r=`>=${r}`:r=`>=${r}${e?"-0":""}`,k(f)?c="":k(m)?c=`<${+f+1}.0.0-0`:k(d)?c=`<${f}.${+m+1}.0-0`:x?c=`<=${f}.${m}.${d}-${x}`:e?c=`<${f}.${m}.${+d+1}-0`:c=`<=${c}`,`${r} ${c}`.trim()),to=(e,t,r)=>{for(let i=0;i<e.length;i++)if(!e[i].test(t))return!1;if(t.prerelease.length&&!r.includePrerelease){for(let i=0;i<e.length;i++)if(P(e[i].semver),e[i].semver!==At.ANY&&e[i].semver.prerelease.length>0){let n=e[i].semver;if(n.major===t.major&&n.minor===t.minor&&n.patch===t.patch)return!0}return!1}return!0}});var Oi=E((Ec,Ii)=>{"use strict";var ro=xt(),io=(e,t,r)=>{try{t=new ro(t,r)}catch{return!1}return t.test(e)};Ii.exports=io});var Pt=E((vc,no)=>{no.exports={name:"sharp",description:"High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP, GIF, AVIF and TIFF images",version:"0.34.3",author:"Lovell Fuller <npm@lovell.info>",homepage:"https://sharp.pixelplumbing.com",contributors:["Pierre Inglebert <pierre.inglebert@gmail.com>","Jonathan Ong <jonathanrichardong@gmail.com>","Chanon Sajjamanochai <chanon.s@gmail.com>","Juliano Julio <julianojulio@gmail.com>","Daniel Gasienica <daniel@gasienica.ch>","Julian Walker <julian@fiftythree.com>","Amit Pitaru <pitaru.amit@gmail.com>","Brandon Aaron <hello.brandon@aaron.sh>","Andreas Lind <andreas@one.com>","Maurus Cuelenaere <mcuelenaere@gmail.com>","Linus Unneb\xE4ck <linus@folkdatorn.se>","Victor Mateevitsi <mvictoras@gmail.com>","Alaric Holloway <alaric.holloway@gmail.com>","Bernhard K. Weisshuhn <bkw@codingforce.com>","Chris Riley <criley@primedia.com>","David Carley <dacarley@gmail.com>","John Tobin <john@limelightmobileinc.com>","Kenton Gray <kentongray@gmail.com>","Felix B\xFCnemann <Felix.Buenemann@gmail.com>","Samy Al Zahrani <samyalzahrany@gmail.com>","Chintan Thakkar <lemnisk8@gmail.com>","F. Orlando Galashan <frulo@gmx.de>","Kleis Auke Wolthuizen <info@kleisauke.nl>","Matt Hirsch <mhirsch@media.mit.edu>","Matthias Thoemmes <thoemmes@gmail.com>","Patrick Paskaris <patrick@paskaris.gr>","J\xE9r\xE9my Lal <kapouer@melix.org>","Rahul Nanwani <r.nanwani@gmail.com>","Alice Monday <alice0meta@gmail.com>","Kristo Jorgenson <kristo.jorgenson@gmail.com>","YvesBos <yves_bos@outlook.com>","Guy Maliar <guy@tailorbrands.com>","Nicolas Coden <nicolas@ncoden.fr>","Matt Parrish <matt.r.parrish@gmail.com>","Marcel Bretschneider <marcel.bretschneider@gmail.com>","Matthew McEachen <matthew+github@mceachen.org>","Jarda Kot\u011B\u0161ovec <jarda.kotesovec@gmail.com>","Kenric D'Souza <kenric.dsouza@gmail.com>","Oleh Aleinyk <oleg.aleynik@gmail.com>","Marcel Bretschneider <marcel.bretschneider@gmail.com>","Andrea Bianco <andrea.bianco@unibas.ch>","Rik Heywood <rik@rik.org>","Thomas Parisot <hi@oncletom.io>","Nathan Graves <nathanrgraves+github@gmail.com>","Tom Lokhorst <tom@lokhorst.eu>","Espen Hovlandsdal <espen@hovlandsdal.com>","Sylvain Dumont <sylvain.dumont35@gmail.com>","Alun Davies <alun.owain.davies@googlemail.com>","Aidan Hoolachan <ajhoolachan21@gmail.com>","Axel Eirola <axel.eirola@iki.fi>","Freezy <freezy@xbmc.org>","Daiz <taneli.vatanen@gmail.com>","Julian Aubourg <j@ubourg.net>","Keith Belovay <keith@picthrive.com>","Michael B. Klein <mbklein@gmail.com>","Jordan Prudhomme <jordan@raboland.fr>","Ilya Ovdin <iovdin@gmail.com>","Andargor <andargor@yahoo.com>","Paul Neave <paul.neave@gmail.com>","Brendan Kennedy <brenwken@gmail.com>","Brychan Bennett-Odlum <git@brychan.io>","Edward Silverton <e.silverton@gmail.com>","Roman Malieiev <aromaleev@gmail.com>","Tomas Szabo <tomas.szabo@deftomat.com>","Robert O'Rourke <robert@o-rourke.org>","Guillermo Alfonso Varela Chouci\xF1o <guillevch@gmail.com>","Christian Flintrup <chr@gigahost.dk>","Manan Jadhav <manan@motionden.com>","Leon Radley <leon@radley.se>","alza54 <alza54@thiocod.in>","Jacob Smith <jacob@frende.me>","Michael Nutt <michael@nutt.im>","Brad Parham <baparham@gmail.com>","Taneli Vatanen <taneli.vatanen@gmail.com>","Joris Dugu\xE9 <zaruike10@gmail.com>","Chris Banks <christopher.bradley.banks@gmail.com>","Ompal Singh <ompal.hitm09@gmail.com>","Brodan <christopher.hranj@gmail.com>","Ankur Parihar <ankur.github@gmail.com>","Brahim Ait elhaj <brahima@gmail.com>","Mart Jansink <m.jansink@gmail.com>","Lachlan Newman <lachnewman007@gmail.com>","Dennis Beatty <dennis@dcbeatty.com>","Ingvar Stepanyan <me@rreverser.com>","Don Denton <don@happycollision.com>"],scripts:{install:"node install/check.js",clean:"rm -rf src/build/ .nyc_output/ coverage/ test/fixtures/output.*",test:"npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types","test-lint":"semistandard && cpplint","test-unit":"nyc --reporter=lcov --reporter=text --check-coverage --branches=100 mocha","test-licensing":'license-checker --production --summary --onlyAllow="Apache-2.0;BSD;ISC;LGPL-3.0-or-later;MIT"',"test-leak":"./test/leak/leak.sh","test-types":"tsd","package-from-local-build":"node npm/from-local-build.js","docs-build":"node docs/build.mjs","docs-serve":"cd docs && npm start","docs-publish":"cd docs && npm run build && npx firebase-tools deploy --project pixelplumbing --only hosting:pixelplumbing-sharp"},type:"commonjs",main:"lib/index.js",types:"lib/index.d.ts",files:["install","lib","src/*.{cc,h,gyp}"],repository:{type:"git",url:"git://github.com/lovell/sharp.git"},keywords:["jpeg","png","webp","avif","tiff","gif","svg","jp2","dzi","image","resize","thumbnail","crop","embed","libvips","vips"],dependencies:{color:"^4.2.3","detect-libc":"^2.0.4",semver:"^7.7.2"},optionalDependencies:{"@img/sharp-darwin-arm64":"0.34.3","@img/sharp-darwin-x64":"0.34.3","@img/sharp-libvips-darwin-arm64":"1.2.0","@img/sharp-libvips-darwin-x64":"1.2.0","@img/sharp-libvips-linux-arm":"1.2.0","@img/sharp-libvips-linux-arm64":"1.2.0","@img/sharp-libvips-linux-ppc64":"1.2.0","@img/sharp-libvips-linux-s390x":"1.2.0","@img/sharp-libvips-linux-x64":"1.2.0","@img/sharp-libvips-linuxmusl-arm64":"1.2.0","@img/sharp-libvips-linuxmusl-x64":"1.2.0","@img/sharp-linux-arm":"0.34.3","@img/sharp-linux-arm64":"0.34.3","@img/sharp-linux-ppc64":"0.34.3","@img/sharp-linux-s390x":"0.34.3","@img/sharp-linux-x64":"0.34.3","@img/sharp-linuxmusl-arm64":"0.34.3","@img/sharp-linuxmusl-x64":"0.34.3","@img/sharp-wasm32":"0.34.3","@img/sharp-win32-arm64":"0.34.3","@img/sharp-win32-ia32":"0.34.3","@img/sharp-win32-x64":"0.34.3"},devDependencies:{"@emnapi/runtime":"^1.4.4","@img/sharp-libvips-dev":"1.2.0","@img/sharp-libvips-dev-wasm32":"1.2.0","@img/sharp-libvips-win32-arm64":"1.2.0","@img/sharp-libvips-win32-ia32":"1.2.0","@img/sharp-libvips-win32-x64":"1.2.0","@types/node":"*",cc:"^3.0.1",emnapi:"^1.4.4","exif-reader":"^2.0.2","extract-zip":"^2.0.1",icc:"^3.0.0","jsdoc-to-markdown":"^9.1.1","license-checker":"^25.0.1",mocha:"^11.7.1","node-addon-api":"^8.4.0","node-gyp":"^11.2.0",nyc:"^17.1.0",semistandard:"^17.0.0","tar-fs":"^3.1.0",tsd:"^0.32.0"},license:"Apache-2.0",engines:{node:"^18.17.0 || ^20.3.0 || >=21.0.0"},config:{libvips:">=8.17.1"},funding:{url:"https://opencollective.com/libvips"},semistandard:{env:["mocha"]},cc:{linelength:"120",filter:["build/include"]},nyc:{include:["lib"]},tsd:{directory:"test/types/"}}});var $t=E((yc,Mi)=>{"use strict";var{spawnSync:He}=require("node:child_process"),{createHash:so}=require("node:crypto"),Li=ei(),ao=bt(),oo=Oi(),Ri=ke(),{config:lo,engines:ki,optionalDependencies:ho}=Pt(),co=process.env.npm_package_config_libvips||lo.libvips,Ni=Li(co).version,uo=["darwin-arm64","darwin-x64","linux-arm","linux-arm64","linux-ppc64","linux-s390x","linux-x64","linuxmusl-arm64","linuxmusl-x64","win32-arm64","win32-ia32","win32-x64"],Be={encoding:"utf8",shell:!0},fo=e=>{e instanceof Error?console.error(`sharp: Installation error: ${e.message}`):console.log(`sharp: ${e}`)},Ti=()=>Ri.isNonGlibcLinuxSync()?Ri.familySync():"",mo=()=>`${process.platform}${Ti()}-${process.arch}`,ce=()=>{if(Fi())return"wasm32";let{npm_config_arch:e,npm_config_platform:t,npm_config_libc:r}=process.env,i=typeof r=="string"?r:Ti();return`${t||process.platform}${i}-${e||process.arch}`},go=()=>{try{return require(`@img/sharp-libvips-dev-${ce()}/include`)}catch{try{return require("@img/sharp-libvips-dev/include")}catch{}}return""},po=()=>{try{return require("@img/sharp-libvips-dev/cplusplus")}catch{}return""},bo=()=>{try{return require(`@img/sharp-libvips-dev-${ce()}/lib`)}catch{try{return require(`@img/sharp-libvips-${ce()}/lib`)}catch{}}return""},wo=()=>{if(process.release?.name==="node"&&process.versions&&!oo(process.versions.node,ki.node))return{found:process.versions.node,expected:ki.node}},Fi=()=>{let{CC:e}=process.env;return!!(e&&e.endsWith("/emcc"))},Eo=()=>process.platform==="darwin"&&process.arch==="x64"?(He("sysctl sysctl.proc_translated",Be).stdout||"").trim()==="sysctl.proc_translated: 1":!1,ji=e=>so("sha512").update(e).digest("hex"),vo=()=>{try{let e=ji(`imgsharp-libvips-${ce()}`),t=Li(ho[`@img/sharp-libvips-${ce()}`],{includePrerelease:!0}).version;return ji(`${e}npm:${t}`).slice(0,10)}catch{}return""},yo=()=>He(`node-gyp rebuild --directory=src ${Fi()?"--nodedir=emscripten":""}`,{...Be,stdio:"inherit"}).status,qi=()=>process.platform!=="win32"?(He("pkg-config --modversion vips-cpp",{...Be,env:{...process.env,PKG_CONFIG_PATH:Di()}}).stdout||"").trim():"",Di=()=>process.platform!=="win32"?[(He('which brew >/dev/null 2>&1 && brew environment --plain | grep PKG_CONFIG_LIBDIR | cut -d" " -f2',Be).stdout||"").trim(),process.env.PKG_CONFIG_PATH,"/usr/local/lib/pkgconfig","/usr/lib/pkgconfig","/usr/local/libdata/pkgconfig","/usr/libdata/pkgconfig"].filter(Boolean).join(":"):"",Ct=(e,t,r)=>(r&&r(`Detected ${t}, skipping search for globally-installed libvips`),e),xo=e=>{if(process.env.SHARP_IGNORE_GLOBAL_LIBVIPS)return Ct(!1,"SHARP_IGNORE_GLOBAL_LIBVIPS",e);if(process.env.SHARP_FORCE_GLOBAL_LIBVIPS)return Ct(!0,"SHARP_FORCE_GLOBAL_LIBVIPS",e);if(Eo())return Ct(!1,"Rosetta",e);let t=qi();return!!t&&ao(t,Ni)};Mi.exports={minimumLibvipsVersion:Ni,prebuiltPlatforms:uo,buildPlatformArch:ce,buildSharpLibvipsIncludeDir:go,buildSharpLibvipsCPlusPlusDir:po,buildSharpLibvipsLibDir:bo,isUnsupportedNodeRuntime:wo,runtimePlatformArch:mo,log:fo,yarnLocator:vo,spawnRebuild:yo,globalLibvipsVersion:qi,pkgConfigPath:Di,useGlobalLibvips:xo}});var ye=E((xc,Bi)=>{"use strict";var{familySync:_o,versionSync:Ao}=ke(),{runtimePlatformArch:Po,isUnsupportedNodeRuntime:Hi,prebuiltPlatforms:Co,minimumLibvipsVersion:$o}=$t(),ne=Po(),So=[`../src/build/Release/sharp-${ne}.node`,"../src/build/Release/sharp-wasm32.node",`@img/sharp-${ne}/sharp.node`,"@img/sharp-wasm32/sharp.node"],St,ue,ve=[];for(St of So)try{ue=require(St);break}catch(e){ve.push(e)}if(ue&&St.startsWith("@img/sharp-linux-x64")&&!ue._isUsingX64V2()){let e=new Error("Prebuilt binaries for linux-x64 require v2 microarchitecture");e.code="Unsupported CPU",ve.push(e),ue=null}if(ue)Bi.exports=ue;else{let[e,t,r]=["linux","darwin","win32"].map(s=>ne.startsWith(s)),i=[`Could not load the "sharp" module using the ${ne} runtime`];ve.forEach(s=>{s.code!=="MODULE_NOT_FOUND"&&i.push(`${s.code}: ${s.message}`)});let n=ve.map(s=>s.message).join(" ");if(i.push("Possible solutions:"),Hi()){let{found:s,expected:a}=Hi();i.push("- Please upgrade Node.js:",`    Found ${s}`,`    Requires ${a}`)}else if(Co.includes(ne)){let[s,a]=ne.split("-"),l=s.endsWith("musl")?" --libc=musl":"";i.push("- Ensure optional dependencies can be installed:","    npm install --include=optional sharp","- Ensure your package manager supports multi-platform installation:","    See https://sharp.pixelplumbing.com/install#cross-platform","- Add platform-specific dependencies:",`    npm install --os=${s.replace("musl","")}${l} --cpu=${a} sharp`)}else i.push(`- Manually install libvips >= ${$o}`,"- Add experimental WebAssembly-based dependencies:","    npm install --cpu=wasm32 sharp","    npm install @img/sharp-wasm32");if(e&&/(symbol not found|CXXABI_)/i.test(n))try{let{config:s}=require(`@img/sharp-libvips-${ne}/package`),a=`${_o()} ${Ao()}`,l=`${s.musl?"musl":"glibc"} ${s.musl||s.glibc}`;i.push("- Update your OS:",`    Found ${a}`,`    Requires ${l}`)}catch{}throw e&&/\/snap\/core[0-9]{2}/.test(n)&&i.push("- Remove the Node.js Snap, which does not support native modules","    snap remove node"),t&&/Incompatible library version/.test(n)&&i.push("- Update Homebrew:","    brew update && brew upgrade vips"),ve.some(s=>s.code==="ERR_DLOPEN_DISABLED")&&i.push("- Run Node.js without using the --no-addons flag"),r&&/The specified procedure could not be found/.test(n)&&i.push("- Using the canvas package on Windows?","    See https://sharp.pixelplumbing.com/install#canvas-and-windows","- Check for outdated versions of sharp in the dependency tree:","    npm ls sharp"),i.push("- Consult the installation documentation:","    See https://sharp.pixelplumbing.com/install"),new Error(i.join(`
-`))}});var Gi=E((_c,Wi)=>{"use strict";var Io=require("node:util"),It=require("node:stream"),Oo=B();ye();var Ro=Io.debuglog("sharp"),se=function(e,t){if(arguments.length===1&&!Oo.defined(e))throw new Error("Invalid input");return this instanceof se?(It.Duplex.call(this),this.options={topOffsetPre:-1,leftOffsetPre:-1,widthPre:-1,heightPre:-1,topOffsetPost:-1,leftOffsetPost:-1,widthPost:-1,heightPost:-1,width:-1,height:-1,canvas:"crop",position:0,resizeBackground:[0,0,0,255],angle:0,rotationAngle:0,rotationBackground:[0,0,0,255],rotateBeforePreExtract:!1,flip:!1,flop:!1,extendTop:0,extendBottom:0,extendLeft:0,extendRight:0,extendBackground:[0,0,0,255],extendWith:"background",withoutEnlargement:!1,withoutReduction:!1,affineMatrix:[],affineBackground:[0,0,0,255],affineIdx:0,affineIdy:0,affineOdx:0,affineOdy:0,affineInterpolator:this.constructor.interpolators.bilinear,kernel:"lanczos3",fastShrinkOnLoad:!0,tint:[-1,0,0,0],flatten:!1,flattenBackground:[0,0,0],unflatten:!1,negate:!1,negateAlpha:!0,medianSize:0,blurSigma:0,precision:"integer",minAmpl:.2,sharpenSigma:0,sharpenM1:1,sharpenM2:2,sharpenX1:2,sharpenY2:10,sharpenY3:20,threshold:0,thresholdGrayscale:!0,trimBackground:[],trimThreshold:-1,trimLineArt:!1,dilateWidth:0,erodeWidth:0,gamma:0,gammaOut:0,greyscale:!1,normalise:!1,normaliseLower:1,normaliseUpper:99,claheWidth:0,claheHeight:0,claheMaxSlope:3,brightness:1,saturation:1,hue:0,lightness:0,booleanBufferIn:null,booleanFileIn:"",joinChannelIn:[],extractChannel:-1,removeAlpha:!1,ensureAlpha:-1,colourspace:"srgb",colourspacePipeline:"last",composite:[],fileOut:"",formatOut:"input",streamOut:!1,keepMetadata:0,withMetadataOrientation:-1,withMetadataDensity:0,withIccProfile:"",withExif:{},withExifMerge:!0,withXmp:"",resolveWithObject:!1,loop:-1,delay:[],jpegQuality:80,jpegProgressive:!1,jpegChromaSubsampling:"4:2:0",jpegTrellisQuantisation:!1,jpegOvershootDeringing:!1,jpegOptimiseScans:!1,jpegOptimiseCoding:!0,jpegQuantisationTable:0,pngProgressive:!1,pngCompressionLevel:6,pngAdaptiveFiltering:!1,pngPalette:!1,pngQuality:100,pngEffort:7,pngBitdepth:8,pngDither:1,jp2Quality:80,jp2TileHeight:512,jp2TileWidth:512,jp2Lossless:!1,jp2ChromaSubsampling:"4:4:4",webpQuality:80,webpAlphaQuality:100,webpLossless:!1,webpNearLossless:!1,webpSmartSubsample:!1,webpSmartDeblock:!1,webpPreset:"default",webpEffort:4,webpMinSize:!1,webpMixed:!1,gifBitdepth:8,gifEffort:7,gifDither:1,gifInterFrameMaxError:0,gifInterPaletteMaxError:3,gifKeepDuplicateFrames:!1,gifReuse:!0,gifProgressive:!1,tiffQuality:80,tiffCompression:"jpeg",tiffPredictor:"horizontal",tiffPyramid:!1,tiffMiniswhite:!1,tiffBitdepth:8,tiffTile:!1,tiffTileHeight:256,tiffTileWidth:256,tiffXres:1,tiffYres:1,tiffResolutionUnit:"inch",heifQuality:50,heifLossless:!1,heifCompression:"av1",heifEffort:4,heifChromaSubsampling:"4:4:4",heifBitdepth:8,jxlDistance:1,jxlDecodingTier:0,jxlEffort:7,jxlLossless:!1,rawDepth:"uchar",tileSize:256,tileOverlap:0,tileContainer:"fs",tileLayout:"dz",tileFormat:"last",tileDepth:"last",tileAngle:0,tileSkipBlanks:-1,tileBackground:[255,255,255,255],tileCentre:!1,tileId:"https://example.com/iiif",tileBasename:"",timeoutSeconds:0,linearA:[],linearB:[],pdfBackground:[255,255,255,255],debuglog:r=>{this.emit("warning",r),Ro(r)},queueListener:function(r){se.queue.emit("change",r)}},this.options.input=this._createInputDescriptor(e,t,{allowStream:!0}),this):new se(e,t)};Object.setPrototypeOf(se.prototype,It.Duplex.prototype);Object.setPrototypeOf(se,It.Duplex);function ko(){let e=this.constructor.call(),{debuglog:t,queueListener:r,...i}=this.options;return e.options=structuredClone(i),e.options.debuglog=t,e.options.queueListener=r,this._isStreamInput()&&this.on("finish",()=>{this._flattenBufferIn(),e.options.input.buffer=this.options.input.buffer,e.emit("finish")}),e}Object.assign(se.prototype,{clone:ko});Wi.exports=se});var Ui=E((Ac,zi)=>{"use strict";var h=B(),Z=ye(),jo={left:"low",top:"low",low:"low",center:"centre",centre:"centre",right:"high",bottom:"high",high:"high"},Lo=["failOn","limitInputPixels","unlimited","animated","autoOrient","density","ignoreIcc","page","pages","sequentialRead","jp2","openSlide","pdf","raw","svg","tiff","failOnError","openSlideLevel","pdfBackground","tiffSubifd"];function Vi(e){let t=Lo.filter(r=>h.defined(e[r])).map(r=>[r,e[r]]);return t.length?Object.fromEntries(t):void 0}function No(e,t,r){let i={autoOrient:!1,failOn:"warning",limitInputPixels:Math.pow(16383,2),ignoreIcc:!1,unlimited:!1,sequentialRead:!0};if(h.string(e))i.file=e;else if(h.buffer(e)){if(e.length===0)throw Error("Input Buffer is empty");i.buffer=e}else if(h.arrayBuffer(e)){if(e.byteLength===0)throw Error("Input bit Array is empty");i.buffer=Buffer.from(e,0,e.byteLength)}else if(h.typedArray(e)){if(e.length===0)throw Error("Input Bit Array is empty");i.buffer=Buffer.from(e.buffer,e.byteOffset,e.byteLength)}else if(h.plainObject(e)&&!h.defined(t))t=e,Vi(t)&&(i.buffer=[]);else if(!h.defined(e)&&!h.defined(t)&&h.object(r)&&r.allowStream)i.buffer=[];else if(Array.isArray(e))if(e.length>1)if(!this.options.joining)this.options.joining=!0,this.options.join=e.map(n=>this._createInputDescriptor(n));else throw new Error("Recursive join is unsupported");else throw new Error("Expected at least two images to join");else throw new Error(`Unsupported input '${e}' of type ${typeof e}${h.defined(t)?` when also providing options of type ${typeof t}`:""}`);if(h.object(t)){if(h.defined(t.failOnError))if(h.bool(t.failOnError))i.failOn=t.failOnError?"warning":"none";else throw h.invalidParameterError("failOnError","boolean",t.failOnError);if(h.defined(t.failOn))if(h.string(t.failOn)&&h.inArray(t.failOn,["none","truncated","error","warning"]))i.failOn=t.failOn;else throw h.invalidParameterError("failOn","one of: none, truncated, error, warning",t.failOn);if(h.defined(t.autoOrient))if(h.bool(t.autoOrient))i.autoOrient=t.autoOrient;else throw h.invalidParameterError("autoOrient","boolean",t.autoOrient);if(h.defined(t.density))if(h.inRange(t.density,1,1e5))i.density=t.density;else throw h.invalidParameterError("density","number between 1 and 100000",t.density);if(h.defined(t.ignoreIcc))if(h.bool(t.ignoreIcc))i.ignoreIcc=t.ignoreIcc;else throw h.invalidParameterError("ignoreIcc","boolean",t.ignoreIcc);if(h.defined(t.limitInputPixels))if(h.bool(t.limitInputPixels))i.limitInputPixels=t.limitInputPixels?Math.pow(16383,2):0;else if(h.integer(t.limitInputPixels)&&h.inRange(t.limitInputPixels,0,Number.MAX_SAFE_INTEGER))i.limitInputPixels=t.limitInputPixels;else throw h.invalidParameterError("limitInputPixels","positive integer",t.limitInputPixels);if(h.defined(t.unlimited))if(h.bool(t.unlimited))i.unlimited=t.unlimited;else throw h.invalidParameterError("unlimited","boolean",t.unlimited);if(h.defined(t.sequentialRead))if(h.bool(t.sequentialRead))i.sequentialRead=t.sequentialRead;else throw h.invalidParameterError("sequentialRead","boolean",t.sequentialRead);if(h.defined(t.raw)){if(h.object(t.raw)&&h.integer(t.raw.width)&&t.raw.width>0&&h.integer(t.raw.height)&&t.raw.height>0&&h.integer(t.raw.channels)&&h.inRange(t.raw.channels,1,4))switch(i.rawWidth=t.raw.width,i.rawHeight=t.raw.height,i.rawChannels=t.raw.channels,e.constructor){case Uint8Array:case Uint8ClampedArray:i.rawDepth="uchar";break;case Int8Array:i.rawDepth="char";break;case Uint16Array:i.rawDepth="ushort";break;case Int16Array:i.rawDepth="short";break;case Uint32Array:i.rawDepth="uint";break;case Int32Array:i.rawDepth="int";break;case Float32Array:i.rawDepth="float";break;case Float64Array:i.rawDepth="double";break;default:i.rawDepth="uchar";break}else throw new Error("Expected width, height and channels for raw pixel input");if(i.rawPremultiplied=!1,h.defined(t.raw.premultiplied))if(h.bool(t.raw.premultiplied))i.rawPremultiplied=t.raw.premultiplied;else throw h.invalidParameterError("raw.premultiplied","boolean",t.raw.premultiplied);if(i.rawPageHeight=0,h.defined(t.raw.pageHeight))if(h.integer(t.raw.pageHeight)&&t.raw.pageHeight>0&&t.raw.pageHeight<=t.raw.height){if(t.raw.height%t.raw.pageHeight!==0)throw new Error(`Expected raw.height ${t.raw.height} to be a multiple of raw.pageHeight ${t.raw.pageHeight}`);i.rawPageHeight=t.raw.pageHeight}else throw h.invalidParameterError("raw.pageHeight","positive integer",t.raw.pageHeight)}if(h.defined(t.animated))if(h.bool(t.animated))i.pages=t.animated?-1:1;else throw h.invalidParameterError("animated","boolean",t.animated);if(h.defined(t.pages))if(h.integer(t.pages)&&h.inRange(t.pages,-1,1e5))i.pages=t.pages;else throw h.invalidParameterError("pages","integer between -1 and 100000",t.pages);if(h.defined(t.page))if(h.integer(t.page)&&h.inRange(t.page,0,1e5))i.page=t.page;else throw h.invalidParameterError("page","integer between 0 and 100000",t.page);if(h.object(t.openSlide)&&h.defined(t.openSlide.level))if(h.integer(t.openSlide.level)&&h.inRange(t.openSlide.level,0,256))i.openSlideLevel=t.openSlide.level;else throw h.invalidParameterError("openSlide.level","integer between 0 and 256",t.openSlide.level);else if(h.defined(t.level))if(h.integer(t.level)&&h.inRange(t.level,0,256))i.openSlideLevel=t.level;else throw h.invalidParameterError("level","integer between 0 and 256",t.level);if(h.object(t.tiff)&&h.defined(t.tiff.subifd))if(h.integer(t.tiff.subifd)&&h.inRange(t.tiff.subifd,-1,1e5))i.tiffSubifd=t.tiff.subifd;else throw h.invalidParameterError("tiff.subifd","integer between -1 and 100000",t.tiff.subifd);else if(h.defined(t.subifd))if(h.integer(t.subifd)&&h.inRange(t.subifd,-1,1e5))i.tiffSubifd=t.subifd;else throw h.invalidParameterError("subifd","integer between -1 and 100000",t.subifd);if(h.object(t.svg)){if(h.defined(t.svg.stylesheet))if(h.string(t.svg.stylesheet))i.svgStylesheet=t.svg.stylesheet;else throw h.invalidParameterError("svg.stylesheet","string",t.svg.stylesheet);if(h.defined(t.svg.highBitdepth))if(h.bool(t.svg.highBitdepth))i.svgHighBitdepth=t.svg.highBitdepth;else throw h.invalidParameterError("svg.highBitdepth","boolean",t.svg.highBitdepth)}if(h.object(t.pdf)&&h.defined(t.pdf.background)?i.pdfBackground=this._getBackgroundColourOption(t.pdf.background):h.defined(t.pdfBackground)&&(i.pdfBackground=this._getBackgroundColourOption(t.pdfBackground)),h.object(t.jp2)&&h.defined(t.jp2.oneshot))if(h.bool(t.jp2.oneshot))i.jp2Oneshot=t.jp2.oneshot;else throw h.invalidParameterError("jp2.oneshot","boolean",t.jp2.oneshot);if(h.defined(t.create))if(h.object(t.create)&&h.integer(t.create.width)&&t.create.width>0&&h.integer(t.create.height)&&t.create.height>0&&h.integer(t.create.channels)){if(i.createWidth=t.create.width,i.createHeight=t.create.height,i.createChannels=t.create.channels,i.createPageHeight=0,h.defined(t.create.pageHeight))if(h.integer(t.create.pageHeight)&&t.create.pageHeight>0&&t.create.pageHeight<=t.create.height){if(t.create.height%t.create.pageHeight!==0)throw new Error(`Expected create.height ${t.create.height} to be a multiple of create.pageHeight ${t.create.pageHeight}`);i.createPageHeight=t.create.pageHeight}else throw h.invalidParameterError("create.pageHeight","positive integer",t.create.pageHeight);if(h.defined(t.create.noise)){if(!h.object(t.create.noise))throw new Error("Expected noise to be an object");if(t.create.noise.type!=="gaussian")throw new Error("Only gaussian noise is supported at the moment");if(i.createNoiseType=t.create.noise.type,!h.inRange(t.create.channels,1,4))throw h.invalidParameterError("create.channels","number between 1 and 4",t.create.channels);if(i.createNoiseMean=128,h.defined(t.create.noise.mean))if(h.number(t.create.noise.mean)&&h.inRange(t.create.noise.mean,0,1e4))i.createNoiseMean=t.create.noise.mean;else throw h.invalidParameterError("create.noise.mean","number between 0 and 10000",t.create.noise.mean);if(i.createNoiseSigma=30,h.defined(t.create.noise.sigma))if(h.number(t.create.noise.sigma)&&h.inRange(t.create.noise.sigma,0,1e4))i.createNoiseSigma=t.create.noise.sigma;else throw h.invalidParameterError("create.noise.sigma","number between 0 and 10000",t.create.noise.sigma)}else if(h.defined(t.create.background)){if(!h.inRange(t.create.channels,3,4))throw h.invalidParameterError("create.channels","number between 3 and 4",t.create.channels);i.createBackground=this._getBackgroundColourOption(t.create.background)}else throw new Error("Expected valid noise or background to create a new input image");delete i.buffer}else throw new Error("Expected valid width, height and channels to create a new input image");if(h.defined(t.text))if(h.object(t.text)&&h.string(t.text.text)){if(i.textValue=t.text.text,h.defined(t.text.height)&&h.defined(t.text.dpi))throw new Error("Expected only one of dpi or height");if(h.defined(t.text.font))if(h.string(t.text.font))i.textFont=t.text.font;else throw h.invalidParameterError("text.font","string",t.text.font);if(h.defined(t.text.fontfile))if(h.string(t.text.fontfile))i.textFontfile=t.text.fontfile;else throw h.invalidParameterError("text.fontfile","string",t.text.fontfile);if(h.defined(t.text.width))if(h.integer(t.text.width)&&t.text.width>0)i.textWidth=t.text.width;else throw h.invalidParameterError("text.width","positive integer",t.text.width);if(h.defined(t.text.height))if(h.integer(t.text.height)&&t.text.height>0)i.textHeight=t.text.height;else throw h.invalidParameterError("text.height","positive integer",t.text.height);if(h.defined(t.text.align))if(h.string(t.text.align)&&h.string(this.constructor.align[t.text.align]))i.textAlign=this.constructor.align[t.text.align];else throw h.invalidParameterError("text.align","valid alignment",t.text.align);if(h.defined(t.text.justify))if(h.bool(t.text.justify))i.textJustify=t.text.justify;else throw h.invalidParameterError("text.justify","boolean",t.text.justify);if(h.defined(t.text.dpi))if(h.integer(t.text.dpi)&&h.inRange(t.text.dpi,1,1e6))i.textDpi=t.text.dpi;else throw h.invalidParameterError("text.dpi","integer between 1 and 1000000",t.text.dpi);if(h.defined(t.text.rgba))if(h.bool(t.text.rgba))i.textRgba=t.text.rgba;else throw h.invalidParameterError("text.rgba","bool",t.text.rgba);if(h.defined(t.text.spacing))if(h.integer(t.text.spacing)&&h.inRange(t.text.spacing,-1e6,1e6))i.textSpacing=t.text.spacing;else throw h.invalidParameterError("text.spacing","integer between -1000000 and 1000000",t.text.spacing);if(h.defined(t.text.wrap))if(h.string(t.text.wrap)&&h.inArray(t.text.wrap,["word","char","word-char","none"]))i.textWrap=t.text.wrap;else throw h.invalidParameterError("text.wrap","one of: word, char, word-char, none",t.text.wrap);delete i.buffer}else throw new Error("Expected a valid string to create an image with text.");if(h.defined(t.join))if(h.defined(this.options.join)){if(h.defined(t.join.animated))if(h.bool(t.join.animated))i.joinAnimated=t.join.animated;else throw h.invalidParameterError("join.animated","boolean",t.join.animated);if(h.defined(t.join.across))if(h.integer(t.join.across)&&h.inRange(t.join.across,1,1e6))i.joinAcross=t.join.across;else throw h.invalidParameterError("join.across","integer between 1 and 100000",t.join.across);if(h.defined(t.join.shim))if(h.integer(t.join.shim)&&h.inRange(t.join.shim,0,1e6))i.joinShim=t.join.shim;else throw h.invalidParameterError("join.shim","integer between 0 and 100000",t.join.shim);if(h.defined(t.join.background)&&(i.joinBackground=this._getBackgroundColourOption(t.join.background)),h.defined(t.join.halign))if(h.string(t.join.halign)&&h.string(this.constructor.align[t.join.halign]))i.joinHalign=this.constructor.align[t.join.halign];else throw h.invalidParameterError("join.halign","valid alignment",t.join.halign);if(h.defined(t.join.valign))if(h.string(t.join.valign)&&h.string(this.constructor.align[t.join.valign]))i.joinValign=this.constructor.align[t.join.valign];else throw h.invalidParameterError("join.valign","valid alignment",t.join.valign)}else throw new Error("Expected input to be an array of images to join")}else if(h.defined(t))throw new Error("Invalid input options "+t);return i}function To(e,t,r){Array.isArray(this.options.input.buffer)?h.buffer(e)?(this.options.input.buffer.length===0&&this.on("finish",()=>{this.streamInFinished=!0}),this.options.input.buffer.push(e),r()):r(new Error("Non-Buffer data on Writable Stream")):r(new Error("Unexpected data on Writable Stream"))}function Fo(){this._isStreamInput()&&(this.options.input.buffer=Buffer.concat(this.options.input.buffer))}function qo(){return Array.isArray(this.options.input.buffer)}function Do(e){let t=Error();return h.fn(e)?(this._isStreamInput()?this.on("finish",()=>{this._flattenBufferIn(),Z.metadata(this.options,(r,i)=>{r?e(h.nativeError(r,t)):e(null,i)})}):Z.metadata(this.options,(r,i)=>{r?e(h.nativeError(r,t)):e(null,i)}),this):this._isStreamInput()?new Promise((r,i)=>{let n=()=>{this._flattenBufferIn(),Z.metadata(this.options,(s,a)=>{s?i(h.nativeError(s,t)):r(a)})};this.writableFinished?n():this.once("finish",n)}):new Promise((r,i)=>{Z.metadata(this.options,(n,s)=>{n?i(h.nativeError(n,t)):r(s)})})}function Mo(e){let t=Error();return h.fn(e)?(this._isStreamInput()?this.on("finish",()=>{this._flattenBufferIn(),Z.stats(this.options,(r,i)=>{r?e(h.nativeError(r,t)):e(null,i)})}):Z.stats(this.options,(r,i)=>{r?e(h.nativeError(r,t)):e(null,i)}),this):this._isStreamInput()?new Promise((r,i)=>{this.on("finish",function(){this._flattenBufferIn(),Z.stats(this.options,(n,s)=>{n?i(h.nativeError(n,t)):r(s)})})}):new Promise((r,i)=>{Z.stats(this.options,(n,s)=>{n?i(h.nativeError(n,t)):r(s)})})}zi.exports=function(e){Object.assign(e.prototype,{_inputOptionsFromObject:Vi,_createInputDescriptor:No,_write:To,_flattenBufferIn:Fo,_isStreamInput:qo,metadata:Do,stats:Mo}),e.align=jo}});var Zi=E((Pc,Yi)=>{"use strict";var w=B(),Qi={center:0,centre:0,north:1,east:2,south:3,west:4,northeast:5,southeast:6,southwest:7,northwest:8},Ji={top:1,right:2,bottom:3,left:4,"right top":5,"right bottom":6,"left bottom":7,"left top":8},Xi={background:"background",copy:"copy",repeat:"repeat",mirror:"mirror"},Ki={entropy:16,attention:17},Ot={nearest:"nearest",linear:"linear",cubic:"cubic",mitchell:"mitchell",lanczos2:"lanczos2",lanczos3:"lanczos3",mks2013:"mks2013",mks2021:"mks2021"},Ho={contain:"contain",cover:"cover",fill:"fill",inside:"inside",outside:"outside"},Bo={contain:"embed",cover:"crop",fill:"ignore_aspect",inside:"max",outside:"min"};function Rt(e){return e.angle%360!==0||e.input.autoOrient===!0||e.rotationAngle!==0}function We(e){return e.width!==-1||e.height!==-1}function Wo(e,t,r){if(We(this.options)&&this.options.debuglog("ignoring previous resize options"),this.options.widthPost!==-1&&this.options.debuglog("operation order will be: extract, resize, extract"),w.defined(e))if(w.object(e)&&!w.defined(r))r=e;else if(w.integer(e)&&e>0)this.options.width=e;else throw w.invalidParameterError("width","positive integer",e);else this.options.width=-1;if(w.defined(t))if(w.integer(t)&&t>0)this.options.height=t;else throw w.invalidParameterError("height","positive integer",t);else this.options.height=-1;if(w.object(r)){if(w.defined(r.width))if(w.integer(r.width)&&r.width>0)this.options.width=r.width;else throw w.invalidParameterError("width","positive integer",r.width);if(w.defined(r.height))if(w.integer(r.height)&&r.height>0)this.options.height=r.height;else throw w.invalidParameterError("height","positive integer",r.height);if(w.defined(r.fit)){let i=Bo[r.fit];if(w.string(i))this.options.canvas=i;else throw w.invalidParameterError("fit","valid fit",r.fit)}if(w.defined(r.position)){let i=w.integer(r.position)?r.position:Ki[r.position]||Ji[r.position]||Qi[r.position];if(w.integer(i)&&(w.inRange(i,0,8)||w.inRange(i,16,17)))this.options.position=i;else throw w.invalidParameterError("position","valid position/gravity/strategy",r.position)}if(this._setBackgroundColourOption("resizeBackground",r.background),w.defined(r.kernel))if(w.string(Ot[r.kernel]))this.options.kernel=Ot[r.kernel];else throw w.invalidParameterError("kernel","valid kernel name",r.kernel);w.defined(r.withoutEnlargement)&&this._setBooleanOption("withoutEnlargement",r.withoutEnlargement),w.defined(r.withoutReduction)&&this._setBooleanOption("withoutReduction",r.withoutReduction),w.defined(r.fastShrinkOnLoad)&&this._setBooleanOption("fastShrinkOnLoad",r.fastShrinkOnLoad)}return Rt(this.options)&&We(this.options)&&(this.options.rotateBeforePreExtract=!0),this}function Go(e){if(w.integer(e)&&e>0)this.options.extendTop=e,this.options.extendBottom=e,this.options.extendLeft=e,this.options.extendRight=e;else if(w.object(e)){if(w.defined(e.top))if(w.integer(e.top)&&e.top>=0)this.options.extendTop=e.top;else throw w.invalidParameterError("top","positive integer",e.top);if(w.defined(e.bottom))if(w.integer(e.bottom)&&e.bottom>=0)this.options.extendBottom=e.bottom;else throw w.invalidParameterError("bottom","positive integer",e.bottom);if(w.defined(e.left))if(w.integer(e.left)&&e.left>=0)this.options.extendLeft=e.left;else throw w.invalidParameterError("left","positive integer",e.left);if(w.defined(e.right))if(w.integer(e.right)&&e.right>=0)this.options.extendRight=e.right;else throw w.invalidParameterError("right","positive integer",e.right);if(this._setBackgroundColourOption("extendBackground",e.background),w.defined(e.extendWith))if(w.string(Xi[e.extendWith]))this.options.extendWith=Xi[e.extendWith];else throw w.invalidParameterError("extendWith","one of: background, copy, repeat, mirror",e.extendWith)}else throw w.invalidParameterError("extend","integer or object",e);return this}function Vo(e){let t=We(this.options)||this.options.widthPre!==-1?"Post":"Pre";return this.options[`width${t}`]!==-1&&this.options.debuglog("ignoring previous extract options"),["left","top","width","height"].forEach(function(r){let i=e[r];if(w.integer(i)&&i>=0)this.options[r+(r==="left"||r==="top"?"Offset":"")+t]=i;else throw w.invalidParameterError(r,"integer",i)},this),Rt(this.options)&&!We(this.options)&&(this.options.widthPre===-1||this.options.widthPost===-1)&&(this.options.rotateBeforePreExtract=!0),this}function zo(e){if(this.options.trimThreshold=10,w.defined(e))if(w.object(e)){if(w.defined(e.background)&&this._setBackgroundColourOption("trimBackground",e.background),w.defined(e.threshold))if(w.number(e.threshold)&&e.threshold>=0)this.options.trimThreshold=e.threshold;else throw w.invalidParameterError("threshold","positive number",e.threshold);w.defined(e.lineArt)&&this._setBooleanOption("trimLineArt",e.lineArt)}else throw w.invalidParameterError("trim","object",e);return Rt(this.options)&&(this.options.rotateBeforePreExtract=!0),this}Yi.exports=function(e){Object.assign(e.prototype,{resize:Wo,extend:Go,extract:Vo,trim:zo}),e.gravity=Qi,e.strategy=Ki,e.kernel=Ot,e.fit=Ho,e.position=Ji}});var tn=E((Cc,en)=>{"use strict";var _=B(),kt={clear:"clear",source:"source",over:"over",in:"in",out:"out",atop:"atop",dest:"dest","dest-over":"dest-over","dest-in":"dest-in","dest-out":"dest-out","dest-atop":"dest-atop",xor:"xor",add:"add",saturate:"saturate",multiply:"multiply",screen:"screen",overlay:"overlay",darken:"darken",lighten:"lighten","colour-dodge":"colour-dodge","color-dodge":"colour-dodge","colour-burn":"colour-burn","color-burn":"colour-burn","hard-light":"hard-light","soft-light":"soft-light",difference:"difference",exclusion:"exclusion"};function Uo(e){if(!Array.isArray(e))throw _.invalidParameterError("images to composite","array",e);return this.options.composite=e.map(t=>{if(!_.object(t))throw _.invalidParameterError("image to composite","object",t);let r=this._inputOptionsFromObject(t),i={input:this._createInputDescriptor(t.input,r,{allowStream:!1}),blend:"over",tile:!1,left:0,top:0,hasOffset:!1,gravity:0,premultiplied:!1};if(_.defined(t.blend))if(_.string(kt[t.blend]))i.blend=kt[t.blend];else throw _.invalidParameterError("blend","valid blend name",t.blend);if(_.defined(t.tile))if(_.bool(t.tile))i.tile=t.tile;else throw _.invalidParameterError("tile","boolean",t.tile);if(_.defined(t.left))if(_.integer(t.left))i.left=t.left;else throw _.invalidParameterError("left","integer",t.left);if(_.defined(t.top))if(_.integer(t.top))i.top=t.top;else throw _.invalidParameterError("top","integer",t.top);if(_.defined(t.top)!==_.defined(t.left))throw new Error("Expected both left and top to be set");if(i.hasOffset=_.integer(t.top)&&_.integer(t.left),_.defined(t.gravity))if(_.integer(t.gravity)&&_.inRange(t.gravity,0,8))i.gravity=t.gravity;else if(_.string(t.gravity)&&_.integer(this.constructor.gravity[t.gravity]))i.gravity=this.constructor.gravity[t.gravity];else throw _.invalidParameterError("gravity","valid gravity",t.gravity);if(_.defined(t.premultiplied))if(_.bool(t.premultiplied))i.premultiplied=t.premultiplied;else throw _.invalidParameterError("premultiplied","boolean",t.premultiplied);return i}),this}en.exports=function(e){e.prototype.composite=Uo,e.blend=kt}});var on=E(($c,an)=>{"use strict";var u=B(),rn={integer:"integer",float:"float",approximate:"approximate"};function Xo(e,t){if(!u.defined(e))return this.autoOrient();if((this.options.angle||this.options.rotationAngle)&&(this.options.debuglog("ignoring previous rotate options"),this.options.angle=0,this.options.rotationAngle=0),u.integer(e)&&!(e%90))this.options.angle=e;else if(u.number(e))this.options.rotationAngle=e,u.object(t)&&t.background&&this._setBackgroundColourOption("rotationBackground",t.background);else throw u.invalidParameterError("angle","numeric",e);return this}function Qo(){return this.options.input.autoOrient=!0,this}function Jo(e){return this.options.flip=u.bool(e)?e:!0,this}function Ko(e){return this.options.flop=u.bool(e)?e:!0,this}function Yo(e,t){let r=[].concat(...e);if(r.length===4&&r.every(u.number))this.options.affineMatrix=r;else throw u.invalidParameterError("matrix","1x4 or 2x2 array",e);if(u.defined(t))if(u.object(t)){if(this._setBackgroundColourOption("affineBackground",t.background),u.defined(t.idx))if(u.number(t.idx))this.options.affineIdx=t.idx;else throw u.invalidParameterError("options.idx","number",t.idx);if(u.defined(t.idy))if(u.number(t.idy))this.options.affineIdy=t.idy;else throw u.invalidParameterError("options.idy","number",t.idy);if(u.defined(t.odx))if(u.number(t.odx))this.options.affineOdx=t.odx;else throw u.invalidParameterError("options.odx","number",t.odx);if(u.defined(t.ody))if(u.number(t.ody))this.options.affineOdy=t.ody;else throw u.invalidParameterError("options.ody","number",t.ody);if(u.defined(t.interpolator))if(u.inArray(t.interpolator,Object.values(this.constructor.interpolators)))this.options.affineInterpolator=t.interpolator;else throw u.invalidParameterError("options.interpolator","valid interpolator name",t.interpolator)}else throw u.invalidParameterError("options","object",t);return this}function Zo(e,t,r){if(!u.defined(e))this.options.sharpenSigma=-1;else if(u.bool(e))this.options.sharpenSigma=e?-1:0;else if(u.number(e)&&u.inRange(e,.01,1e4)){if(this.options.sharpenSigma=e,u.defined(t))if(u.number(t)&&u.inRange(t,0,1e4))this.options.sharpenM1=t;else throw u.invalidParameterError("flat","number between 0 and 10000",t);if(u.defined(r))if(u.number(r)&&u.inRange(r,0,1e4))this.options.sharpenM2=r;else throw u.invalidParameterError("jagged","number between 0 and 10000",r)}else if(u.plainObject(e)){if(u.number(e.sigma)&&u.inRange(e.sigma,1e-6,10))this.options.sharpenSigma=e.sigma;else throw u.invalidParameterError("options.sigma","number between 0.000001 and 10",e.sigma);if(u.defined(e.m1))if(u.number(e.m1)&&u.inRange(e.m1,0,1e6))this.options.sharpenM1=e.m1;else throw u.invalidParameterError("options.m1","number between 0 and 1000000",e.m1);if(u.defined(e.m2))if(u.number(e.m2)&&u.inRange(e.m2,0,1e6))this.options.sharpenM2=e.m2;else throw u.invalidParameterError("options.m2","number between 0 and 1000000",e.m2);if(u.defined(e.x1))if(u.number(e.x1)&&u.inRange(e.x1,0,1e6))this.options.sharpenX1=e.x1;else throw u.invalidParameterError("options.x1","number between 0 and 1000000",e.x1);if(u.defined(e.y2))if(u.number(e.y2)&&u.inRange(e.y2,0,1e6))this.options.sharpenY2=e.y2;else throw u.invalidParameterError("options.y2","number between 0 and 1000000",e.y2);if(u.defined(e.y3))if(u.number(e.y3)&&u.inRange(e.y3,0,1e6))this.options.sharpenY3=e.y3;else throw u.invalidParameterError("options.y3","number between 0 and 1000000",e.y3)}else throw u.invalidParameterError("sigma","number between 0.01 and 10000",e);return this}function el(e){if(!u.defined(e))this.options.medianSize=3;else if(u.integer(e)&&u.inRange(e,1,1e3))this.options.medianSize=e;else throw u.invalidParameterError("size","integer between 1 and 1000",e);return this}function tl(e){let t;if(u.number(e))t=e;else if(u.plainObject(e)){if(!u.number(e.sigma))throw u.invalidParameterError("options.sigma","number between 0.3 and 1000",t);if(t=e.sigma,"precision"in e)if(u.string(rn[e.precision]))this.options.precision=rn[e.precision];else throw u.invalidParameterError("precision","one of: integer, float, approximate",e.precision);if("minAmplitude"in e)if(u.number(e.minAmplitude)&&u.inRange(e.minAmplitude,.001,1))this.options.minAmpl=e.minAmplitude;else throw u.invalidParameterError("minAmplitude","number between 0.001 and 1",e.minAmplitude)}if(!u.defined(e))this.options.blurSigma=-1;else if(u.bool(e))this.options.blurSigma=e?-1:0;else if(u.number(t)&&u.inRange(t,.3,1e3))this.options.blurSigma=t;else throw u.invalidParameterError("sigma","number between 0.3 and 1000",t);return this}function nn(e){if(!u.defined(e))this.options.dilateWidth=1;else if(u.integer(e)&&e>0)this.options.dilateWidth=e;else throw u.invalidParameterError("dilate","positive integer",nn);return this}function sn(e){if(!u.defined(e))this.options.erodeWidth=1;else if(u.integer(e)&&e>0)this.options.erodeWidth=e;else throw u.invalidParameterError("erode","positive integer",sn);return this}function rl(e){return this.options.flatten=u.bool(e)?e:!0,u.object(e)&&this._setBackgroundColourOption("flattenBackground",e.background),this}function il(){return this.options.unflatten=!0,this}function nl(e,t){if(!u.defined(e))this.options.gamma=2.2;else if(u.number(e)&&u.inRange(e,1,3))this.options.gamma=e;else throw u.invalidParameterError("gamma","number between 1.0 and 3.0",e);if(!u.defined(t))this.options.gammaOut=this.options.gamma;else if(u.number(t)&&u.inRange(t,1,3))this.options.gammaOut=t;else throw u.invalidParameterError("gammaOut","number between 1.0 and 3.0",t);return this}function sl(e){if(this.options.negate=u.bool(e)?e:!0,u.plainObject(e)&&"alpha"in e)if(u.bool(e.alpha))this.options.negateAlpha=e.alpha;else throw u.invalidParameterError("alpha","should be boolean value",e.alpha);return this}function al(e){if(u.plainObject(e)){if(u.defined(e.lower))if(u.number(e.lower)&&u.inRange(e.lower,0,99))this.options.normaliseLower=e.lower;else throw u.invalidParameterError("lower","number between 0 and 99",e.lower);if(u.defined(e.upper))if(u.number(e.upper)&&u.inRange(e.upper,1,100))this.options.normaliseUpper=e.upper;else throw u.invalidParameterError("upper","number between 1 and 100",e.upper)}if(this.options.normaliseLower>=this.options.normaliseUpper)throw u.invalidParameterError("range","lower to be less than upper",`${this.options.normaliseLower} >= ${this.options.normaliseUpper}`);return this.options.normalise=!0,this}function ol(e){return this.normalise(e)}function ll(e){if(u.plainObject(e)){if(u.integer(e.width)&&e.width>0)this.options.claheWidth=e.width;else throw u.invalidParameterError("width","integer greater than zero",e.width);if(u.integer(e.height)&&e.height>0)this.options.claheHeight=e.height;else throw u.invalidParameterError("height","integer greater than zero",e.height);if(u.defined(e.maxSlope))if(u.integer(e.maxSlope)&&u.inRange(e.maxSlope,0,100))this.options.claheMaxSlope=e.maxSlope;else throw u.invalidParameterError("maxSlope","integer between 0 and 100",e.maxSlope)}else throw u.invalidParameterError("options","plain object",e);return this}function hl(e){if(!u.object(e)||!Array.isArray(e.kernel)||!u.integer(e.width)||!u.integer(e.height)||!u.inRange(e.width,3,1001)||!u.inRange(e.height,3,1001)||e.height*e.width!==e.kernel.length)throw new Error("Invalid convolution kernel");return u.integer(e.scale)||(e.scale=e.kernel.reduce(function(t,r){return t+r},0)),e.scale<1&&(e.scale=1),u.integer(e.offset)||(e.offset=0),this.options.convKernel=e,this}function cl(e,t){if(!u.defined(e))this.options.threshold=128;else if(u.bool(e))this.options.threshold=e?128:0;else if(u.integer(e)&&u.inRange(e,0,255))this.options.threshold=e;else throw u.invalidParameterError("threshold","integer between 0 and 255",e);return!u.object(t)||t.greyscale===!0||t.grayscale===!0?this.options.thresholdGrayscale=!0:this.options.thresholdGrayscale=!1,this}function ul(e,t,r){if(this.options.boolean=this._createInputDescriptor(e,r),u.string(t)&&u.inArray(t,["and","or","eor"]))this.options.booleanOp=t;else throw u.invalidParameterError("operator","one of: and, or, eor",t);return this}function fl(e,t){if(!u.defined(e)&&u.number(t)?e=1:u.number(e)&&!u.defined(t)&&(t=0),!u.defined(e))this.options.linearA=[];else if(u.number(e))this.options.linearA=[e];else if(Array.isArray(e)&&e.length&&e.every(u.number))this.options.linearA=e;else throw u.invalidParameterError("a","number or array of numbers",e);if(!u.defined(t))this.options.linearB=[];else if(u.number(t))this.options.linearB=[t];else if(Array.isArray(t)&&t.length&&t.every(u.number))this.options.linearB=t;else throw u.invalidParameterError("b","number or array of numbers",t);if(this.options.linearA.length!==this.options.linearB.length)throw new Error("Expected a and b to be arrays of the same length");return this}function dl(e){if(!Array.isArray(e))throw u.invalidParameterError("inputMatrix","array",e);if(e.length!==3&&e.length!==4)throw u.invalidParameterError("inputMatrix","3x3 or 4x4 array",e.length);let t=e.flat().map(Number);if(t.length!==9&&t.length!==16)throw u.invalidParameterError("inputMatrix","cardinality of 9 or 16",t.length);return this.options.recombMatrix=t,this}function ml(e){if(!u.plainObject(e))throw u.invalidParameterError("options","plain object",e);if("brightness"in e)if(u.number(e.brightness)&&e.brightness>=0)this.options.brightness=e.brightness;else throw u.invalidParameterError("brightness","number above zero",e.brightness);if("saturation"in e)if(u.number(e.saturation)&&e.saturation>=0)this.options.saturation=e.saturation;else throw u.invalidParameterError("saturation","number above zero",e.saturation);if("hue"in e)if(u.integer(e.hue))this.options.hue=e.hue%360;else throw u.invalidParameterError("hue","number",e.hue);if("lightness"in e)if(u.number(e.lightness))this.options.lightness=e.lightness;else throw u.invalidParameterError("lightness","number",e.lightness);return this}an.exports=function(e){Object.assign(e.prototype,{autoOrient:Qo,rotate:Xo,flip:Jo,flop:Ko,affine:Yo,sharpen:Zo,erode:sn,dilate:nn,median:el,blur:tl,flatten:rl,unflatten:il,gamma:nl,negate:sl,normalise:al,normalize:ol,clahe:ll,convolve:hl,threshold:cl,boolean:ul,linear:fl,recomb:dl,modulate:ml})}});var jt=E((Sc,ln)=>{"use strict";ln.exports={aliceblue:[240,248,255],antiquewhite:[250,235,215],aqua:[0,255,255],aquamarine:[127,255,212],azure:[240,255,255],beige:[245,245,220],bisque:[255,228,196],black:[0,0,0],blanchedalmond:[255,235,205],blue:[0,0,255],blueviolet:[138,43,226],brown:[165,42,42],burlywood:[222,184,135],cadetblue:[95,158,160],chartreuse:[127,255,0],chocolate:[210,105,30],coral:[255,127,80],cornflowerblue:[100,149,237],cornsilk:[255,248,220],crimson:[220,20,60],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgoldenrod:[184,134,11],darkgray:[169,169,169],darkgreen:[0,100,0],darkgrey:[169,169,169],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkseagreen:[143,188,143],darkslateblue:[72,61,139],darkslategray:[47,79,79],darkslategrey:[47,79,79],darkturquoise:[0,206,209],darkviolet:[148,0,211],deeppink:[255,20,147],deepskyblue:[0,191,255],dimgray:[105,105,105],dimgrey:[105,105,105],dodgerblue:[30,144,255],firebrick:[178,34,34],floralwhite:[255,250,240],forestgreen:[34,139,34],fuchsia:[255,0,255],gainsboro:[220,220,220],ghostwhite:[248,248,255],gold:[255,215,0],goldenrod:[218,165,32],gray:[128,128,128],green:[0,128,0],greenyellow:[173,255,47],grey:[128,128,128],honeydew:[240,255,240],hotpink:[255,105,180],indianred:[205,92,92],indigo:[75,0,130],ivory:[255,255,240],khaki:[240,230,140],lavender:[230,230,250],lavenderblush:[255,240,245],lawngreen:[124,252,0],lemonchiffon:[255,250,205],lightblue:[173,216,230],lightcoral:[240,128,128],lightcyan:[224,255,255],lightgoldenrodyellow:[250,250,210],lightgray:[211,211,211],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightsalmon:[255,160,122],lightseagreen:[32,178,170],lightskyblue:[135,206,250],lightslategray:[119,136,153],lightslategrey:[119,136,153],lightsteelblue:[176,196,222],lightyellow:[255,255,224],lime:[0,255,0],limegreen:[50,205,50],linen:[250,240,230],magenta:[255,0,255],maroon:[128,0,0],mediumaquamarine:[102,205,170],mediumblue:[0,0,205],mediumorchid:[186,85,211],mediumpurple:[147,112,219],mediumseagreen:[60,179,113],mediumslateblue:[123,104,238],mediumspringgreen:[0,250,154],mediumturquoise:[72,209,204],mediumvioletred:[199,21,133],midnightblue:[25,25,112],mintcream:[245,255,250],mistyrose:[255,228,225],moccasin:[255,228,181],navajowhite:[255,222,173],navy:[0,0,128],oldlace:[253,245,230],olive:[128,128,0],olivedrab:[107,142,35],orange:[255,165,0],orangered:[255,69,0],orchid:[218,112,214],palegoldenrod:[238,232,170],palegreen:[152,251,152],paleturquoise:[175,238,238],palevioletred:[219,112,147],papayawhip:[255,239,213],peachpuff:[255,218,185],peru:[205,133,63],pink:[255,192,203],plum:[221,160,221],powderblue:[176,224,230],purple:[128,0,128],rebeccapurple:[102,51,153],red:[255,0,0],rosybrown:[188,143,143],royalblue:[65,105,225],saddlebrown:[139,69,19],salmon:[250,128,114],sandybrown:[244,164,96],seagreen:[46,139,87],seashell:[255,245,238],sienna:[160,82,45],silver:[192,192,192],skyblue:[135,206,235],slateblue:[106,90,205],slategray:[112,128,144],slategrey:[112,128,144],snow:[255,250,250],springgreen:[0,255,127],steelblue:[70,130,180],tan:[210,180,140],teal:[0,128,128],thistle:[216,191,216],tomato:[255,99,71],turquoise:[64,224,208],violet:[238,130,238],wheat:[245,222,179],white:[255,255,255],whitesmoke:[245,245,245],yellow:[255,255,0],yellowgreen:[154,205,50]}});var cn=E((Ic,hn)=>{hn.exports=function(t){return!t||typeof t=="string"?!1:t instanceof Array||Array.isArray(t)||t.length>=0&&(t.splice instanceof Function||Object.getOwnPropertyDescriptor(t,t.length-1)&&t.constructor.name!=="String")}});var dn=E((Oc,fn)=>{"use strict";var gl=cn(),pl=Array.prototype.concat,bl=Array.prototype.slice,un=fn.exports=function(t){for(var r=[],i=0,n=t.length;i<n;i++){var s=t[i];gl(s)?r=pl.call(r,bl.call(s)):r.push(s)}return r};un.wrap=function(e){return function(){return e(un(arguments))}}});var bn=E((Rc,pn)=>{var xe=jt(),_e=dn(),mn=Object.hasOwnProperty,gn=Object.create(null);for(Ge in xe)mn.call(xe,Ge)&&(gn[xe[Ge]]=Ge);var Ge,T=pn.exports={to:{},get:{}};T.get=function(e){var t=e.substring(0,3).toLowerCase(),r,i;switch(t){case"hsl":r=T.get.hsl(e),i="hsl";break;case"hwb":r=T.get.hwb(e),i="hwb";break;default:r=T.get.rgb(e),i="rgb";break}return r?{model:i,value:r}:null};T.get.rgb=function(e){if(!e)return null;var t=/^#([a-f0-9]{3,4})$/i,r=/^#([a-f0-9]{6})([a-f0-9]{2})?$/i,i=/^rgba?\(\s*([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/,n=/^rgba?\(\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/,s=/^(\w+)$/,a=[0,0,0,1],l,c,f;if(l=e.match(r)){for(f=l[2],l=l[1],c=0;c<3;c++){var m=c*2;a[c]=parseInt(l.slice(m,m+2),16)}f&&(a[3]=parseInt(f,16)/255)}else if(l=e.match(t)){for(l=l[1],f=l[3],c=0;c<3;c++)a[c]=parseInt(l[c]+l[c],16);f&&(a[3]=parseInt(f+f,16)/255)}else if(l=e.match(i)){for(c=0;c<3;c++)a[c]=parseInt(l[c+1],0);l[4]&&(l[5]?a[3]=parseFloat(l[4])*.01:a[3]=parseFloat(l[4]))}else if(l=e.match(n)){for(c=0;c<3;c++)a[c]=Math.round(parseFloat(l[c+1])*2.55);l[4]&&(l[5]?a[3]=parseFloat(l[4])*.01:a[3]=parseFloat(l[4]))}else return(l=e.match(s))?l[1]==="transparent"?[0,0,0,0]:mn.call(xe,l[1])?(a=xe[l[1]],a[3]=1,a):null:null;for(c=0;c<3;c++)a[c]=ee(a[c],0,255);return a[3]=ee(a[3],0,1),a};T.get.hsl=function(e){if(!e)return null;var t=/^hsla?\(\s*([+-]?(?:\d{0,3}\.)?\d+)(?:deg)?\s*,?\s*([+-]?[\d\.]+)%\s*,?\s*([+-]?[\d\.]+)%\s*(?:[,|\/]\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,r=e.match(t);if(r){var i=parseFloat(r[4]),n=(parseFloat(r[1])%360+360)%360,s=ee(parseFloat(r[2]),0,100),a=ee(parseFloat(r[3]),0,100),l=ee(isNaN(i)?1:i,0,1);return[n,s,a,l]}return null};T.get.hwb=function(e){if(!e)return null;var t=/^hwb\(\s*([+-]?\d{0,3}(?:\.\d+)?)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/,r=e.match(t);if(r){var i=parseFloat(r[4]),n=(parseFloat(r[1])%360+360)%360,s=ee(parseFloat(r[2]),0,100),a=ee(parseFloat(r[3]),0,100),l=ee(isNaN(i)?1:i,0,1);return[n,s,a,l]}return null};T.to.hex=function(){var e=_e(arguments);return"#"+Ve(e[0])+Ve(e[1])+Ve(e[2])+(e[3]<1?Ve(Math.round(e[3]*255)):"")};T.to.rgb=function(){var e=_e(arguments);return e.length<4||e[3]===1?"rgb("+Math.round(e[0])+", "+Math.round(e[1])+", "+Math.round(e[2])+")":"rgba("+Math.round(e[0])+", "+Math.round(e[1])+", "+Math.round(e[2])+", "+e[3]+")"};T.to.rgb.percent=function(){var e=_e(arguments),t=Math.round(e[0]/255*100),r=Math.round(e[1]/255*100),i=Math.round(e[2]/255*100);return e.length<4||e[3]===1?"rgb("+t+"%, "+r+"%, "+i+"%)":"rgba("+t+"%, "+r+"%, "+i+"%, "+e[3]+")"};T.to.hsl=function(){var e=_e(arguments);return e.length<4||e[3]===1?"hsl("+e[0]+", "+e[1]+"%, "+e[2]+"%)":"hsla("+e[0]+", "+e[1]+"%, "+e[2]+"%, "+e[3]+")"};T.to.hwb=function(){var e=_e(arguments),t="";return e.length>=4&&e[3]!==1&&(t=", "+e[3]),"hwb("+e[0]+", "+e[1]+"%, "+e[2]+"%"+t+")"};T.to.keyword=function(e){return gn[e.slice(0,3)]};function ee(e,t,r){return Math.min(Math.max(t,e),r)}function Ve(e){var t=Math.round(e).toString(16).toUpperCase();return t.length<2?"0"+t:t}});var Lt=E((kc,En)=>{var Ae=jt(),wn={};for(let e of Object.keys(Ae))wn[Ae[e]]=e;var b={rgb:{channels:3,labels:"rgb"},hsl:{channels:3,labels:"hsl"},hsv:{channels:3,labels:"hsv"},hwb:{channels:3,labels:"hwb"},cmyk:{channels:4,labels:"cmyk"},xyz:{channels:3,labels:"xyz"},lab:{channels:3,labels:"lab"},lch:{channels:3,labels:"lch"},hex:{channels:1,labels:["hex"]},keyword:{channels:1,labels:["keyword"]},ansi16:{channels:1,labels:["ansi16"]},ansi256:{channels:1,labels:["ansi256"]},hcg:{channels:3,labels:["h","c","g"]},apple:{channels:3,labels:["r16","g16","b16"]},gray:{channels:1,labels:["gray"]}};En.exports=b;for(let e of Object.keys(b)){if(!("channels"in b[e]))throw new Error("missing channels property: "+e);if(!("labels"in b[e]))throw new Error("missing channel labels property: "+e);if(b[e].labels.length!==b[e].channels)throw new Error("channel and label counts mismatch: "+e);let{channels:t,labels:r}=b[e];delete b[e].channels,delete b[e].labels,Object.defineProperty(b[e],"channels",{value:t}),Object.defineProperty(b[e],"labels",{value:r})}b.rgb.hsl=function(e){let t=e[0]/255,r=e[1]/255,i=e[2]/255,n=Math.min(t,r,i),s=Math.max(t,r,i),a=s-n,l,c;s===n?l=0:t===s?l=(r-i)/a:r===s?l=2+(i-t)/a:i===s&&(l=4+(t-r)/a),l=Math.min(l*60,360),l<0&&(l+=360);let f=(n+s)/2;return s===n?c=0:f<=.5?c=a/(s+n):c=a/(2-s-n),[l,c*100,f*100]};b.rgb.hsv=function(e){let t,r,i,n,s,a=e[0]/255,l=e[1]/255,c=e[2]/255,f=Math.max(a,l,c),m=f-Math.min(a,l,c),d=function(x){return(f-x)/6/m+1/2};return m===0?(n=0,s=0):(s=m/f,t=d(a),r=d(l),i=d(c),a===f?n=i-r:l===f?n=1/3+t-i:c===f&&(n=2/3+r-t),n<0?n+=1:n>1&&(n-=1)),[n*360,s*100,f*100]};b.rgb.hwb=function(e){let t=e[0],r=e[1],i=e[2],n=b.rgb.hsl(e)[0],s=1/255*Math.min(t,Math.min(r,i));return i=1-1/255*Math.max(t,Math.max(r,i)),[n,s*100,i*100]};b.rgb.cmyk=function(e){let t=e[0]/255,r=e[1]/255,i=e[2]/255,n=Math.min(1-t,1-r,1-i),s=(1-t-n)/(1-n)||0,a=(1-r-n)/(1-n)||0,l=(1-i-n)/(1-n)||0;return[s*100,a*100,l*100,n*100]};function wl(e,t){return(e[0]-t[0])**2+(e[1]-t[1])**2+(e[2]-t[2])**2}b.rgb.keyword=function(e){let t=wn[e];if(t)return t;let r=1/0,i;for(let n of Object.keys(Ae)){let s=Ae[n],a=wl(e,s);a<r&&(r=a,i=n)}return i};b.keyword.rgb=function(e){return Ae[e]};b.rgb.xyz=function(e){let t=e[0]/255,r=e[1]/255,i=e[2]/255;t=t>.04045?((t+.055)/1.055)**2.4:t/12.92,r=r>.04045?((r+.055)/1.055)**2.4:r/12.92,i=i>.04045?((i+.055)/1.055)**2.4:i/12.92;let n=t*.4124+r*.3576+i*.1805,s=t*.2126+r*.7152+i*.0722,a=t*.0193+r*.1192+i*.9505;return[n*100,s*100,a*100]};b.rgb.lab=function(e){let t=b.rgb.xyz(e),r=t[0],i=t[1],n=t[2];r/=95.047,i/=100,n/=108.883,r=r>.008856?r**(1/3):7.787*r+16/116,i=i>.008856?i**(1/3):7.787*i+16/116,n=n>.008856?n**(1/3):7.787*n+16/116;let s=116*i-16,a=500*(r-i),l=200*(i-n);return[s,a,l]};b.hsl.rgb=function(e){let t=e[0]/360,r=e[1]/100,i=e[2]/100,n,s,a;if(r===0)return a=i*255,[a,a,a];i<.5?n=i*(1+r):n=i+r-i*r;let l=2*i-n,c=[0,0,0];for(let f=0;f<3;f++)s=t+1/3*-(f-1),s<0&&s++,s>1&&s--,6*s<1?a=l+(n-l)*6*s:2*s<1?a=n:3*s<2?a=l+(n-l)*(2/3-s)*6:a=l,c[f]=a*255;return c};b.hsl.hsv=function(e){let t=e[0],r=e[1]/100,i=e[2]/100,n=r,s=Math.max(i,.01);i*=2,r*=i<=1?i:2-i,n*=s<=1?s:2-s;let a=(i+r)/2,l=i===0?2*n/(s+n):2*r/(i+r);return[t,l*100,a*100]};b.hsv.rgb=function(e){let t=e[0]/60,r=e[1]/100,i=e[2]/100,n=Math.floor(t)%6,s=t-Math.floor(t),a=255*i*(1-r),l=255*i*(1-r*s),c=255*i*(1-r*(1-s));switch(i*=255,n){case 0:return[i,c,a];case 1:return[l,i,a];case 2:return[a,i,c];case 3:return[a,l,i];case 4:return[c,a,i];case 5:return[i,a,l]}};b.hsv.hsl=function(e){let t=e[0],r=e[1]/100,i=e[2]/100,n=Math.max(i,.01),s,a;a=(2-r)*i;let l=(2-r)*n;return s=r*n,s/=l<=1?l:2-l,s=s||0,a/=2,[t,s*100,a*100]};b.hwb.rgb=function(e){let t=e[0]/360,r=e[1]/100,i=e[2]/100,n=r+i,s;n>1&&(r/=n,i/=n);let a=Math.floor(6*t),l=1-i;s=6*t-a,(a&1)!==0&&(s=1-s);let c=r+s*(l-r),f,m,d;switch(a){default:case 6:case 0:f=l,m=c,d=r;break;case 1:f=c,m=l,d=r;break;case 2:f=r,m=l,d=c;break;case 3:f=r,m=c,d=l;break;case 4:f=c,m=r,d=l;break;case 5:f=l,m=r,d=c;break}return[f*255,m*255,d*255]};b.cmyk.rgb=function(e){let t=e[0]/100,r=e[1]/100,i=e[2]/100,n=e[3]/100,s=1-Math.min(1,t*(1-n)+n),a=1-Math.min(1,r*(1-n)+n),l=1-Math.min(1,i*(1-n)+n);return[s*255,a*255,l*255]};b.xyz.rgb=function(e){let t=e[0]/100,r=e[1]/100,i=e[2]/100,n,s,a;return n=t*3.2406+r*-1.5372+i*-.4986,s=t*-.9689+r*1.8758+i*.0415,a=t*.0557+r*-.204+i*1.057,n=n>.0031308?1.055*n**(1/2.4)-.055:n*12.92,s=s>.0031308?1.055*s**(1/2.4)-.055:s*12.92,a=a>.0031308?1.055*a**(1/2.4)-.055:a*12.92,n=Math.min(Math.max(0,n),1),s=Math.min(Math.max(0,s),1),a=Math.min(Math.max(0,a),1),[n*255,s*255,a*255]};b.xyz.lab=function(e){let t=e[0],r=e[1],i=e[2];t/=95.047,r/=100,i/=108.883,t=t>.008856?t**(1/3):7.787*t+16/116,r=r>.008856?r**(1/3):7.787*r+16/116,i=i>.008856?i**(1/3):7.787*i+16/116;let n=116*r-16,s=500*(t-r),a=200*(r-i);return[n,s,a]};b.lab.xyz=function(e){let t=e[0],r=e[1],i=e[2],n,s,a;s=(t+16)/116,n=r/500+s,a=s-i/200;let l=s**3,c=n**3,f=a**3;return s=l>.008856?l:(s-16/116)/7.787,n=c>.008856?c:(n-16/116)/7.787,a=f>.008856?f:(a-16/116)/7.787,n*=95.047,s*=100,a*=108.883,[n,s,a]};b.lab.lch=function(e){let t=e[0],r=e[1],i=e[2],n;n=Math.atan2(i,r)*360/2/Math.PI,n<0&&(n+=360);let a=Math.sqrt(r*r+i*i);return[t,a,n]};b.lch.lab=function(e){let t=e[0],r=e[1],n=e[2]/360*2*Math.PI,s=r*Math.cos(n),a=r*Math.sin(n);return[t,s,a]};b.rgb.ansi16=function(e,t=null){let[r,i,n]=e,s=t===null?b.rgb.hsv(e)[2]:t;if(s=Math.round(s/50),s===0)return 30;let a=30+(Math.round(n/255)<<2|Math.round(i/255)<<1|Math.round(r/255));return s===2&&(a+=60),a};b.hsv.ansi16=function(e){return b.rgb.ansi16(b.hsv.rgb(e),e[2])};b.rgb.ansi256=function(e){let t=e[0],r=e[1],i=e[2];return t===r&&r===i?t<8?16:t>248?231:Math.round((t-8)/247*24)+232:16+36*Math.round(t/255*5)+6*Math.round(r/255*5)+Math.round(i/255*5)};b.ansi16.rgb=function(e){let t=e%10;if(t===0||t===7)return e>50&&(t+=3.5),t=t/10.5*255,[t,t,t];let r=(~~(e>50)+1)*.5,i=(t&1)*r*255,n=(t>>1&1)*r*255,s=(t>>2&1)*r*255;return[i,n,s]};b.ansi256.rgb=function(e){if(e>=232){let s=(e-232)*10+8;return[s,s,s]}e-=16;let t,r=Math.floor(e/36)/5*255,i=Math.floor((t=e%36)/6)/5*255,n=t%6/5*255;return[r,i,n]};b.rgb.hex=function(e){let r=(((Math.round(e[0])&255)<<16)+((Math.round(e[1])&255)<<8)+(Math.round(e[2])&255)).toString(16).toUpperCase();return"000000".substring(r.length)+r};b.hex.rgb=function(e){let t=e.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);if(!t)return[0,0,0];let r=t[0];t[0].length===3&&(r=r.split("").map(l=>l+l).join(""));let i=parseInt(r,16),n=i>>16&255,s=i>>8&255,a=i&255;return[n,s,a]};b.rgb.hcg=function(e){let t=e[0]/255,r=e[1]/255,i=e[2]/255,n=Math.max(Math.max(t,r),i),s=Math.min(Math.min(t,r),i),a=n-s,l,c;return a<1?l=s/(1-a):l=0,a<=0?c=0:n===t?c=(r-i)/a%6:n===r?c=2+(i-t)/a:c=4+(t-r)/a,c/=6,c%=1,[c*360,a*100,l*100]};b.hsl.hcg=function(e){let t=e[1]/100,r=e[2]/100,i=r<.5?2*t*r:2*t*(1-r),n=0;return i<1&&(n=(r-.5*i)/(1-i)),[e[0],i*100,n*100]};b.hsv.hcg=function(e){let t=e[1]/100,r=e[2]/100,i=t*r,n=0;return i<1&&(n=(r-i)/(1-i)),[e[0],i*100,n*100]};b.hcg.rgb=function(e){let t=e[0]/360,r=e[1]/100,i=e[2]/100;if(r===0)return[i*255,i*255,i*255];let n=[0,0,0],s=t%1*6,a=s%1,l=1-a,c=0;switch(Math.floor(s)){case 0:n[0]=1,n[1]=a,n[2]=0;break;case 1:n[0]=l,n[1]=1,n[2]=0;break;case 2:n[0]=0,n[1]=1,n[2]=a;break;case 3:n[0]=0,n[1]=l,n[2]=1;break;case 4:n[0]=a,n[1]=0,n[2]=1;break;default:n[0]=1,n[1]=0,n[2]=l}return c=(1-r)*i,[(r*n[0]+c)*255,(r*n[1]+c)*255,(r*n[2]+c)*255]};b.hcg.hsv=function(e){let t=e[1]/100,r=e[2]/100,i=t+r*(1-t),n=0;return i>0&&(n=t/i),[e[0],n*100,i*100]};b.hcg.hsl=function(e){let t=e[1]/100,i=e[2]/100*(1-t)+.5*t,n=0;return i>0&&i<.5?n=t/(2*i):i>=.5&&i<1&&(n=t/(2*(1-i))),[e[0],n*100,i*100]};b.hcg.hwb=function(e){let t=e[1]/100,r=e[2]/100,i=t+r*(1-t);return[e[0],(i-t)*100,(1-i)*100]};b.hwb.hcg=function(e){let t=e[1]/100,i=1-e[2]/100,n=i-t,s=0;return n<1&&(s=(i-n)/(1-n)),[e[0],n*100,s*100]};b.apple.rgb=function(e){return[e[0]/65535*255,e[1]/65535*255,e[2]/65535*255]};b.rgb.apple=function(e){return[e[0]/255*65535,e[1]/255*65535,e[2]/255*65535]};b.gray.rgb=function(e){return[e[0]/100*255,e[0]/100*255,e[0]/100*255]};b.gray.hsl=function(e){return[0,0,e[0]]};b.gray.hsv=b.gray.hsl;b.gray.hwb=function(e){return[0,100,e[0]]};b.gray.cmyk=function(e){return[0,0,0,e[0]]};b.gray.lab=function(e){return[e[0],0,0]};b.gray.hex=function(e){let t=Math.round(e[0]/100*255)&255,i=((t<<16)+(t<<8)+t).toString(16).toUpperCase();return"000000".substring(i.length)+i};b.rgb.gray=function(e){return[(e[0]+e[1]+e[2])/3/255*100]}});var yn=E((jc,vn)=>{var ze=Lt();function El(){let e={},t=Object.keys(ze);for(let r=t.length,i=0;i<r;i++)e[t[i]]={distance:-1,parent:null};return e}function vl(e){let t=El(),r=[e];for(t[e].distance=0;r.length;){let i=r.pop(),n=Object.keys(ze[i]);for(let s=n.length,a=0;a<s;a++){let l=n[a],c=t[l];c.distance===-1&&(c.distance=t[i].distance+1,c.parent=i,r.unshift(l))}}return t}function yl(e,t){return function(r){return t(e(r))}}function xl(e,t){let r=[t[e].parent,e],i=ze[t[e].parent][e],n=t[e].parent;for(;t[n].parent;)r.unshift(t[n].parent),i=yl(ze[t[n].parent][n],i),n=t[n].parent;return i.conversion=r,i}vn.exports=function(e){let t=vl(e),r={},i=Object.keys(t);for(let n=i.length,s=0;s<n;s++){let a=i[s];t[a].parent!==null&&(r[a]=xl(a,t))}return r}});var _n=E((Lc,xn)=>{var Nt=Lt(),_l=yn(),fe={},Al=Object.keys(Nt);function Pl(e){let t=function(...r){let i=r[0];return i==null?i:(i.length>1&&(r=i),e(r))};return"conversion"in e&&(t.conversion=e.conversion),t}function Cl(e){let t=function(...r){let i=r[0];if(i==null)return i;i.length>1&&(r=i);let n=e(r);if(typeof n=="object")for(let s=n.length,a=0;a<s;a++)n[a]=Math.round(n[a]);return n};return"conversion"in e&&(t.conversion=e.conversion),t}Al.forEach(e=>{fe[e]={},Object.defineProperty(fe[e],"channels",{value:Nt[e].channels}),Object.defineProperty(fe[e],"labels",{value:Nt[e].labels});let t=_l(e);Object.keys(t).forEach(i=>{let n=t[i];fe[e][i]=Cl(n),fe[e][i].raw=Pl(n)})});xn.exports=fe});var Cn=E((Nc,Pn)=>{var de=bn(),F=_n(),An=["keyword","gray","hex"],Tt={};for(let e of Object.keys(F))Tt[[...F[e].labels].sort().join("")]=e;var Ue={};function O(e,t){if(!(this instanceof O))return new O(e,t);if(t&&t in An&&(t=null),t&&!(t in F))throw new Error("Unknown model: "+t);let r,i;if(e==null)this.model="rgb",this.color=[0,0,0],this.valpha=1;else if(e instanceof O)this.model=e.model,this.color=[...e.color],this.valpha=e.valpha;else if(typeof e=="string"){let n=de.get(e);if(n===null)throw new Error("Unable to parse color from string: "+e);this.model=n.model,i=F[this.model].channels,this.color=n.value.slice(0,i),this.valpha=typeof n.value[i]=="number"?n.value[i]:1}else if(e.length>0){this.model=t||"rgb",i=F[this.model].channels;let n=Array.prototype.slice.call(e,0,i);this.color=Ft(n,i),this.valpha=typeof e[i]=="number"?e[i]:1}else if(typeof e=="number")this.model="rgb",this.color=[e>>16&255,e>>8&255,e&255],this.valpha=1;else{this.valpha=1;let n=Object.keys(e);"alpha"in e&&(n.splice(n.indexOf("alpha"),1),this.valpha=typeof e.alpha=="number"?e.alpha:0);let s=n.sort().join("");if(!(s in Tt))throw new Error("Unable to parse color from object: "+JSON.stringify(e));this.model=Tt[s];let{labels:a}=F[this.model],l=[];for(r=0;r<a.length;r++)l.push(e[a[r]]);this.color=Ft(l)}if(Ue[this.model])for(i=F[this.model].channels,r=0;r<i;r++){let n=Ue[this.model][r];n&&(this.color[r]=n(this.color[r]))}this.valpha=Math.max(0,Math.min(1,this.valpha)),Object.freeze&&Object.freeze(this)}O.prototype={toString(){return this.string()},toJSON(){return this[this.model]()},string(e){let t=this.model in de.to?this:this.rgb();t=t.round(typeof e=="number"?e:1);let r=t.valpha===1?t.color:[...t.color,this.valpha];return de.to[t.model](r)},percentString(e){let t=this.rgb().round(typeof e=="number"?e:1),r=t.valpha===1?t.color:[...t.color,this.valpha];return de.to.rgb.percent(r)},array(){return this.valpha===1?[...this.color]:[...this.color,this.valpha]},object(){let e={},{channels:t}=F[this.model],{labels:r}=F[this.model];for(let i=0;i<t;i++)e[r[i]]=this.color[i];return this.valpha!==1&&(e.alpha=this.valpha),e},unitArray(){let e=this.rgb().color;return e[0]/=255,e[1]/=255,e[2]/=255,this.valpha!==1&&e.push(this.valpha),e},unitObject(){let e=this.rgb().object();return e.r/=255,e.g/=255,e.b/=255,this.valpha!==1&&(e.alpha=this.valpha),e},round(e){return e=Math.max(e||0,0),new O([...this.color.map(Sl(e)),this.valpha],this.model)},alpha(e){return e!==void 0?new O([...this.color,Math.max(0,Math.min(1,e))],this.model):this.valpha},red:C("rgb",0,S(255)),green:C("rgb",1,S(255)),blue:C("rgb",2,S(255)),hue:C(["hsl","hsv","hsl","hwb","hcg"],0,e=>(e%360+360)%360),saturationl:C("hsl",1,S(100)),lightness:C("hsl",2,S(100)),saturationv:C("hsv",1,S(100)),value:C("hsv",2,S(100)),chroma:C("hcg",1,S(100)),gray:C("hcg",2,S(100)),white:C("hwb",1,S(100)),wblack:C("hwb",2,S(100)),cyan:C("cmyk",0,S(100)),magenta:C("cmyk",1,S(100)),yellow:C("cmyk",2,S(100)),black:C("cmyk",3,S(100)),x:C("xyz",0,S(95.047)),y:C("xyz",1,S(100)),z:C("xyz",2,S(108.833)),l:C("lab",0,S(100)),a:C("lab",1),b:C("lab",2),keyword(e){return e!==void 0?new O(e):F[this.model].keyword(this.color)},hex(e){return e!==void 0?new O(e):de.to.hex(this.rgb().round().color)},hexa(e){if(e!==void 0)return new O(e);let t=this.rgb().round().color,r=Math.round(this.valpha*255).toString(16).toUpperCase();return r.length===1&&(r="0"+r),de.to.hex(t)+r},rgbNumber(){let e=this.rgb().color;return(e[0]&255)<<16|(e[1]&255)<<8|e[2]&255},luminosity(){let e=this.rgb().color,t=[];for(let[r,i]of e.entries()){let n=i/255;t[r]=n<=.04045?n/12.92:((n+.055)/1.055)**2.4}return .2126*t[0]+.7152*t[1]+.0722*t[2]},contrast(e){let t=this.luminosity(),r=e.luminosity();return t>r?(t+.05)/(r+.05):(r+.05)/(t+.05)},level(e){let t=this.contrast(e);return t>=7?"AAA":t>=4.5?"AA":""},isDark(){let e=this.rgb().color;return(e[0]*2126+e[1]*7152+e[2]*722)/1e4<128},isLight(){return!this.isDark()},negate(){let e=this.rgb();for(let t=0;t<3;t++)e.color[t]=255-e.color[t];return e},lighten(e){let t=this.hsl();return t.color[2]+=t.color[2]*e,t},darken(e){let t=this.hsl();return t.color[2]-=t.color[2]*e,t},saturate(e){let t=this.hsl();return t.color[1]+=t.color[1]*e,t},desaturate(e){let t=this.hsl();return t.color[1]-=t.color[1]*e,t},whiten(e){let t=this.hwb();return t.color[1]+=t.color[1]*e,t},blacken(e){let t=this.hwb();return t.color[2]+=t.color[2]*e,t},grayscale(){let e=this.rgb().color,t=e[0]*.3+e[1]*.59+e[2]*.11;return O.rgb(t,t,t)},fade(e){return this.alpha(this.valpha-this.valpha*e)},opaquer(e){return this.alpha(this.valpha+this.valpha*e)},rotate(e){let t=this.hsl(),r=t.color[0];return r=(r+e)%360,r=r<0?360+r:r,t.color[0]=r,t},mix(e,t){if(!e||!e.rgb)throw new Error('Argument to "mix" was not a Color instance, but rather an instance of '+typeof e);let r=e.rgb(),i=this.rgb(),n=t===void 0?.5:t,s=2*n-1,a=r.alpha()-i.alpha(),l=((s*a===-1?s:(s+a)/(1+s*a))+1)/2,c=1-l;return O.rgb(l*r.red()+c*i.red(),l*r.green()+c*i.green(),l*r.blue()+c*i.blue(),r.alpha()*n+i.alpha()*(1-n))}};for(let e of Object.keys(F)){if(An.includes(e))continue;let{channels:t}=F[e];O.prototype[e]=function(...r){return this.model===e?new O(this):r.length>0?new O(r,e):new O([...Il(F[this.model][e].raw(this.color)),this.valpha],e)},O[e]=function(...r){let i=r[0];return typeof i=="number"&&(i=Ft(r,t)),new O(i,e)}}function $l(e,t){return Number(e.toFixed(t))}function Sl(e){return function(t){return $l(t,e)}}function C(e,t,r){e=Array.isArray(e)?e:[e];for(let i of e)(Ue[i]||(Ue[i]=[]))[t]=r;return e=e[0],function(i){let n;return i!==void 0?(r&&(i=r(i)),n=this[e](),n.color[t]=i,n):(n=this[e]().color[t],r&&(n=r(n)),n)}}function S(e){return function(t){return Math.max(0,Math.min(e,t))}}function Il(e){return Array.isArray(e)?e:[e]}function Ft(e,t){for(let r=0;r<t;r++)typeof e[r]!="number"&&(e[r]=0);return e}Pn.exports=O});var On=E((Tc,In)=>{"use strict";var Ol=Cn(),Q=B(),$n={multiband:"multiband","b-w":"b-w",bw:"b-w",cmyk:"cmyk",srgb:"srgb"};function Rl(e){return this._setBackgroundColourOption("tint",e),this}function kl(e){return this.options.greyscale=Q.bool(e)?e:!0,this}function jl(e){return this.greyscale(e)}function Ll(e){if(!Q.string(e))throw Q.invalidParameterError("colourspace","string",e);return this.options.colourspacePipeline=e,this}function Nl(e){return this.pipelineColourspace(e)}function Tl(e){if(!Q.string(e))throw Q.invalidParameterError("colourspace","string",e);return this.options.colourspace=e,this}function Fl(e){return this.toColourspace(e)}function Sn(e){if(Q.object(e)||Q.string(e)){let t=Ol(e);return[t.red(),t.green(),t.blue(),Math.round(t.alpha()*255)]}else throw Q.invalidParameterError("background","object or string",e)}function ql(e,t){Q.defined(t)&&(this.options[e]=Sn(t))}In.exports=function(e){Object.assign(e.prototype,{tint:Rl,greyscale:kl,grayscale:jl,pipelineColourspace:Ll,pipelineColorspace:Nl,toColourspace:Tl,toColorspace:Fl,_getBackgroundColourOption:Sn,_setBackgroundColourOption:ql}),e.colourspace=$n,e.colorspace=$n}});var kn=E((Fc,Rn)=>{"use strict";var z=B(),Dl={and:"and",or:"or",eor:"eor"};function Ml(){return this.options.removeAlpha=!0,this}function Hl(e){if(z.defined(e))if(z.number(e)&&z.inRange(e,0,1))this.options.ensureAlpha=e;else throw z.invalidParameterError("alpha","number between 0 and 1",e);else this.options.ensureAlpha=1;return this}function Bl(e){let t={red:0,green:1,blue:2,alpha:3};if(Object.keys(t).includes(e)&&(e=t[e]),z.integer(e)&&z.inRange(e,0,4))this.options.extractChannel=e;else throw z.invalidParameterError("channel","integer or one of: red, green, blue, alpha",e);return this}function Wl(e,t){return Array.isArray(e)?e.forEach(function(r){this.options.joinChannelIn.push(this._createInputDescriptor(r,t))},this):this.options.joinChannelIn.push(this._createInputDescriptor(e,t)),this}function Gl(e){if(z.string(e)&&z.inArray(e,["and","or","eor"]))this.options.bandBoolOp=e;else throw z.invalidParameterError("boolOp","one of: and, or, eor",e);return this}Rn.exports=function(e){Object.assign(e.prototype,{removeAlpha:Ml,ensureAlpha:Hl,extractChannel:Bl,joinChannel:Wl,bandbool:Gl}),e.bool=Dl}});var Fn=E((qc,Tn)=>{"use strict";var qt=require("node:path"),o=B(),me=ye(),jn=new Map([["heic","heif"],["heif","heif"],["avif","avif"],["jpeg","jpeg"],["jpg","jpeg"],["jpe","jpeg"],["tile","tile"],["dz","tile"],["png","png"],["raw","raw"],["tiff","tiff"],["tif","tiff"],["webp","webp"],["gif","gif"],["jp2","jp2"],["jpx","jp2"],["j2k","jp2"],["j2c","jp2"],["jxl","jxl"]]),Vl=/\.(jp[2x]|j2[kc])$/i,Ln=()=>new Error("JP2 output requires libvips with support for OpenJPEG"),Nn=e=>1<<31-Math.clz32(Math.ceil(Math.log2(e)));function zl(e,t){let r;if(o.string(e)?o.string(this.options.input.file)&&qt.resolve(this.options.input.file)===qt.resolve(e)?r=new Error("Cannot use same file for input and output"):Vl.test(qt.extname(e))&&!this.constructor.format.jp2k.output.file&&(r=Ln()):r=new Error("Missing output file path"),r)if(o.fn(t))t(r);else return Promise.reject(r);else{this.options.fileOut=e;let i=Error();return this._pipeline(t,i)}return this}function Ul(e,t){o.object(e)?this._setBooleanOption("resolveWithObject",e.resolveWithObject):this.options.resolveWithObject&&(this.options.resolveWithObject=!1),this.options.fileOut="";let r=Error();return this._pipeline(o.fn(e)?e:t,r)}function Xl(){return this.options.keepMetadata|=1,this}function Ql(e){if(o.object(e))for(let[t,r]of Object.entries(e))if(o.object(r))for(let[i,n]of Object.entries(r))if(o.string(n))this.options.withExif[`exif-${t.toLowerCase()}-${i}`]=n;else throw o.invalidParameterError(`${t}.${i}`,"string",n);else throw o.invalidParameterError(t,"object",r);else throw o.invalidParameterError("exif","object",e);return this.options.withExifMerge=!1,this.keepExif()}function Jl(e){return this.withExif(e),this.options.withExifMerge=!0,this}function Kl(){return this.options.keepMetadata|=8,this}function Yl(e,t){if(o.string(e))this.options.withIccProfile=e;else throw o.invalidParameterError("icc","string",e);if(this.keepIccProfile(),o.object(t)&&o.defined(t.attach))if(o.bool(t.attach))t.attach||(this.options.keepMetadata&=-9);else throw o.invalidParameterError("attach","boolean",t.attach);return this}function Zl(){return this.options.keepMetadata|=2,this}function eh(e){if(o.string(e)&&e.length>0)this.options.withXmp=e,this.options.keepMetadata|=2;else throw o.invalidParameterError("xmp","non-empty string",e);return this}function th(){return this.options.keepMetadata=31,this}function rh(e){if(this.keepMetadata(),this.withIccProfile("srgb"),o.object(e)){if(o.defined(e.orientation))if(o.integer(e.orientation)&&o.inRange(e.orientation,1,8))this.options.withMetadataOrientation=e.orientation;else throw o.invalidParameterError("orientation","integer between 1 and 8",e.orientation);if(o.defined(e.density))if(o.number(e.density)&&e.density>0)this.options.withMetadataDensity=e.density;else throw o.invalidParameterError("density","positive number",e.density);o.defined(e.icc)&&this.withIccProfile(e.icc),o.defined(e.exif)&&this.withExifMerge(e.exif)}return this}function ih(e,t){let r=jn.get((o.object(e)&&o.string(e.id)?e.id:e).toLowerCase());if(!r)throw o.invalidParameterError("format",`one of: ${[...jn.keys()].join(", ")}`,e);return this[r](t)}function nh(e){if(o.object(e)){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.jpegQuality=e.quality;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);if(o.defined(e.progressive)&&this._setBooleanOption("jpegProgressive",e.progressive),o.defined(e.chromaSubsampling))if(o.string(e.chromaSubsampling)&&o.inArray(e.chromaSubsampling,["4:2:0","4:4:4"]))this.options.jpegChromaSubsampling=e.chromaSubsampling;else throw o.invalidParameterError("chromaSubsampling","one of: 4:2:0, 4:4:4",e.chromaSubsampling);let t=o.bool(e.optimizeCoding)?e.optimizeCoding:e.optimiseCoding;if(o.defined(t)&&this._setBooleanOption("jpegOptimiseCoding",t),o.defined(e.mozjpeg))if(o.bool(e.mozjpeg))e.mozjpeg&&(this.options.jpegTrellisQuantisation=!0,this.options.jpegOvershootDeringing=!0,this.options.jpegOptimiseScans=!0,this.options.jpegProgressive=!0,this.options.jpegQuantisationTable=3);else throw o.invalidParameterError("mozjpeg","boolean",e.mozjpeg);let r=o.bool(e.trellisQuantization)?e.trellisQuantization:e.trellisQuantisation;o.defined(r)&&this._setBooleanOption("jpegTrellisQuantisation",r),o.defined(e.overshootDeringing)&&this._setBooleanOption("jpegOvershootDeringing",e.overshootDeringing);let i=o.bool(e.optimizeScans)?e.optimizeScans:e.optimiseScans;o.defined(i)&&(this._setBooleanOption("jpegOptimiseScans",i),i&&(this.options.jpegProgressive=!0));let n=o.number(e.quantizationTable)?e.quantizationTable:e.quantisationTable;if(o.defined(n))if(o.integer(n)&&o.inRange(n,0,8))this.options.jpegQuantisationTable=n;else throw o.invalidParameterError("quantisationTable","integer between 0 and 8",n)}return this._updateFormatOut("jpeg",e)}function sh(e){if(o.object(e)){if(o.defined(e.progressive)&&this._setBooleanOption("pngProgressive",e.progressive),o.defined(e.compressionLevel))if(o.integer(e.compressionLevel)&&o.inRange(e.compressionLevel,0,9))this.options.pngCompressionLevel=e.compressionLevel;else throw o.invalidParameterError("compressionLevel","integer between 0 and 9",e.compressionLevel);o.defined(e.adaptiveFiltering)&&this._setBooleanOption("pngAdaptiveFiltering",e.adaptiveFiltering);let t=e.colours||e.colors;if(o.defined(t))if(o.integer(t)&&o.inRange(t,2,256))this.options.pngBitdepth=Nn(t);else throw o.invalidParameterError("colours","integer between 2 and 256",t);if(o.defined(e.palette)?this._setBooleanOption("pngPalette",e.palette):[e.quality,e.effort,e.colours,e.colors,e.dither].some(o.defined)&&this._setBooleanOption("pngPalette",!0),this.options.pngPalette){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,0,100))this.options.pngQuality=e.quality;else throw o.invalidParameterError("quality","integer between 0 and 100",e.quality);if(o.defined(e.effort))if(o.integer(e.effort)&&o.inRange(e.effort,1,10))this.options.pngEffort=e.effort;else throw o.invalidParameterError("effort","integer between 1 and 10",e.effort);if(o.defined(e.dither))if(o.number(e.dither)&&o.inRange(e.dither,0,1))this.options.pngDither=e.dither;else throw o.invalidParameterError("dither","number between 0.0 and 1.0",e.dither)}}return this._updateFormatOut("png",e)}function ah(e){if(o.object(e)){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.webpQuality=e.quality;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);if(o.defined(e.alphaQuality))if(o.integer(e.alphaQuality)&&o.inRange(e.alphaQuality,0,100))this.options.webpAlphaQuality=e.alphaQuality;else throw o.invalidParameterError("alphaQuality","integer between 0 and 100",e.alphaQuality);if(o.defined(e.lossless)&&this._setBooleanOption("webpLossless",e.lossless),o.defined(e.nearLossless)&&this._setBooleanOption("webpNearLossless",e.nearLossless),o.defined(e.smartSubsample)&&this._setBooleanOption("webpSmartSubsample",e.smartSubsample),o.defined(e.smartDeblock)&&this._setBooleanOption("webpSmartDeblock",e.smartDeblock),o.defined(e.preset))if(o.string(e.preset)&&o.inArray(e.preset,["default","photo","picture","drawing","icon","text"]))this.options.webpPreset=e.preset;else throw o.invalidParameterError("preset","one of: default, photo, picture, drawing, icon, text",e.preset);if(o.defined(e.effort))if(o.integer(e.effort)&&o.inRange(e.effort,0,6))this.options.webpEffort=e.effort;else throw o.invalidParameterError("effort","integer between 0 and 6",e.effort);o.defined(e.minSize)&&this._setBooleanOption("webpMinSize",e.minSize),o.defined(e.mixed)&&this._setBooleanOption("webpMixed",e.mixed)}return Dt(e,this.options),this._updateFormatOut("webp",e)}function oh(e){if(o.object(e)){o.defined(e.reuse)&&this._setBooleanOption("gifReuse",e.reuse),o.defined(e.progressive)&&this._setBooleanOption("gifProgressive",e.progressive);let t=e.colours||e.colors;if(o.defined(t))if(o.integer(t)&&o.inRange(t,2,256))this.options.gifBitdepth=Nn(t);else throw o.invalidParameterError("colours","integer between 2 and 256",t);if(o.defined(e.effort))if(o.number(e.effort)&&o.inRange(e.effort,1,10))this.options.gifEffort=e.effort;else throw o.invalidParameterError("effort","integer between 1 and 10",e.effort);if(o.defined(e.dither))if(o.number(e.dither)&&o.inRange(e.dither,0,1))this.options.gifDither=e.dither;else throw o.invalidParameterError("dither","number between 0.0 and 1.0",e.dither);if(o.defined(e.interFrameMaxError))if(o.number(e.interFrameMaxError)&&o.inRange(e.interFrameMaxError,0,32))this.options.gifInterFrameMaxError=e.interFrameMaxError;else throw o.invalidParameterError("interFrameMaxError","number between 0.0 and 32.0",e.interFrameMaxError);if(o.defined(e.interPaletteMaxError))if(o.number(e.interPaletteMaxError)&&o.inRange(e.interPaletteMaxError,0,256))this.options.gifInterPaletteMaxError=e.interPaletteMaxError;else throw o.invalidParameterError("interPaletteMaxError","number between 0.0 and 256.0",e.interPaletteMaxError);if(o.defined(e.keepDuplicateFrames))if(o.bool(e.keepDuplicateFrames))this._setBooleanOption("gifKeepDuplicateFrames",e.keepDuplicateFrames);else throw o.invalidParameterError("keepDuplicateFrames","boolean",e.keepDuplicateFrames)}return Dt(e,this.options),this._updateFormatOut("gif",e)}function lh(e){if(!this.constructor.format.jp2k.output.buffer)throw Ln();if(o.object(e)){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.jp2Quality=e.quality;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);if(o.defined(e.lossless))if(o.bool(e.lossless))this.options.jp2Lossless=e.lossless;else throw o.invalidParameterError("lossless","boolean",e.lossless);if(o.defined(e.tileWidth))if(o.integer(e.tileWidth)&&o.inRange(e.tileWidth,1,32768))this.options.jp2TileWidth=e.tileWidth;else throw o.invalidParameterError("tileWidth","integer between 1 and 32768",e.tileWidth);if(o.defined(e.tileHeight))if(o.integer(e.tileHeight)&&o.inRange(e.tileHeight,1,32768))this.options.jp2TileHeight=e.tileHeight;else throw o.invalidParameterError("tileHeight","integer between 1 and 32768",e.tileHeight);if(o.defined(e.chromaSubsampling))if(o.string(e.chromaSubsampling)&&o.inArray(e.chromaSubsampling,["4:2:0","4:4:4"]))this.options.jp2ChromaSubsampling=e.chromaSubsampling;else throw o.invalidParameterError("chromaSubsampling","one of: 4:2:0, 4:4:4",e.chromaSubsampling)}return this._updateFormatOut("jp2",e)}function Dt(e,t){if(o.object(e)&&o.defined(e.loop))if(o.integer(e.loop)&&o.inRange(e.loop,0,65535))t.loop=e.loop;else throw o.invalidParameterError("loop","integer between 0 and 65535",e.loop);if(o.object(e)&&o.defined(e.delay))if(o.integer(e.delay)&&o.inRange(e.delay,0,65535))t.delay=[e.delay];else if(Array.isArray(e.delay)&&e.delay.every(o.integer)&&e.delay.every(r=>o.inRange(r,0,65535)))t.delay=e.delay;else throw o.invalidParameterError("delay","integer or an array of integers between 0 and 65535",e.delay)}function hh(e){if(o.object(e)){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.tiffQuality=e.quality;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);if(o.defined(e.bitdepth))if(o.integer(e.bitdepth)&&o.inArray(e.bitdepth,[1,2,4,8]))this.options.tiffBitdepth=e.bitdepth;else throw o.invalidParameterError("bitdepth","1, 2, 4 or 8",e.bitdepth);if(o.defined(e.tile)&&this._setBooleanOption("tiffTile",e.tile),o.defined(e.tileWidth))if(o.integer(e.tileWidth)&&e.tileWidth>0)this.options.tiffTileWidth=e.tileWidth;else throw o.invalidParameterError("tileWidth","integer greater than zero",e.tileWidth);if(o.defined(e.tileHeight))if(o.integer(e.tileHeight)&&e.tileHeight>0)this.options.tiffTileHeight=e.tileHeight;else throw o.invalidParameterError("tileHeight","integer greater than zero",e.tileHeight);if(o.defined(e.miniswhite)&&this._setBooleanOption("tiffMiniswhite",e.miniswhite),o.defined(e.pyramid)&&this._setBooleanOption("tiffPyramid",e.pyramid),o.defined(e.xres))if(o.number(e.xres)&&e.xres>0)this.options.tiffXres=e.xres;else throw o.invalidParameterError("xres","number greater than zero",e.xres);if(o.defined(e.yres))if(o.number(e.yres)&&e.yres>0)this.options.tiffYres=e.yres;else throw o.invalidParameterError("yres","number greater than zero",e.yres);if(o.defined(e.compression))if(o.string(e.compression)&&o.inArray(e.compression,["none","jpeg","deflate","packbits","ccittfax4","lzw","webp","zstd","jp2k"]))this.options.tiffCompression=e.compression;else throw o.invalidParameterError("compression","one of: none, jpeg, deflate, packbits, ccittfax4, lzw, webp, zstd, jp2k",e.compression);if(o.defined(e.predictor))if(o.string(e.predictor)&&o.inArray(e.predictor,["none","horizontal","float"]))this.options.tiffPredictor=e.predictor;else throw o.invalidParameterError("predictor","one of: none, horizontal, float",e.predictor);if(o.defined(e.resolutionUnit))if(o.string(e.resolutionUnit)&&o.inArray(e.resolutionUnit,["inch","cm"]))this.options.tiffResolutionUnit=e.resolutionUnit;else throw o.invalidParameterError("resolutionUnit","one of: inch, cm",e.resolutionUnit)}return this._updateFormatOut("tiff",e)}function ch(e){return this.heif({...e,compression:"av1"})}function uh(e){if(o.object(e)){if(o.string(e.compression)&&o.inArray(e.compression,["av1","hevc"]))this.options.heifCompression=e.compression;else throw o.invalidParameterError("compression","one of: av1, hevc",e.compression);if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.heifQuality=e.quality;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);if(o.defined(e.lossless))if(o.bool(e.lossless))this.options.heifLossless=e.lossless;else throw o.invalidParameterError("lossless","boolean",e.lossless);if(o.defined(e.effort))if(o.integer(e.effort)&&o.inRange(e.effort,0,9))this.options.heifEffort=e.effort;else throw o.invalidParameterError("effort","integer between 0 and 9",e.effort);if(o.defined(e.chromaSubsampling))if(o.string(e.chromaSubsampling)&&o.inArray(e.chromaSubsampling,["4:2:0","4:4:4"]))this.options.heifChromaSubsampling=e.chromaSubsampling;else throw o.invalidParameterError("chromaSubsampling","one of: 4:2:0, 4:4:4",e.chromaSubsampling);if(o.defined(e.bitdepth))if(o.integer(e.bitdepth)&&o.inArray(e.bitdepth,[8,10,12])){if(e.bitdepth!==8&&this.constructor.versions.heif)throw o.invalidParameterError("bitdepth when using prebuilt binaries",8,e.bitdepth);this.options.heifBitdepth=e.bitdepth}else throw o.invalidParameterError("bitdepth","8, 10 or 12",e.bitdepth)}else throw o.invalidParameterError("options","Object",e);return this._updateFormatOut("heif",e)}function fh(e){if(o.object(e)){if(o.defined(e.quality))if(o.integer(e.quality)&&o.inRange(e.quality,1,100))this.options.jxlDistance=e.quality>=30?.1+(100-e.quality)*.09:53/3e3*e.quality*e.quality-23/20*e.quality+25;else throw o.invalidParameterError("quality","integer between 1 and 100",e.quality);else if(o.defined(e.distance))if(o.number(e.distance)&&o.inRange(e.distance,0,15))this.options.jxlDistance=e.distance;else throw o.invalidParameterError("distance","number between 0.0 and 15.0",e.distance);if(o.defined(e.decodingTier))if(o.integer(e.decodingTier)&&o.inRange(e.decodingTier,0,4))this.options.jxlDecodingTier=e.decodingTier;else throw o.invalidParameterError("decodingTier","integer between 0 and 4",e.decodingTier);if(o.defined(e.lossless))if(o.bool(e.lossless))this.options.jxlLossless=e.lossless;else throw o.invalidParameterError("lossless","boolean",e.lossless);if(o.defined(e.effort))if(o.integer(e.effort)&&o.inRange(e.effort,1,9))this.options.jxlEffort=e.effort;else throw o.invalidParameterError("effort","integer between 1 and 9",e.effort)}return Dt(e,this.options),this._updateFormatOut("jxl",e)}function dh(e){if(o.object(e)&&o.defined(e.depth))if(o.string(e.depth)&&o.inArray(e.depth,["char","uchar","short","ushort","int","uint","float","complex","double","dpcomplex"]))this.options.rawDepth=e.depth;else throw o.invalidParameterError("depth","one of: char, uchar, short, ushort, int, uint, float, complex, double, dpcomplex",e.depth);return this._updateFormatOut("raw")}function mh(e){if(o.object(e)){if(o.defined(e.size))if(o.integer(e.size)&&o.inRange(e.size,1,8192))this.options.tileSize=e.size;else throw o.invalidParameterError("size","integer between 1 and 8192",e.size);if(o.defined(e.overlap))if(o.integer(e.overlap)&&o.inRange(e.overlap,0,8192)){if(e.overlap>this.options.tileSize)throw o.invalidParameterError("overlap",`<= size (${this.options.tileSize})`,e.overlap);this.options.tileOverlap=e.overlap}else throw o.invalidParameterError("overlap","integer between 0 and 8192",e.overlap);if(o.defined(e.container))if(o.string(e.container)&&o.inArray(e.container,["fs","zip"]))this.options.tileContainer=e.container;else throw o.invalidParameterError("container","one of: fs, zip",e.container);if(o.defined(e.layout))if(o.string(e.layout)&&o.inArray(e.layout,["dz","google","iiif","iiif3","zoomify"]))this.options.tileLayout=e.layout;else throw o.invalidParameterError("layout","one of: dz, google, iiif, iiif3, zoomify",e.layout);if(o.defined(e.angle))if(o.integer(e.angle)&&!(e.angle%90))this.options.tileAngle=e.angle;else throw o.invalidParameterError("angle","positive/negative multiple of 90",e.angle);if(this._setBackgroundColourOption("tileBackground",e.background),o.defined(e.depth))if(o.string(e.depth)&&o.inArray(e.depth,["onepixel","onetile","one"]))this.options.tileDepth=e.depth;else throw o.invalidParameterError("depth","one of: onepixel, onetile, one",e.depth);if(o.defined(e.skipBlanks))if(o.integer(e.skipBlanks)&&o.inRange(e.skipBlanks,-1,65535))this.options.tileSkipBlanks=e.skipBlanks;else throw o.invalidParameterError("skipBlanks","integer between -1 and 255/65535",e.skipBlanks);else o.defined(e.layout)&&e.layout==="google"&&(this.options.tileSkipBlanks=5);let t=o.bool(e.center)?e.center:e.centre;if(o.defined(t)&&this._setBooleanOption("tileCentre",t),o.defined(e.id))if(o.string(e.id))this.options.tileId=e.id;else throw o.invalidParameterError("id","string",e.id);if(o.defined(e.basename))if(o.string(e.basename))this.options.tileBasename=e.basename;else throw o.invalidParameterError("basename","string",e.basename)}if(o.inArray(this.options.formatOut,["jpeg","png","webp"]))this.options.tileFormat=this.options.formatOut;else if(this.options.formatOut!=="input")throw o.invalidParameterError("format","one of: jpeg, png, webp",this.options.formatOut);return this._updateFormatOut("dz")}function gh(e){if(!o.plainObject(e))throw o.invalidParameterError("options","object",e);if(o.integer(e.seconds)&&o.inRange(e.seconds,0,3600))this.options.timeoutSeconds=e.seconds;else throw o.invalidParameterError("seconds","integer between 0 and 3600",e.seconds);return this}function ph(e,t){return o.object(t)&&t.force===!1||(this.options.formatOut=e),this}function bh(e,t){if(o.bool(t))this.options[e]=t;else throw o.invalidParameterError(e,"boolean",t)}function wh(){if(!this.options.streamOut){this.options.streamOut=!0;let e=Error();this._pipeline(void 0,e)}}function Eh(e,t){return typeof e=="function"?(this._isStreamInput()?this.on("finish",()=>{this._flattenBufferIn(),me.pipeline(this.options,(r,i,n)=>{r?e(o.nativeError(r,t)):e(null,i,n)})}):me.pipeline(this.options,(r,i,n)=>{r?e(o.nativeError(r,t)):e(null,i,n)}),this):this.options.streamOut?(this._isStreamInput()?(this.once("finish",()=>{this._flattenBufferIn(),me.pipeline(this.options,(r,i,n)=>{r?this.emit("error",o.nativeError(r,t)):(this.emit("info",n),this.push(i)),this.push(null),this.on("end",()=>this.emit("close"))})}),this.streamInFinished&&this.emit("finish")):me.pipeline(this.options,(r,i,n)=>{r?this.emit("error",o.nativeError(r,t)):(this.emit("info",n),this.push(i)),this.push(null),this.on("end",()=>this.emit("close"))}),this):this._isStreamInput()?new Promise((r,i)=>{this.once("finish",()=>{this._flattenBufferIn(),me.pipeline(this.options,(n,s,a)=>{n?i(o.nativeError(n,t)):this.options.resolveWithObject?r({data:s,info:a}):r(s)})})}):new Promise((r,i)=>{me.pipeline(this.options,(n,s,a)=>{n?i(o.nativeError(n,t)):this.options.resolveWithObject?r({data:s,info:a}):r(s)})})}Tn.exports=function(e){Object.assign(e.prototype,{toFile:zl,toBuffer:Ul,keepExif:Xl,withExif:Ql,withExifMerge:Jl,keepIccProfile:Kl,withIccProfile:Yl,keepXmp:Zl,withXmp:eh,keepMetadata:th,withMetadata:rh,toFormat:ih,jpeg:nh,jp2:lh,png:sh,webp:ah,tiff:hh,avif:ch,heif:uh,jxl:fh,gif:oh,raw:dh,tile:mh,timeout:gh,_updateFormatOut:ph,_setBooleanOption:bh,_read:wh,_pipeline:Eh})}});var Hn=E((Dc,Mn)=>{"use strict";var vh=require("node:events"),Xe=ke(),D=B(),{runtimePlatformArch:yh}=$t(),j=ye(),qn=yh(),Mt=j.libvipsVersion(),te=j.format();te.heif.output.alias=["avif","heic"];te.jpeg.output.alias=["jpe","jpg"];te.tiff.output.alias=["tif"];te.jp2k.output.alias=["j2c","j2k","jp2","jpx"];var xh={nearest:"nearest",bilinear:"bilinear",bicubic:"bicubic",locallyBoundedBicubic:"lbb",nohalo:"nohalo",vertexSplitQuadraticBasisSpline:"vsqbs"},ge={vips:Mt.semver};if(!Mt.isGlobal)if(Mt.isWasm)try{ge=require("@img/sharp-wasm32/versions")}catch{}else try{ge=require(`@img/sharp-${qn}/versions`)}catch{try{ge=require(`@img/sharp-libvips-${qn}/versions`)}catch{}}ge.sharp=Pt().version;ge.heif&&te.heif&&(te.heif.input.fileSuffix=[".avif"],te.heif.output.alias=["avif"]);function Dn(e){return D.bool(e)?e?j.cache(50,20,100):j.cache(0,0,0):D.object(e)?j.cache(e.memory,e.files,e.items):j.cache()}Dn(!0);function _h(e){return j.concurrency(D.integer(e)?e:null)}Xe.familySync()===Xe.GLIBC&&!j._isUsingJemalloc()?j.concurrency(1):Xe.familySync()===Xe.MUSL&&j.concurrency()===1024&&j.concurrency(require("node:os").availableParallelism());var Ah=new vh.EventEmitter;function Ph(){return j.counters()}function Ch(e){return j.simd(D.bool(e)?e:null)}function $h(e){if(D.object(e))if(Array.isArray(e.operation)&&e.operation.every(D.string))j.block(e.operation,!0);else throw D.invalidParameterError("operation","Array<string>",e.operation);else throw D.invalidParameterError("options","object",e)}function Sh(e){if(D.object(e))if(Array.isArray(e.operation)&&e.operation.every(D.string))j.block(e.operation,!1);else throw D.invalidParameterError("operation","Array<string>",e.operation);else throw D.invalidParameterError("options","object",e)}Mn.exports=function(e){e.cache=Dn,e.concurrency=_h,e.counters=Ph,e.simd=Ch,e.format=te,e.interpolators=xh,e.versions=ge,e.queue=Ah,e.block=$h,e.unblock=Sh}});var Wn=E((Mc,Bn)=>{"use strict";var J=Gi();Ui()(J);Zi()(J);tn()(J);on()(J);On()(J);kn()(J);Fn()(J);Hn()(J);Bn.exports=J});var re=Ce(require("node:fs"));var dr=Ce(fr(),1),{program:Hh,createCommand:Bh,createArgument:Wh,createOption:Gh,CommanderError:Vh,InvalidArgumentError:zh,InvalidOptionArgumentError:Uh,Command:mr,Argument:Xh,Option:N,Help:Qh}=dr.default;var Vn=Ce(require("puppeteer")),zn=Ce(Wn());var Gn={name:"@helvio/web-screenshot",version:"2.0.4",description:"Screenshots Pages to PNG",keywords:["screenshot","webpage","png","image"],main:"dist/screenshot.js",bin:{"web-screenshot":"dist/screenshot.js"},scripts:{build:"npx esbuild --bundle --external:puppeteer src/screenshot.ts --minify --platform=node --outfile=dist/screenshot.js"},license:"ISC",preferGlobal:!0,author:"Helvio Pedreschi",bugs:"https://github.com/Helvio88/web-screenshot/issues",homepage:"https://github.com/Helvio88/web-screenshot",publishConfig:{access:"public"},dependencies:{commander:"^14.0.0",puppeteer:"^24.14.0",sharp:"^0.34.3",tslib:"^2.8.1"},devDependencies:{"@biomejs/biome":"^2.1.2",tsc:"^2.0.4",typescript:"^5.8.3"}};var Oh={sanitizeUrl(e){return e=e.trim(),!e.startsWith("http://")&&!e.startsWith("https://")&&(e=`http://${e}`),e},sanitizeTime(e){return Number.isInteger(e)&&e>=1&&e<=600?e*1e3:5e3},sanitizeX(e){return Number.isInteger(e)&&e>=0&&e<=1920?e:0},sanitizeY(e){return Number.isInteger(e)&&e>=0&&e<=1080?e:0},sanitizeWidth(e){return Number.isInteger(e)&&e>=1&&e<=1920?e:1920},sanitizeHeight(e){return Number.isInteger(e)&&e>=1&&e<=1080?e:1080},sanitizeOutput(e,t,r){let i=r,n="png";if(!i||/\.(png|jpg|jpeg|webp)$/i.test(i))if(i)n=i.split(".").pop().replace("jpg","jpeg"),i=i.substring(0,i.lastIndexOf("."));else{let s=e.split("/"),a=e.endsWith("/")?2:1;i=s[s.length-a]}return t&&(i=`${i}_tmp`),{path:i,ext:n}},sanitizeAuth(e){return/^[^:]+:[^:]+$/.test(e)?e:void 0}},$=Oh;var Un=new mr;Un.version(Gn.version).addHelpText("beforeAll","Web Screenshot Utility").addOption(new N("-p, --path [path]","Chrome executable path.")).addOption(new N("-d, --debug","Enable debug mode.").default(!1)).addOption(new N("-b, --batch [file]","Batch file with URLs to screenshot. Supersedes all other options.")).addOption(new N("-u, --url <url>","URL (website) to screenshot.")).addOption(new N("-t, --time [s]","Number of seconds to wait for page to load.").default(3)).addOption(new N("-x, --x [x]","Leftmost Pixel.").default(0)).addOption(new N("-y, --y [y]","Top Pixel.").default(0)).addOption(new N("-w, --width [width]","Image Width.").default(1920)).addOption(new N("-h, --height [height]","Image Height.").default(1080)).addOption(new N("-o, --out [out]","Absolute or Relative Path to save the screenshot.")).addOption(new N("-c, --crop","Auto crop same-color borders.")).addOption(new N("-a, --auth [auth]","NTLM Credentials in username:password format.")).parse(process.argv);var I=Un.opts(),Ht=[],M=I.debug||!1,Rh=I.path;if(I.batch){let e=I.batch;re.existsSync(e)||(console.error(`Batch file "${e}" does not exist.`),process.exit(1));let r=re.readFileSync(e,"utf-8").split(`
-`).filter(i=>i.trim()!==""&&!i.startsWith("#"));for(let i of r){let n=i.split(" ").filter(A=>A.trim()!=="");M&&console.log("Parsed arguments:",n);let s=n.findIndex(A=>A.startsWith("-u")||A.startsWith("--url"));if(s===-1){M&&console.log("No URL found in line, skipping:",i);continue}let a=$.sanitizeUrl(n[s+1]),l=n.findIndex(A=>A.startsWith("-t")||A.startsWith("--time")),c=3;l!==-1&&(c=Number(n[l+1]));let f=$.sanitizeTime(c);M&&console.log(`Sanitized time: ${f}`);let m=n.findIndex(A=>A.startsWith("-x")||A.startsWith("--x")),d=0;m!==-1&&(d=Number(n[m+1]));let x=$.sanitizeX(d);M&&console.log(`Sanitized x: ${x}`);let U=n.findIndex(A=>A.startsWith("-y")||A.startsWith("--y")),H=0;U!==-1&&(H=Number(n[U+1]));let Bt=$.sanitizeY(H);M&&console.log(`Sanitized y: ${Bt}`);let Wt=n.findIndex(A=>A.startsWith("-w")||A.startsWith("--width")),Gt=1920;Wt!==-1&&(Gt=Number(n[Wt+1]));let Vt=$.sanitizeWidth(Gt);M&&console.log(`Sanitized width: ${Vt}`);let zt=n.findIndex(A=>A.startsWith("-h")||A.startsWith("--height")),Ut=1080;zt!==-1&&(Ut=Number(n[zt+1]));let Xt=$.sanitizeHeight(Ut);M&&console.log(`Sanitized height: ${Xt}`);let Qt=n.findIndex(A=>A.startsWith("-o")||A.startsWith("--out")),Qe;Qt!==-1&&(Qe=n[Qt+1]);let Pe=$.sanitizeOutput(a,!1,Qe),Jt=$.sanitizeOutput(a,!0,Qe),Xn=Pe.path,Qn=Jt.path,Jn=Pe.ext;M&&console.log(`Sanitized output path: ${Pe.path}, tmp: ${Jt.path}, ext: ${Pe.ext}`);let Kt=n.includes("--crop")||n.includes("-c");M&&console.log(`Crop flag: ${Kt}`);let Yt=n.findIndex(A=>A.startsWith("-a")||A.startsWith("--auth")),Je;Yt!==-1&&(Je=n[Yt+1]);let Zt=Je?$.sanitizeAuth(Je):void 0;M&&console.log(`Sanitized auth: ${Zt}`),Ht.push({url:a,time:f,x,y:Bt,width:Vt,height:Xt,path:Xn,tmp:Qn,ext:Jn,auth:Zt,crop:Kt})}}else I.url&&Ht.push({url:$.sanitizeUrl(I.url),time:$.sanitizeTime(I.time),x:$.sanitizeX(Number(I.x)),y:$.sanitizeY(Number(I.y)),width:$.sanitizeWidth(Number(I.width)),height:$.sanitizeHeight(Number(I.height)),path:$.sanitizeOutput(I.url,!1,I.out).path,tmp:$.sanitizeOutput(I.url,!0,I.out).path,ext:$.sanitizeOutput(I.url,!1,I.out).ext,auth:$.sanitizeAuth(I.auth),crop:I.crop||!1});(async()=>{try{let e=await Vn.launch({headless:M?!1:"shell",executablePath:Rh,args:["--no-sandbox"]});console.log("Browser Opened");let t=await e.newPage();console.log("Page Created"),await t.setViewport({width:1920,height:1080}),console.log("Viewport Set");for(let r of Ht)r.auth&&(await t.authenticate({username:r.auth.split(":")[0],password:r.auth.split(":")[1]}),console.log("Credentials Entered")),await t.goto(r.url),console.log(`Navigated to ${r.url}`),console.log(`Waiting for ${r.time/1e3} seconds`),await kh(r.time),console.log("Page Loaded"),await t.screenshot({clip:{x:r.x,y:r.y,width:r.width,height:r.height},path:`${r.tmp}.${r.ext}`}),console.log(`Temp screenshot taken: ${r.tmp}.${r.ext}`),r.crop?(await(0,zn.default)(`${r.tmp}.${r.ext}`).trim({threshold:0}).toFile(`${r.path}.${r.ext}`),re.unlinkSync(`${r.tmp}.${r.ext}`),console.log(`Image cropped and saved to ${r.path}.${r.ext}`)):(re.renameSync(`${r.tmp}.${r.ext}`,`${r.path}.${r.ext}`),console.log(`Image saved to ${r.path}.${r.ext}`));await t.close(),console.log("Page Closed"),await e.close(),console.log("Browser Closed"),console.log("Screenshot Process Completed Successfully"),process.exit(0)}catch(e){console.error("Screenshot Failed"),console.error(e),process.exit(1)}})();var kh=e=>new Promise(t=>setTimeout(t,e));
+ - ${executableDirMessage}`;
+        throw new Error(executableMissing);
+      }
+      /**
+       * Execute a sub-command executable.
+       *
+       * @private
+       */
+      _executeSubCommand(subcommand, args) {
+        args = args.slice();
+        let launchWithNode = false;
+        const sourceExt = [".js", ".ts", ".tsx", ".mjs", ".cjs"];
+        function findFile(baseDir, baseName) {
+          const localBin = path.resolve(baseDir, baseName);
+          if (fs4.existsSync(localBin)) return localBin;
+          if (sourceExt.includes(path.extname(baseName))) return void 0;
+          const foundExt = sourceExt.find(
+            (ext) => fs4.existsSync(`${localBin}${ext}`)
+          );
+          if (foundExt) return `${localBin}${foundExt}`;
+          return void 0;
+        }
+        this._checkForMissingMandatoryOptions();
+        this._checkForConflictingOptions();
+        let executableFile = subcommand._executableFile || `${this._name}-${subcommand._name}`;
+        let executableDir = this._executableDir || "";
+        if (this._scriptPath) {
+          let resolvedScriptPath;
+          try {
+            resolvedScriptPath = fs4.realpathSync(this._scriptPath);
+          } catch {
+            resolvedScriptPath = this._scriptPath;
+          }
+          executableDir = path.resolve(
+            path.dirname(resolvedScriptPath),
+            executableDir
+          );
+        }
+        if (executableDir) {
+          let localFile = findFile(executableDir, executableFile);
+          if (!localFile && !subcommand._executableFile && this._scriptPath) {
+            const legacyName = path.basename(
+              this._scriptPath,
+              path.extname(this._scriptPath)
+            );
+            if (legacyName !== this._name) {
+              localFile = findFile(
+                executableDir,
+                `${legacyName}-${subcommand._name}`
+              );
+            }
+          }
+          executableFile = localFile || executableFile;
+        }
+        launchWithNode = sourceExt.includes(path.extname(executableFile));
+        let proc;
+        if (process2.platform !== "win32") {
+          if (launchWithNode) {
+            args.unshift(executableFile);
+            args = incrementNodeInspectorPort(process2.execArgv).concat(args);
+            proc = childProcess.spawn(process2.argv[0], args, { stdio: "inherit" });
+          } else {
+            proc = childProcess.spawn(executableFile, args, { stdio: "inherit" });
+          }
+        } else {
+          this._checkForMissingExecutable(
+            executableFile,
+            executableDir,
+            subcommand._name
+          );
+          args.unshift(executableFile);
+          args = incrementNodeInspectorPort(process2.execArgv).concat(args);
+          proc = childProcess.spawn(process2.execPath, args, { stdio: "inherit" });
+        }
+        if (!proc.killed) {
+          const signals = ["SIGUSR1", "SIGUSR2", "SIGTERM", "SIGINT", "SIGHUP"];
+          signals.forEach((signal) => {
+            process2.on(signal, () => {
+              if (proc.killed === false && proc.exitCode === null) {
+                proc.kill(signal);
+              }
+            });
+          });
+        }
+        const exitCallback = this._exitCallback;
+        proc.on("close", (code) => {
+          code = code ?? 1;
+          if (!exitCallback) {
+            process2.exit(code);
+          } else {
+            exitCallback(
+              new CommanderError2(
+                code,
+                "commander.executeSubCommandAsync",
+                "(close)"
+              )
+            );
+          }
+        });
+        proc.on("error", (err) => {
+          if (err.code === "ENOENT") {
+            this._checkForMissingExecutable(
+              executableFile,
+              executableDir,
+              subcommand._name
+            );
+          } else if (err.code === "EACCES") {
+            throw new Error(`'${executableFile}' not executable`);
+          }
+          if (!exitCallback) {
+            process2.exit(1);
+          } else {
+            const wrappedError = new CommanderError2(
+              1,
+              "commander.executeSubCommandAsync",
+              "(error)"
+            );
+            wrappedError.nestedError = err;
+            exitCallback(wrappedError);
+          }
+        });
+        this.runningCommand = proc;
+      }
+      /**
+       * @private
+       */
+      _dispatchSubcommand(commandName, operands, unknown) {
+        const subCommand = this._findCommand(commandName);
+        if (!subCommand) this.help({ error: true });
+        subCommand._prepareForParse();
+        let promiseChain;
+        promiseChain = this._chainOrCallSubCommandHook(
+          promiseChain,
+          subCommand,
+          "preSubcommand"
+        );
+        promiseChain = this._chainOrCall(promiseChain, () => {
+          if (subCommand._executableHandler) {
+            this._executeSubCommand(subCommand, operands.concat(unknown));
+          } else {
+            return subCommand._parseCommand(operands, unknown);
+          }
+        });
+        return promiseChain;
+      }
+      /**
+       * Invoke help directly if possible, or dispatch if necessary.
+       * e.g. help foo
+       *
+       * @private
+       */
+      _dispatchHelpCommand(subcommandName) {
+        if (!subcommandName) {
+          this.help();
+        }
+        const subCommand = this._findCommand(subcommandName);
+        if (subCommand && !subCommand._executableHandler) {
+          subCommand.help();
+        }
+        return this._dispatchSubcommand(
+          subcommandName,
+          [],
+          [this._getHelpOption()?.long ?? this._getHelpOption()?.short ?? "--help"]
+        );
+      }
+      /**
+       * Check this.args against expected this.registeredArguments.
+       *
+       * @private
+       */
+      _checkNumberOfArguments() {
+        this.registeredArguments.forEach((arg, i) => {
+          if (arg.required && this.args[i] == null) {
+            this.missingArgument(arg.name());
+          }
+        });
+        if (this.registeredArguments.length > 0 && this.registeredArguments[this.registeredArguments.length - 1].variadic) {
+          return;
+        }
+        if (this.args.length > this.registeredArguments.length) {
+          this._excessArguments(this.args);
+        }
+      }
+      /**
+       * Process this.args using this.registeredArguments and save as this.processedArgs!
+       *
+       * @private
+       */
+      _processArguments() {
+        const myParseArg = (argument, value, previous) => {
+          let parsedValue = value;
+          if (value !== null && argument.parseArg) {
+            const invalidValueMessage = `error: command-argument value '${value}' is invalid for argument '${argument.name()}'.`;
+            parsedValue = this._callParseArg(
+              argument,
+              value,
+              previous,
+              invalidValueMessage
+            );
+          }
+          return parsedValue;
+        };
+        this._checkNumberOfArguments();
+        const processedArgs = [];
+        this.registeredArguments.forEach((declaredArg, index) => {
+          let value = declaredArg.defaultValue;
+          if (declaredArg.variadic) {
+            if (index < this.args.length) {
+              value = this.args.slice(index);
+              if (declaredArg.parseArg) {
+                value = value.reduce((processed, v) => {
+                  return myParseArg(declaredArg, v, processed);
+                }, declaredArg.defaultValue);
+              }
+            } else if (value === void 0) {
+              value = [];
+            }
+          } else if (index < this.args.length) {
+            value = this.args[index];
+            if (declaredArg.parseArg) {
+              value = myParseArg(declaredArg, value, declaredArg.defaultValue);
+            }
+          }
+          processedArgs[index] = value;
+        });
+        this.processedArgs = processedArgs;
+      }
+      /**
+       * Once we have a promise we chain, but call synchronously until then.
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {Function} fn
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCall(promise, fn) {
+        if (promise && promise.then && typeof promise.then === "function") {
+          return promise.then(() => fn());
+        }
+        return fn();
+      }
+      /**
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {string} event
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCallHooks(promise, event) {
+        let result = promise;
+        const hooks = [];
+        this._getCommandAndAncestors().reverse().filter((cmd) => cmd._lifeCycleHooks[event] !== void 0).forEach((hookedCommand) => {
+          hookedCommand._lifeCycleHooks[event].forEach((callback) => {
+            hooks.push({ hookedCommand, callback });
+          });
+        });
+        if (event === "postAction") {
+          hooks.reverse();
+        }
+        hooks.forEach((hookDetail) => {
+          result = this._chainOrCall(result, () => {
+            return hookDetail.callback(hookDetail.hookedCommand, this);
+          });
+        });
+        return result;
+      }
+      /**
+       *
+       * @param {(Promise|undefined)} promise
+       * @param {Command} subCommand
+       * @param {string} event
+       * @return {(Promise|undefined)}
+       * @private
+       */
+      _chainOrCallSubCommandHook(promise, subCommand, event) {
+        let result = promise;
+        if (this._lifeCycleHooks[event] !== void 0) {
+          this._lifeCycleHooks[event].forEach((hook) => {
+            result = this._chainOrCall(result, () => {
+              return hook(this, subCommand);
+            });
+          });
+        }
+        return result;
+      }
+      /**
+       * Process arguments in context of this command.
+       * Returns action result, in case it is a promise.
+       *
+       * @private
+       */
+      _parseCommand(operands, unknown) {
+        const parsed = this.parseOptions(unknown);
+        this._parseOptionsEnv();
+        this._parseOptionsImplied();
+        operands = operands.concat(parsed.operands);
+        unknown = parsed.unknown;
+        this.args = operands.concat(unknown);
+        if (operands && this._findCommand(operands[0])) {
+          return this._dispatchSubcommand(operands[0], operands.slice(1), unknown);
+        }
+        if (this._getHelpCommand() && operands[0] === this._getHelpCommand().name()) {
+          return this._dispatchHelpCommand(operands[1]);
+        }
+        if (this._defaultCommandName) {
+          this._outputHelpIfRequested(unknown);
+          return this._dispatchSubcommand(
+            this._defaultCommandName,
+            operands,
+            unknown
+          );
+        }
+        if (this.commands.length && this.args.length === 0 && !this._actionHandler && !this._defaultCommandName) {
+          this.help({ error: true });
+        }
+        this._outputHelpIfRequested(parsed.unknown);
+        this._checkForMissingMandatoryOptions();
+        this._checkForConflictingOptions();
+        const checkForUnknownOptions = () => {
+          if (parsed.unknown.length > 0) {
+            this.unknownOption(parsed.unknown[0]);
+          }
+        };
+        const commandEvent = `command:${this.name()}`;
+        if (this._actionHandler) {
+          checkForUnknownOptions();
+          this._processArguments();
+          let promiseChain;
+          promiseChain = this._chainOrCallHooks(promiseChain, "preAction");
+          promiseChain = this._chainOrCall(
+            promiseChain,
+            () => this._actionHandler(this.processedArgs)
+          );
+          if (this.parent) {
+            promiseChain = this._chainOrCall(promiseChain, () => {
+              this.parent.emit(commandEvent, operands, unknown);
+            });
+          }
+          promiseChain = this._chainOrCallHooks(promiseChain, "postAction");
+          return promiseChain;
+        }
+        if (this.parent && this.parent.listenerCount(commandEvent)) {
+          checkForUnknownOptions();
+          this._processArguments();
+          this.parent.emit(commandEvent, operands, unknown);
+        } else if (operands.length) {
+          if (this._findCommand("*")) {
+            return this._dispatchSubcommand("*", operands, unknown);
+          }
+          if (this.listenerCount("command:*")) {
+            this.emit("command:*", operands, unknown);
+          } else if (this.commands.length) {
+            this.unknownCommand();
+          } else {
+            checkForUnknownOptions();
+            this._processArguments();
+          }
+        } else if (this.commands.length) {
+          checkForUnknownOptions();
+          this.help({ error: true });
+        } else {
+          checkForUnknownOptions();
+          this._processArguments();
+        }
+      }
+      /**
+       * Find matching command.
+       *
+       * @private
+       * @return {Command | undefined}
+       */
+      _findCommand(name) {
+        if (!name) return void 0;
+        return this.commands.find(
+          (cmd) => cmd._name === name || cmd._aliases.includes(name)
+        );
+      }
+      /**
+       * Return an option matching `arg` if any.
+       *
+       * @param {string} arg
+       * @return {Option}
+       * @package
+       */
+      _findOption(arg) {
+        return this.options.find((option) => option.is(arg));
+      }
+      /**
+       * Display an error message if a mandatory option does not have a value.
+       * Called after checking for help flags in leaf subcommand.
+       *
+       * @private
+       */
+      _checkForMissingMandatoryOptions() {
+        this._getCommandAndAncestors().forEach((cmd) => {
+          cmd.options.forEach((anOption) => {
+            if (anOption.mandatory && cmd.getOptionValue(anOption.attributeName()) === void 0) {
+              cmd.missingMandatoryOptionValue(anOption);
+            }
+          });
+        });
+      }
+      /**
+       * Display an error message if conflicting options are used together in this.
+       *
+       * @private
+       */
+      _checkForConflictingLocalOptions() {
+        const definedNonDefaultOptions = this.options.filter((option) => {
+          const optionKey = option.attributeName();
+          if (this.getOptionValue(optionKey) === void 0) {
+            return false;
+          }
+          return this.getOptionValueSource(optionKey) !== "default";
+        });
+        const optionsWithConflicting = definedNonDefaultOptions.filter(
+          (option) => option.conflictsWith.length > 0
+        );
+        optionsWithConflicting.forEach((option) => {
+          const conflictingAndDefined = definedNonDefaultOptions.find(
+            (defined) => option.conflictsWith.includes(defined.attributeName())
+          );
+          if (conflictingAndDefined) {
+            this._conflictingOption(option, conflictingAndDefined);
+          }
+        });
+      }
+      /**
+       * Display an error message if conflicting options are used together.
+       * Called after checking for help flags in leaf subcommand.
+       *
+       * @private
+       */
+      _checkForConflictingOptions() {
+        this._getCommandAndAncestors().forEach((cmd) => {
+          cmd._checkForConflictingLocalOptions();
+        });
+      }
+      /**
+       * Parse options from `argv` removing known options,
+       * and return argv split into operands and unknown arguments.
+       *
+       * Side effects: modifies command by storing options. Does not reset state if called again.
+       *
+       * Examples:
+       *
+       *     argv => operands, unknown
+       *     --known kkk op => [op], []
+       *     op --known kkk => [op], []
+       *     sub --unknown uuu op => [sub], [--unknown uuu op]
+       *     sub -- --unknown uuu op => [sub --unknown uuu op], []
+       *
+       * @param {string[]} argv
+       * @return {{operands: string[], unknown: string[]}}
+       */
+      parseOptions(argv) {
+        const operands = [];
+        const unknown = [];
+        let dest = operands;
+        const args = argv.slice();
+        function maybeOption(arg) {
+          return arg.length > 1 && arg[0] === "-";
+        }
+        const negativeNumberArg = (arg) => {
+          if (!/^-\d*\.?\d+(e[+-]?\d+)?$/.test(arg)) return false;
+          return !this._getCommandAndAncestors().some(
+            (cmd) => cmd.options.map((opt) => opt.short).some((short) => /^-\d$/.test(short))
+          );
+        };
+        let activeVariadicOption = null;
+        while (args.length) {
+          const arg = args.shift();
+          if (arg === "--") {
+            if (dest === unknown) dest.push(arg);
+            dest.push(...args);
+            break;
+          }
+          if (activeVariadicOption && (!maybeOption(arg) || negativeNumberArg(arg))) {
+            this.emit(`option:${activeVariadicOption.name()}`, arg);
+            continue;
+          }
+          activeVariadicOption = null;
+          if (maybeOption(arg)) {
+            const option = this._findOption(arg);
+            if (option) {
+              if (option.required) {
+                const value = args.shift();
+                if (value === void 0) this.optionMissingArgument(option);
+                this.emit(`option:${option.name()}`, value);
+              } else if (option.optional) {
+                let value = null;
+                if (args.length > 0 && (!maybeOption(args[0]) || negativeNumberArg(args[0]))) {
+                  value = args.shift();
+                }
+                this.emit(`option:${option.name()}`, value);
+              } else {
+                this.emit(`option:${option.name()}`);
+              }
+              activeVariadicOption = option.variadic ? option : null;
+              continue;
+            }
+          }
+          if (arg.length > 2 && arg[0] === "-" && arg[1] !== "-") {
+            const option = this._findOption(`-${arg[1]}`);
+            if (option) {
+              if (option.required || option.optional && this._combineFlagAndOptionalValue) {
+                this.emit(`option:${option.name()}`, arg.slice(2));
+              } else {
+                this.emit(`option:${option.name()}`);
+                args.unshift(`-${arg.slice(2)}`);
+              }
+              continue;
+            }
+          }
+          if (/^--[^=]+=/.test(arg)) {
+            const index = arg.indexOf("=");
+            const option = this._findOption(arg.slice(0, index));
+            if (option && (option.required || option.optional)) {
+              this.emit(`option:${option.name()}`, arg.slice(index + 1));
+              continue;
+            }
+          }
+          if (dest === operands && maybeOption(arg) && !(this.commands.length === 0 && negativeNumberArg(arg))) {
+            dest = unknown;
+          }
+          if ((this._enablePositionalOptions || this._passThroughOptions) && operands.length === 0 && unknown.length === 0) {
+            if (this._findCommand(arg)) {
+              operands.push(arg);
+              if (args.length > 0) unknown.push(...args);
+              break;
+            } else if (this._getHelpCommand() && arg === this._getHelpCommand().name()) {
+              operands.push(arg);
+              if (args.length > 0) operands.push(...args);
+              break;
+            } else if (this._defaultCommandName) {
+              unknown.push(arg);
+              if (args.length > 0) unknown.push(...args);
+              break;
+            }
+          }
+          if (this._passThroughOptions) {
+            dest.push(arg);
+            if (args.length > 0) dest.push(...args);
+            break;
+          }
+          dest.push(arg);
+        }
+        return { operands, unknown };
+      }
+      /**
+       * Return an object containing local option values as key-value pairs.
+       *
+       * @return {object}
+       */
+      opts() {
+        if (this._storeOptionsAsProperties) {
+          const result = {};
+          const len = this.options.length;
+          for (let i = 0; i < len; i++) {
+            const key = this.options[i].attributeName();
+            result[key] = key === this._versionOptionName ? this._version : this[key];
+          }
+          return result;
+        }
+        return this._optionValues;
+      }
+      /**
+       * Return an object containing merged local and global option values as key-value pairs.
+       *
+       * @return {object}
+       */
+      optsWithGlobals() {
+        return this._getCommandAndAncestors().reduce(
+          (combinedOptions, cmd) => Object.assign(combinedOptions, cmd.opts()),
+          {}
+        );
+      }
+      /**
+       * Display error message and exit (or call exitOverride).
+       *
+       * @param {string} message
+       * @param {object} [errorOptions]
+       * @param {string} [errorOptions.code] - an id string representing the error
+       * @param {number} [errorOptions.exitCode] - used with process.exit
+       */
+      error(message, errorOptions) {
+        this._outputConfiguration.outputError(
+          `${message}
+`,
+          this._outputConfiguration.writeErr
+        );
+        if (typeof this._showHelpAfterError === "string") {
+          this._outputConfiguration.writeErr(`${this._showHelpAfterError}
+`);
+        } else if (this._showHelpAfterError) {
+          this._outputConfiguration.writeErr("\n");
+          this.outputHelp({ error: true });
+        }
+        const config = errorOptions || {};
+        const exitCode = config.exitCode || 1;
+        const code = config.code || "commander.error";
+        this._exit(exitCode, code, message);
+      }
+      /**
+       * Apply any option related environment variables, if option does
+       * not have a value from cli or client code.
+       *
+       * @private
+       */
+      _parseOptionsEnv() {
+        this.options.forEach((option) => {
+          if (option.envVar && option.envVar in process2.env) {
+            const optionKey = option.attributeName();
+            if (this.getOptionValue(optionKey) === void 0 || ["default", "config", "env"].includes(
+              this.getOptionValueSource(optionKey)
+            )) {
+              if (option.required || option.optional) {
+                this.emit(`optionEnv:${option.name()}`, process2.env[option.envVar]);
+              } else {
+                this.emit(`optionEnv:${option.name()}`);
+              }
+            }
+          }
+        });
+      }
+      /**
+       * Apply any implied option values, if option is undefined or default value.
+       *
+       * @private
+       */
+      _parseOptionsImplied() {
+        const dualHelper = new DualOptions(this.options);
+        const hasCustomOptionValue = (optionKey) => {
+          return this.getOptionValue(optionKey) !== void 0 && !["default", "implied"].includes(this.getOptionValueSource(optionKey));
+        };
+        this.options.filter(
+          (option) => option.implied !== void 0 && hasCustomOptionValue(option.attributeName()) && dualHelper.valueFromOption(
+            this.getOptionValue(option.attributeName()),
+            option
+          )
+        ).forEach((option) => {
+          Object.keys(option.implied).filter((impliedKey) => !hasCustomOptionValue(impliedKey)).forEach((impliedKey) => {
+            this.setOptionValueWithSource(
+              impliedKey,
+              option.implied[impliedKey],
+              "implied"
+            );
+          });
+        });
+      }
+      /**
+       * Argument `name` is missing.
+       *
+       * @param {string} name
+       * @private
+       */
+      missingArgument(name) {
+        const message = `error: missing required argument '${name}'`;
+        this.error(message, { code: "commander.missingArgument" });
+      }
+      /**
+       * `Option` is missing an argument.
+       *
+       * @param {Option} option
+       * @private
+       */
+      optionMissingArgument(option) {
+        const message = `error: option '${option.flags}' argument missing`;
+        this.error(message, { code: "commander.optionMissingArgument" });
+      }
+      /**
+       * `Option` does not have a value, and is a mandatory option.
+       *
+       * @param {Option} option
+       * @private
+       */
+      missingMandatoryOptionValue(option) {
+        const message = `error: required option '${option.flags}' not specified`;
+        this.error(message, { code: "commander.missingMandatoryOptionValue" });
+      }
+      /**
+       * `Option` conflicts with another option.
+       *
+       * @param {Option} option
+       * @param {Option} conflictingOption
+       * @private
+       */
+      _conflictingOption(option, conflictingOption) {
+        const findBestOptionFromValue = (option2) => {
+          const optionKey = option2.attributeName();
+          const optionValue = this.getOptionValue(optionKey);
+          const negativeOption = this.options.find(
+            (target) => target.negate && optionKey === target.attributeName()
+          );
+          const positiveOption = this.options.find(
+            (target) => !target.negate && optionKey === target.attributeName()
+          );
+          if (negativeOption && (negativeOption.presetArg === void 0 && optionValue === false || negativeOption.presetArg !== void 0 && optionValue === negativeOption.presetArg)) {
+            return negativeOption;
+          }
+          return positiveOption || option2;
+        };
+        const getErrorMessage = (option2) => {
+          const bestOption = findBestOptionFromValue(option2);
+          const optionKey = bestOption.attributeName();
+          const source = this.getOptionValueSource(optionKey);
+          if (source === "env") {
+            return `environment variable '${bestOption.envVar}'`;
+          }
+          return `option '${bestOption.flags}'`;
+        };
+        const message = `error: ${getErrorMessage(option)} cannot be used with ${getErrorMessage(conflictingOption)}`;
+        this.error(message, { code: "commander.conflictingOption" });
+      }
+      /**
+       * Unknown option `flag`.
+       *
+       * @param {string} flag
+       * @private
+       */
+      unknownOption(flag) {
+        if (this._allowUnknownOption) return;
+        let suggestion = "";
+        if (flag.startsWith("--") && this._showSuggestionAfterError) {
+          let candidateFlags = [];
+          let command = this;
+          do {
+            const moreFlags = command.createHelp().visibleOptions(command).filter((option) => option.long).map((option) => option.long);
+            candidateFlags = candidateFlags.concat(moreFlags);
+            command = command.parent;
+          } while (command && !command._enablePositionalOptions);
+          suggestion = suggestSimilar(flag, candidateFlags);
+        }
+        const message = `error: unknown option '${flag}'${suggestion}`;
+        this.error(message, { code: "commander.unknownOption" });
+      }
+      /**
+       * Excess arguments, more than expected.
+       *
+       * @param {string[]} receivedArgs
+       * @private
+       */
+      _excessArguments(receivedArgs) {
+        if (this._allowExcessArguments) return;
+        const expected = this.registeredArguments.length;
+        const s = expected === 1 ? "" : "s";
+        const forSubcommand = this.parent ? ` for '${this.name()}'` : "";
+        const message = `error: too many arguments${forSubcommand}. Expected ${expected} argument${s} but got ${receivedArgs.length}.`;
+        this.error(message, { code: "commander.excessArguments" });
+      }
+      /**
+       * Unknown command.
+       *
+       * @private
+       */
+      unknownCommand() {
+        const unknownName = this.args[0];
+        let suggestion = "";
+        if (this._showSuggestionAfterError) {
+          const candidateNames = [];
+          this.createHelp().visibleCommands(this).forEach((command) => {
+            candidateNames.push(command.name());
+            if (command.alias()) candidateNames.push(command.alias());
+          });
+          suggestion = suggestSimilar(unknownName, candidateNames);
+        }
+        const message = `error: unknown command '${unknownName}'${suggestion}`;
+        this.error(message, { code: "commander.unknownCommand" });
+      }
+      /**
+       * Get or set the program version.
+       *
+       * This method auto-registers the "-V, --version" option which will print the version number.
+       *
+       * You can optionally supply the flags and description to override the defaults.
+       *
+       * @param {string} [str]
+       * @param {string} [flags]
+       * @param {string} [description]
+       * @return {(this | string | undefined)} `this` command for chaining, or version string if no arguments
+       */
+      version(str, flags, description) {
+        if (str === void 0) return this._version;
+        this._version = str;
+        flags = flags || "-V, --version";
+        description = description || "output the version number";
+        const versionOption = this.createOption(flags, description);
+        this._versionOptionName = versionOption.attributeName();
+        this._registerOption(versionOption);
+        this.on("option:" + versionOption.name(), () => {
+          this._outputConfiguration.writeOut(`${str}
+`);
+          this._exit(0, "commander.version", str);
+        });
+        return this;
+      }
+      /**
+       * Set the description.
+       *
+       * @param {string} [str]
+       * @param {object} [argsDescription]
+       * @return {(string|Command)}
+       */
+      description(str, argsDescription) {
+        if (str === void 0 && argsDescription === void 0)
+          return this._description;
+        this._description = str;
+        if (argsDescription) {
+          this._argsDescription = argsDescription;
+        }
+        return this;
+      }
+      /**
+       * Set the summary. Used when listed as subcommand of parent.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      summary(str) {
+        if (str === void 0) return this._summary;
+        this._summary = str;
+        return this;
+      }
+      /**
+       * Set an alias for the command.
+       *
+       * You may call more than once to add multiple aliases. Only the first alias is shown in the auto-generated help.
+       *
+       * @param {string} [alias]
+       * @return {(string|Command)}
+       */
+      alias(alias) {
+        if (alias === void 0) return this._aliases[0];
+        let command = this;
+        if (this.commands.length !== 0 && this.commands[this.commands.length - 1]._executableHandler) {
+          command = this.commands[this.commands.length - 1];
+        }
+        if (alias === command._name)
+          throw new Error("Command alias can't be the same as its name");
+        const matchingCommand = this.parent?._findCommand(alias);
+        if (matchingCommand) {
+          const existingCmd = [matchingCommand.name()].concat(matchingCommand.aliases()).join("|");
+          throw new Error(
+            `cannot add alias '${alias}' to command '${this.name()}' as already have command '${existingCmd}'`
+          );
+        }
+        command._aliases.push(alias);
+        return this;
+      }
+      /**
+       * Set aliases for the command.
+       *
+       * Only the first alias is shown in the auto-generated help.
+       *
+       * @param {string[]} [aliases]
+       * @return {(string[]|Command)}
+       */
+      aliases(aliases) {
+        if (aliases === void 0) return this._aliases;
+        aliases.forEach((alias) => this.alias(alias));
+        return this;
+      }
+      /**
+       * Set / get the command usage `str`.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      usage(str) {
+        if (str === void 0) {
+          if (this._usage) return this._usage;
+          const args = this.registeredArguments.map((arg) => {
+            return humanReadableArgName(arg);
+          });
+          return [].concat(
+            this.options.length || this._helpOption !== null ? "[options]" : [],
+            this.commands.length ? "[command]" : [],
+            this.registeredArguments.length ? args : []
+          ).join(" ");
+        }
+        this._usage = str;
+        return this;
+      }
+      /**
+       * Get or set the name of the command.
+       *
+       * @param {string} [str]
+       * @return {(string|Command)}
+       */
+      name(str) {
+        if (str === void 0) return this._name;
+        this._name = str;
+        return this;
+      }
+      /**
+       * Set/get the help group heading for this subcommand in parent command's help.
+       *
+       * @param {string} [heading]
+       * @return {Command | string}
+       */
+      helpGroup(heading) {
+        if (heading === void 0) return this._helpGroupHeading ?? "";
+        this._helpGroupHeading = heading;
+        return this;
+      }
+      /**
+       * Set/get the default help group heading for subcommands added to this command.
+       * (This does not override a group set directly on the subcommand using .helpGroup().)
+       *
+       * @example
+       * program.commandsGroup('Development Commands:);
+       * program.command('watch')...
+       * program.command('lint')...
+       * ...
+       *
+       * @param {string} [heading]
+       * @returns {Command | string}
+       */
+      commandsGroup(heading) {
+        if (heading === void 0) return this._defaultCommandGroup ?? "";
+        this._defaultCommandGroup = heading;
+        return this;
+      }
+      /**
+       * Set/get the default help group heading for options added to this command.
+       * (This does not override a group set directly on the option using .helpGroup().)
+       *
+       * @example
+       * program
+       *   .optionsGroup('Development Options:')
+       *   .option('-d, --debug', 'output extra debugging')
+       *   .option('-p, --profile', 'output profiling information')
+       *
+       * @param {string} [heading]
+       * @returns {Command | string}
+       */
+      optionsGroup(heading) {
+        if (heading === void 0) return this._defaultOptionGroup ?? "";
+        this._defaultOptionGroup = heading;
+        return this;
+      }
+      /**
+       * @param {Option} option
+       * @private
+       */
+      _initOptionGroup(option) {
+        if (this._defaultOptionGroup && !option.helpGroupHeading)
+          option.helpGroup(this._defaultOptionGroup);
+      }
+      /**
+       * @param {Command} cmd
+       * @private
+       */
+      _initCommandGroup(cmd) {
+        if (this._defaultCommandGroup && !cmd.helpGroup())
+          cmd.helpGroup(this._defaultCommandGroup);
+      }
+      /**
+       * Set the name of the command from script filename, such as process.argv[1],
+       * or require.main.filename, or __filename.
+       *
+       * (Used internally and public although not documented in README.)
+       *
+       * @example
+       * program.nameFromFilename(require.main.filename);
+       *
+       * @param {string} filename
+       * @return {Command}
+       */
+      nameFromFilename(filename) {
+        this._name = path.basename(filename, path.extname(filename));
+        return this;
+      }
+      /**
+       * Get or set the directory for searching for executable subcommands of this command.
+       *
+       * @example
+       * program.executableDir(__dirname);
+       * // or
+       * program.executableDir('subcommands');
+       *
+       * @param {string} [path]
+       * @return {(string|null|Command)}
+       */
+      executableDir(path2) {
+        if (path2 === void 0) return this._executableDir;
+        this._executableDir = path2;
+        return this;
+      }
+      /**
+       * Return program help documentation.
+       *
+       * @param {{ error: boolean }} [contextOptions] - pass {error:true} to wrap for stderr instead of stdout
+       * @return {string}
+       */
+      helpInformation(contextOptions) {
+        const helper = this.createHelp();
+        const context = this._getOutputContext(contextOptions);
+        helper.prepareContext({
+          error: context.error,
+          helpWidth: context.helpWidth,
+          outputHasColors: context.hasColors
+        });
+        const text = helper.formatHelp(this, helper);
+        if (context.hasColors) return text;
+        return this._outputConfiguration.stripColor(text);
+      }
+      /**
+       * @typedef HelpContext
+       * @type {object}
+       * @property {boolean} error
+       * @property {number} helpWidth
+       * @property {boolean} hasColors
+       * @property {function} write - includes stripColor if needed
+       *
+       * @returns {HelpContext}
+       * @private
+       */
+      _getOutputContext(contextOptions) {
+        contextOptions = contextOptions || {};
+        const error = !!contextOptions.error;
+        let baseWrite;
+        let hasColors;
+        let helpWidth;
+        if (error) {
+          baseWrite = (str) => this._outputConfiguration.writeErr(str);
+          hasColors = this._outputConfiguration.getErrHasColors();
+          helpWidth = this._outputConfiguration.getErrHelpWidth();
+        } else {
+          baseWrite = (str) => this._outputConfiguration.writeOut(str);
+          hasColors = this._outputConfiguration.getOutHasColors();
+          helpWidth = this._outputConfiguration.getOutHelpWidth();
+        }
+        const write = (str) => {
+          if (!hasColors) str = this._outputConfiguration.stripColor(str);
+          return baseWrite(str);
+        };
+        return { error, write, hasColors, helpWidth };
+      }
+      /**
+       * Output help information for this command.
+       *
+       * Outputs built-in help, and custom text added using `.addHelpText()`.
+       *
+       * @param {{ error: boolean } | Function} [contextOptions] - pass {error:true} to write to stderr instead of stdout
+       */
+      outputHelp(contextOptions) {
+        let deprecatedCallback;
+        if (typeof contextOptions === "function") {
+          deprecatedCallback = contextOptions;
+          contextOptions = void 0;
+        }
+        const outputContext = this._getOutputContext(contextOptions);
+        const eventContext = {
+          error: outputContext.error,
+          write: outputContext.write,
+          command: this
+        };
+        this._getCommandAndAncestors().reverse().forEach((command) => command.emit("beforeAllHelp", eventContext));
+        this.emit("beforeHelp", eventContext);
+        let helpInformation = this.helpInformation({ error: outputContext.error });
+        if (deprecatedCallback) {
+          helpInformation = deprecatedCallback(helpInformation);
+          if (typeof helpInformation !== "string" && !Buffer.isBuffer(helpInformation)) {
+            throw new Error("outputHelp callback must return a string or a Buffer");
+          }
+        }
+        outputContext.write(helpInformation);
+        if (this._getHelpOption()?.long) {
+          this.emit(this._getHelpOption().long);
+        }
+        this.emit("afterHelp", eventContext);
+        this._getCommandAndAncestors().forEach(
+          (command) => command.emit("afterAllHelp", eventContext)
+        );
+      }
+      /**
+       * You can pass in flags and a description to customise the built-in help option.
+       * Pass in false to disable the built-in help option.
+       *
+       * @example
+       * program.helpOption('-?, --help' 'show help'); // customise
+       * program.helpOption(false); // disable
+       *
+       * @param {(string | boolean)} flags
+       * @param {string} [description]
+       * @return {Command} `this` command for chaining
+       */
+      helpOption(flags, description) {
+        if (typeof flags === "boolean") {
+          if (flags) {
+            if (this._helpOption === null) this._helpOption = void 0;
+            if (this._defaultOptionGroup) {
+              this._initOptionGroup(this._getHelpOption());
+            }
+          } else {
+            this._helpOption = null;
+          }
+          return this;
+        }
+        this._helpOption = this.createOption(
+          flags ?? "-h, --help",
+          description ?? "display help for command"
+        );
+        if (flags || description) this._initOptionGroup(this._helpOption);
+        return this;
+      }
+      /**
+       * Lazy create help option.
+       * Returns null if has been disabled with .helpOption(false).
+       *
+       * @returns {(Option | null)} the help option
+       * @package
+       */
+      _getHelpOption() {
+        if (this._helpOption === void 0) {
+          this.helpOption(void 0, void 0);
+        }
+        return this._helpOption;
+      }
+      /**
+       * Supply your own option to use for the built-in help option.
+       * This is an alternative to using helpOption() to customise the flags and description etc.
+       *
+       * @param {Option} option
+       * @return {Command} `this` command for chaining
+       */
+      addHelpOption(option) {
+        this._helpOption = option;
+        this._initOptionGroup(option);
+        return this;
+      }
+      /**
+       * Output help information and exit.
+       *
+       * Outputs built-in help, and custom text added using `.addHelpText()`.
+       *
+       * @param {{ error: boolean }} [contextOptions] - pass {error:true} to write to stderr instead of stdout
+       */
+      help(contextOptions) {
+        this.outputHelp(contextOptions);
+        let exitCode = Number(process2.exitCode ?? 0);
+        if (exitCode === 0 && contextOptions && typeof contextOptions !== "function" && contextOptions.error) {
+          exitCode = 1;
+        }
+        this._exit(exitCode, "commander.help", "(outputHelp)");
+      }
+      /**
+       * // Do a little typing to coordinate emit and listener for the help text events.
+       * @typedef HelpTextEventContext
+       * @type {object}
+       * @property {boolean} error
+       * @property {Command} command
+       * @property {function} write
+       */
+      /**
+       * Add additional text to be displayed with the built-in help.
+       *
+       * Position is 'before' or 'after' to affect just this command,
+       * and 'beforeAll' or 'afterAll' to affect this command and all its subcommands.
+       *
+       * @param {string} position - before or after built-in help
+       * @param {(string | Function)} text - string to add, or a function returning a string
+       * @return {Command} `this` command for chaining
+       */
+      addHelpText(position, text) {
+        const allowedValues = ["beforeAll", "before", "after", "afterAll"];
+        if (!allowedValues.includes(position)) {
+          throw new Error(`Unexpected value for position to addHelpText.
+Expecting one of '${allowedValues.join("', '")}'`);
+        }
+        const helpEvent = `${position}Help`;
+        this.on(helpEvent, (context) => {
+          let helpStr;
+          if (typeof text === "function") {
+            helpStr = text({ error: context.error, command: context.command });
+          } else {
+            helpStr = text;
+          }
+          if (helpStr) {
+            context.write(`${helpStr}
+`);
+          }
+        });
+        return this;
+      }
+      /**
+       * Output help information if help flags specified
+       *
+       * @param {Array} args - array of options to search for help flags
+       * @private
+       */
+      _outputHelpIfRequested(args) {
+        const helpOption = this._getHelpOption();
+        const helpRequested = helpOption && args.find((arg) => helpOption.is(arg));
+        if (helpRequested) {
+          this.outputHelp();
+          this._exit(0, "commander.helpDisplayed", "(outputHelp)");
+        }
+      }
+    };
+    function incrementNodeInspectorPort(args) {
+      return args.map((arg) => {
+        if (!arg.startsWith("--inspect")) {
+          return arg;
+        }
+        let debugOption;
+        let debugHost = "127.0.0.1";
+        let debugPort = "9229";
+        let match;
+        if ((match = arg.match(/^(--inspect(-brk)?)$/)) !== null) {
+          debugOption = match[1];
+        } else if ((match = arg.match(/^(--inspect(-brk|-port)?)=([^:]+)$/)) !== null) {
+          debugOption = match[1];
+          if (/^\d+$/.test(match[3])) {
+            debugPort = match[3];
+          } else {
+            debugHost = match[3];
+          }
+        } else if ((match = arg.match(/^(--inspect(-brk|-port)?)=([^:]+):(\d+)$/)) !== null) {
+          debugOption = match[1];
+          debugHost = match[3];
+          debugPort = match[4];
+        }
+        if (debugOption && debugPort !== "0") {
+          return `${debugOption}=${debugHost}:${parseInt(debugPort) + 1}`;
+        }
+        return arg;
+      });
+    }
+    function useColor() {
+      if (process2.env.NO_COLOR || process2.env.FORCE_COLOR === "0" || process2.env.FORCE_COLOR === "false")
+        return false;
+      if (process2.env.FORCE_COLOR || process2.env.CLICOLOR_FORCE !== void 0)
+        return true;
+      return void 0;
+    }
+    exports2.Command = Command2;
+    exports2.useColor = useColor;
+  }
+});
+
+// node_modules/commander/index.js
+var require_commander = __commonJS({
+  "node_modules/commander/index.js"(exports2) {
+    var { Argument: Argument2 } = require_argument();
+    var { Command: Command2 } = require_command();
+    var { CommanderError: CommanderError2, InvalidArgumentError: InvalidArgumentError2 } = require_error();
+    var { Help: Help2 } = require_help();
+    var { Option: Option2 } = require_option();
+    exports2.program = new Command2();
+    exports2.createCommand = (name) => new Command2(name);
+    exports2.createOption = (flags, description) => new Option2(flags, description);
+    exports2.createArgument = (name, description) => new Argument2(name, description);
+    exports2.Command = Command2;
+    exports2.Option = Option2;
+    exports2.Argument = Argument2;
+    exports2.Help = Help2;
+    exports2.CommanderError = CommanderError2;
+    exports2.InvalidArgumentError = InvalidArgumentError2;
+    exports2.InvalidOptionArgumentError = InvalidArgumentError2;
+  }
+});
+
+// src/screenshot.ts
+var fs3 = __toESM(require("node:fs"));
+
+// src/cli.ts
+var fs = __toESM(require("node:fs"));
+
+// node_modules/commander/esm.mjs
+var import_index = __toESM(require_commander(), 1);
+var {
+  program,
+  createCommand,
+  createArgument,
+  createOption,
+  CommanderError,
+  InvalidArgumentError,
+  InvalidOptionArgumentError,
+  // deprecated old name
+  Command,
+  Argument,
+  Option,
+  Help
+} = import_index.default;
+
+// package.json
+var package_default = {
+  name: "@helvio/web-screenshot",
+  version: "2.1.0",
+  description: "CLI to take webpage screenshots with Puppeteer and optional Sharp crop",
+  keywords: [
+    "screenshot",
+    "webpage",
+    "png",
+    "image",
+    "cli",
+    "puppeteer"
+  ],
+  main: "dist/screenshot.js",
+  bin: {
+    "web-screenshot": "dist/screenshot.js"
+  },
+  files: [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  scripts: {
+    build: "esbuild --bundle --external:puppeteer --external:sharp src/screenshot.ts --platform=node --outfile=dist/screenshot.js",
+    lint: "biome check src test",
+    format: "biome check --write src test",
+    test: "tsx --test test/*.test.ts",
+    typecheck: "tsc --noEmit",
+    prepublishOnly: "npm run build"
+  },
+  license: "ISC",
+  preferGlobal: true,
+  author: "Helvio Pedreschi (https://github.com/Helvio88)",
+  repository: {
+    type: "git",
+    url: "git+https://github.com/Helvio88/web-screenshot.git"
+  },
+  bugs: "https://github.com/Helvio88/web-screenshot/issues",
+  homepage: "https://github.com/Helvio88/web-screenshot",
+  publishConfig: {
+    access: "public"
+  },
+  engines: {
+    node: ">=20"
+  },
+  dependencies: {
+    commander: "^14.0.0",
+    puppeteer: "^24.14.0",
+    sharp: "^0.34.3"
+  },
+  devDependencies: {
+    "@biomejs/biome": "^2.1.2",
+    "@types/node": "^22.16.5",
+    esbuild: "^0.25.8",
+    tsx: "^4.20.3",
+    typescript: "^5.8.3"
+  }
+};
+
+// src/Sanitizer.ts
+function parseInteger(value) {
+  if (typeof value === "boolean" || value == null) return void 0;
+  const n = typeof value === "number" ? value : Number(String(value).trim());
+  return Number.isInteger(n) ? n : void 0;
+}
+var Sanitizer = {
+  // Sanitize URL, ensuring it starts with http:// or https://
+  // If it doesn't, prepend http://
+  sanitizeUrl(url) {
+    url = url.trim();
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = `http://${url}`;
+    }
+    return url;
+  },
+  // Sanitize time in seconds, ensuring it's an integer between 1 and 600.
+  // Exceptions = 5000 ms (5 seconds)
+  sanitizeTime(time) {
+    const n = parseInteger(time);
+    return n !== void 0 && n >= 1 && n <= 600 ? n * 1e3 : 5e3;
+  },
+  // Sanitize x (starting x coordinate), ensuring it's an integer between 0 and 1920.
+  // Exceptions = 0
+  sanitizeX(x) {
+    const n = parseInteger(x);
+    return n !== void 0 && n >= 0 && n <= 1920 ? n : 0;
+  },
+  // Sanitize y (starting y coordinate), ensuring it's an integer between 0 and 1080.
+  // Exceptions = 0
+  sanitizeY(y) {
+    const n = parseInteger(y);
+    return n !== void 0 && n >= 0 && n <= 1080 ? n : 0;
+  },
+  // Sanitize width, ensuring it's an integer between 0 and 1920.
+  // 0 = full-page screenshot. Invalid values default to 1920.
+  sanitizeWidth(width) {
+    const n = parseInteger(width);
+    return n !== void 0 && n >= 0 && n <= 1920 ? n : 1920;
+  },
+  // Sanitize height, ensuring it's an integer between 0 and 1080.
+  // 0 = full-page screenshot. Invalid values default to 1080.
+  sanitizeHeight(height) {
+    const n = parseInteger(height);
+    return n !== void 0 && n >= 0 && n <= 1080 ? n : 1080;
+  },
+  sanitizeOutput(url, tmp, output) {
+    let path = typeof output === "string" ? output : void 0;
+    let ext = "png";
+    if (!path || /\.(png|jpg|jpeg|webp)$/i.test(path)) {
+      if (path) {
+        const rawExt = path.split(".").pop() ?? "png";
+        ext = rawExt.toLowerCase().replace("jpg", "jpeg");
+        path = path.substring(0, path.lastIndexOf("."));
+      } else {
+        const sections = url.split("/");
+        const count = url.endsWith("/") ? 2 : 1;
+        path = sections[sections.length - count];
+      }
+    }
+    if (tmp) path = `${path}_tmp`;
+    return { path, ext };
+  },
+  // Sanitize NTLM credentials. Format: username:password (no extra colons).
+  sanitizeAuth(auth) {
+    if (!auth) return void 0;
+    return /^[^:]+:[^:]+$/.test(auth) ? auth : void 0;
+  }
+};
+var Sanitizer_default = Sanitizer;
+
+// src/splitArgv.ts
+function splitArgv(line) {
+  const args = [];
+  let current = "";
+  let quote = null;
+  let escaped = false;
+  for (const char of line) {
+    if (escaped) {
+      current += char;
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote !== "'") {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (current.length > 0) {
+        args.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += char;
+  }
+  if (escaped) current += "\\";
+  if (current.length > 0) args.push(current);
+  return args;
+}
+
+// src/cli.ts
+function createProgram() {
+  const program3 = new Command();
+  program3.name("web-screenshot").description("Take screenshots of web pages").version(package_default.version).addHelpText("beforeAll", "Web Screenshot Utility").showHelpAfterError().addOption(new Option("-p, --path [path]", "Chrome executable path.")).addOption(new Option("-d, --debug", "Enable debug mode.").default(false)).addOption(new Option("-b, --batch [file]", "Batch file with URLs to screenshot. Supersedes all other options.")).addOption(new Option("-u, --url <url>", "URL (website) to screenshot.")).addOption(new Option("-t, --time [s]", "Extra seconds to wait after the page is idle.").default(3)).addOption(new Option("-x, --x [x]", "Leftmost pixel.").default(0)).addOption(new Option("-y, --y [y]", "Top pixel.").default(0)).addOption(
+    new Option("-w, --width [width]", "Image width in pixels. 0 takes a full-page screenshot.").default(1920)
+  ).addOption(
+    new Option("-h, --height [height]", "Image height in pixels. 0 takes a full-page screenshot.").default(1080)
+  ).addOption(new Option("-o, --out [out]", "Absolute or relative path to save the screenshot.")).addOption(new Option("-c, --crop", "Auto crop same-color borders.")).addOption(new Option("-a, --auth [auth]", "NTLM credentials in username:password format.")).addHelpText(
+    "after",
+    `
+Examples:
+  $ web-screenshot -u https://example.com
+  $ web-screenshot -u github.com -w 0 -h 0 -o full.png
+  $ web-screenshot -u https://google.com -x 700 -y 190 -w 700 -h 180 -o google_logo.png --crop
+  $ web-screenshot -b jobs.txt
+`
+  );
+  return program3;
+}
+function optionsToScreenshot(options2) {
+  if (!options2.url || typeof options2.url !== "string") return void 0;
+  const url = Sanitizer_default.sanitizeUrl(options2.url);
+  const outValue = typeof options2.out === "string" ? options2.out : void 0;
+  const outSanitized = Sanitizer_default.sanitizeOutput(url, false, outValue);
+  const tmpSanitized = Sanitizer_default.sanitizeOutput(url, true, outValue);
+  const authValue = typeof options2.auth === "string" ? options2.auth : void 0;
+  return {
+    url,
+    time: Sanitizer_default.sanitizeTime(options2.time),
+    x: Sanitizer_default.sanitizeX(options2.x),
+    y: Sanitizer_default.sanitizeY(options2.y),
+    width: Sanitizer_default.sanitizeWidth(options2.width),
+    height: Sanitizer_default.sanitizeHeight(options2.height),
+    path: outSanitized.path,
+    tmp: tmpSanitized.path,
+    ext: outSanitized.ext,
+    auth: Sanitizer_default.sanitizeAuth(authValue),
+    crop: Boolean(options2.crop)
+  };
+}
+function parseBatchContent(content, debug2 = false) {
+  const screenshots = [];
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line === "" || line.startsWith("#")) continue;
+    const args = splitArgv(line);
+    if (debug2) console.log("Parsed arguments:", args);
+    try {
+      const program3 = createProgram();
+      program3.exitOverride();
+      program3.configureOutput({
+        writeOut: () => {
+        },
+        writeErr: () => {
+        }
+      });
+      program3.parse(args, { from: "user" });
+      const screenshot = optionsToScreenshot(program3.opts());
+      if (!screenshot) {
+        if (debug2) console.log("No URL found in line, skipping:", line);
+        continue;
+      }
+      screenshots.push(screenshot);
+    } catch (error) {
+      if (debug2) console.log("Invalid batch line, skipping:", line, error);
+    }
+  }
+  return screenshots;
+}
+function jobsFromOptions(options2, io = fs, debug2 = false) {
+  if (options2.batch) {
+    const batchFile = String(options2.batch);
+    if (!io.existsSync(batchFile)) {
+      throw new Error(`Batch file "${batchFile}" does not exist.`);
+    }
+    return parseBatchContent(io.readFileSync(batchFile, "utf-8"), debug2);
+  }
+  const screenshot = optionsToScreenshot(options2);
+  return screenshot ? [screenshot] : [];
+}
+
+// src/runScreenshots.ts
+var fs2 = __toESM(require("node:fs"));
+
+// src/capture.ts
+function isFullPage(width, height) {
+  return width === 0 || height === 0;
+}
+function planCapture(ss) {
+  const path = `${ss.tmp}.${ss.ext}`;
+  const screenshot = isFullPage(ss.width, ss.height) ? { path, fullPage: true } : { path, clip: { x: ss.x, y: ss.y, width: ss.width, height: ss.height } };
+  return {
+    goto: { url: ss.url, waitUntil: "networkidle2" },
+    extraWaitMs: ss.time,
+    screenshot
+  };
+}
+
+// src/runScreenshots.ts
+var defaultSleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+async function defaultTrimToFile(input, output) {
+  const sharp = (await import("sharp")).default;
+  await sharp(input).trim({ threshold: 0 }).toFile(output);
+}
+async function runScreenshots(jobs2, runtime) {
+  const sleep = runtime.sleep ?? defaultSleep;
+  const fileOps = runtime.fs ?? fs2;
+  const trimToFile = runtime.trimToFile ?? defaultTrimToFile;
+  const launchOptions = {
+    headless: runtime.debug ? false : "shell",
+    args: ["--no-sandbox"]
+  };
+  if (runtime.chromePath) launchOptions.executablePath = runtime.chromePath;
+  const browser = await runtime.launch(launchOptions);
+  console.log("Browser Opened");
+  try {
+    const page = await browser.newPage();
+    console.log("Page Created");
+    await page.setViewport({ width: 1920, height: 1080 });
+    console.log("Viewport Set");
+    try {
+      for (const ss of jobs2) {
+        if (ss.auth) {
+          const [username, password] = ss.auth.split(":");
+          await page.authenticate({ username, password: password ?? "" });
+          console.log("Credentials Entered");
+        }
+        const plan = planCapture(ss);
+        await page.goto(plan.goto.url, { waitUntil: plan.goto.waitUntil });
+        console.log(`Navigated to ${ss.url}`);
+        console.log(`Waiting for ${ss.time / 1e3} seconds`);
+        await sleep(plan.extraWaitMs);
+        console.log("Page Loaded");
+        await page.screenshot(plan.screenshot);
+        console.log(`Temp screenshot taken: ${ss.tmp}.${ss.ext}`);
+        if (ss.crop) {
+          await trimToFile(`${ss.tmp}.${ss.ext}`, `${ss.path}.${ss.ext}`);
+          fileOps.unlinkSync(`${ss.tmp}.${ss.ext}`);
+          console.log(`Image cropped and saved to ${ss.path}.${ss.ext}`);
+        } else {
+          fileOps.renameSync(`${ss.tmp}.${ss.ext}`, `${ss.path}.${ss.ext}`);
+          console.log(`Image saved to ${ss.path}.${ss.ext}`);
+        }
+      }
+    } finally {
+      await page.close();
+      console.log("Page Closed");
+    }
+  } finally {
+    await browser.close();
+    console.log("Browser Closed");
+  }
+}
+
+// src/screenshot.ts
+var program2 = createProgram();
+program2.parse(process.argv);
+var options = program2.opts();
+var debug = Boolean(options.debug);
+var chromePath = typeof options.path === "string" ? options.path : void 0;
+var jobs = [];
+try {
+  jobs = jobsFromOptions(options, fs3, debug);
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+if (jobs.length === 0) {
+  program2.error("Specify --url <url> or --batch <file> with at least one -u/--url line.");
+}
+(async () => {
+  try {
+    const puppeteer = await import("puppeteer");
+    await runScreenshots(jobs, {
+      debug,
+      chromePath,
+      launch: (launchOptions) => puppeteer.launch(launchOptions)
+    });
+    console.log("Screenshot Process Completed Successfully");
+    process.exit(0);
+  } catch (error) {
+    console.error("Screenshot Failed");
+    console.error(error);
+    process.exit(1);
+  }
+})();
