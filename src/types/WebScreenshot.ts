@@ -10,4 +10,7 @@ export default interface WebScreenshot {
   ext: 'jpeg' | 'png' | 'webp'
   crop: boolean
   auth?: string
+  waitFor?: string
+  waitTimeout: number
+  cookiesFile?: string
 }

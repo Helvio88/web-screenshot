@@ -9,8 +9,14 @@ export type ClipRect = {
 
 export type ScreenshotCall = { path: string; fullPage: true } | { path: string; clip: ClipRect }
 
+export type WaitForPlan = {
+  selector: string
+  timeout: number
+}
+
 export type CapturePlan = {
   goto: { url: string; waitUntil: 'networkidle2' }
+  waitFor?: WaitForPlan
   extraWaitMs: number
   screenshot: ScreenshotCall
 }
@@ -27,6 +33,7 @@ export function planCapture(ss: WebScreenshot): CapturePlan {
 
   return {
     goto: { url: ss.url, waitUntil: 'networkidle2' },
+    waitFor: ss.waitFor ? { selector: ss.waitFor, timeout: ss.waitTimeout } : undefined,
     extraWaitMs: ss.time,
     screenshot,
   }

@@ -120,3 +120,46 @@ describe('Sanitizer.sanitizeAuth', () => {
     assert.equal(Sanitizer.sanitizeAuth('user:pass'), 'user:pass')
   })
 })
+
+describe('Sanitizer.sanitizeWaitFor', () => {
+  it('trims a CSS selector', () => {
+    assert.equal(Sanitizer.sanitizeWaitFor('  #dashboard  '), '#dashboard')
+  })
+
+  it('returns undefined for empty or non-string values', () => {
+    assert.equal(Sanitizer.sanitizeWaitFor(undefined), undefined)
+    assert.equal(Sanitizer.sanitizeWaitFor(''), undefined)
+    assert.equal(Sanitizer.sanitizeWaitFor('   '), undefined)
+    assert.equal(Sanitizer.sanitizeWaitFor(true), undefined)
+  })
+})
+
+describe('Sanitizer.sanitizeWaitTimeout', () => {
+  it('converts integer seconds in 1–600 to milliseconds, defaulting to 30s', () => {
+    assert.equal(Sanitizer.sanitizeWaitTimeout(30), 30000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout(1), 1000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout(600), 600000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout('45'), 45000)
+  })
+
+  it('falls back to 30000ms for invalid values', () => {
+    assert.equal(Sanitizer.sanitizeWaitTimeout(undefined), 30000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout(0), 30000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout(601), 30000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout('nope'), 30000)
+    assert.equal(Sanitizer.sanitizeWaitTimeout(true), 30000)
+  })
+})
+
+describe('Sanitizer.sanitizeCookiesFile', () => {
+  it('keeps a non-empty path', () => {
+    assert.equal(Sanitizer.sanitizeCookiesFile('session.json'), 'session.json')
+    assert.equal(Sanitizer.sanitizeCookiesFile('  cookies/session.json  '), 'cookies/session.json')
+  })
+
+  it('returns undefined for empty or non-string values', () => {
+    assert.equal(Sanitizer.sanitizeCookiesFile(undefined), undefined)
+    assert.equal(Sanitizer.sanitizeCookiesFile(''), undefined)
+    assert.equal(Sanitizer.sanitizeCookiesFile(true), undefined)
+  })
+})
